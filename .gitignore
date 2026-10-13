@@ -1,0 +1,21 @@
+# --- private / never commit ---
+Backup/
+Binary Bet/
+member-finance-prototype/
+*.pptx
+
+# --- downloaded assets (setup.ps1 re-creates these) ---
+models/
+tts/
+bin/
+dl/
+rag_db/
+.venv*/
+
+# --- python ---
+__pycache__/
+*.pyc
+
+# --- os ---
+desktop.ini
+Thumbs.db
