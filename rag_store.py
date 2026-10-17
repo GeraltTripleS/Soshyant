@@ -7,6 +7,7 @@ Storage is deliberately transparent — no database server:
 import json
 import os
 import re
+from contextlib import contextmanager
 
 import numpy as np
 
@@ -17,6 +18,8 @@ VECTORS_PATH = os.path.join(DB_DIR, "embeddings.npy")
 FILES_PATH = os.path.join(DB_DIR, "files.json")      # relpath -> content md5
 CHUNK_DIR = os.path.join(DB_DIR, "chunks")           # per-file chunk json
 VEC_DIR = os.path.join(DB_DIR, "vectors")            # per-file vector matrix
+SNAPSHOT_PATH = os.path.join(DB_DIR, "index.npz")
+REPORT_PATH = os.path.join(DB_DIR, "sync-report.json")
 MODEL_NAME = "BAAI/bge-small-en-v1.5"
 CHUNK_CHARS = 1200
 OVERLAP_CHARS = 150
@@ -105,8 +108,49 @@ def load_files() -> dict:
 
 def _save_files(files: dict):
     os.makedirs(DB_DIR, exist_ok=True)
-    with open(FILES_PATH, "w", encoding="utf-8") as f:
+    with open(FILES_PATH + ".tmp", "w", encoding="utf-8") as f:
         json.dump(files, f, ensure_ascii=False, indent=0)
+    os.replace(FILES_PATH + ".tmp", FILES_PATH)
+
+
+@contextmanager
+def sync_lock():
+    """Serialize syncs across the web app and standalone watcher."""
+    os.makedirs(DB_DIR, exist_ok=True)
+    with open(os.path.join(DB_DIR, "sync.lock"), "a+b") as lock:
+        lock.seek(0)
+        lock.write(b"0")
+        lock.flush()
+        lock.seek(0)
+        try:
+            if os.name == "nt":
+                import msvcrt
+                msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError as exc:
+            raise RuntimeError("Another document sync is running. Try again shortly.") from exc
+        try:
+            yield
+        finally:
+            lock.seek(0)
+            if os.name == "nt":
+                msvcrt.locking(lock.fileno(), msvcrt.LK_UNLCK, 1)
+            else:
+                fcntl.flock(lock, fcntl.LOCK_UN)
+
+
+def reuse_file(rel: str, h: str) -> bool:
+    """Reuse vectors without losing a renamed or duplicate source's identity."""
+    key = h[:16]
+    if not (os.path.exists(os.path.join(CHUNK_DIR, key + ".json")) and
+            os.path.exists(os.path.join(VEC_DIR, key + ".npy"))):
+        return False
+    files = load_files()
+    files[rel] = h
+    _save_files(files)
+    return True
 
 
 def save_file(rel: str, h: str, chunks: list[dict], vectors: np.ndarray):
@@ -148,11 +192,12 @@ def rebuild_index() -> int:
         vn = os.path.join(VEC_DIR, key + ".npy")
         if not (os.path.exists(cj) and os.path.exists(vn)):
             continue
-        cs = json.load(open(cj, encoding="utf-8"))
+        with open(cj, encoding="utf-8") as f:
+            cs = json.load(f)
         v = np.load(vn)
         if len(cs) != len(v):
             continue
-        chunks.extend(cs)
+        chunks.extend(dict(c, source=rel) for c in cs)
         vecs.append(v)
     os.makedirs(DB_DIR, exist_ok=True)
     tmp = CHUNKS_PATH + ".tmp"
@@ -167,11 +212,20 @@ def rebuild_index() -> int:
         else:
             np.save(f, np.zeros((0, 384), dtype=np.float32))
     os.replace(tmpv, VECTORS_PATH)
+    # Publish chunks and vectors together; readers see one complete generation.
+    with open(SNAPSHOT_PATH + ".tmp", "wb") as f:
+        np.savez(f, chunks=np.array(json.dumps(chunks, ensure_ascii=False)),
+                 vectors=np.concatenate(vecs).astype(np.float32) if vecs
+                 else np.zeros((0, 384), dtype=np.float32))
+    os.replace(SNAPSHOT_PATH + ".tmp", SNAPSHOT_PATH)
     return len(chunks)
 
 
 def load():
     """-> (chunks, vectors) or ([], None) when nothing is indexed yet."""
+    if os.path.exists(SNAPSHOT_PATH):
+        with np.load(SNAPSHOT_PATH, allow_pickle=False) as data:
+            return json.loads(str(data["chunks"])), data["vectors"].copy()
     if not (os.path.exists(CHUNKS_PATH) and os.path.exists(VECTORS_PATH)):
         return [], None
     with open(CHUNKS_PATH, encoding="utf-8") as f:

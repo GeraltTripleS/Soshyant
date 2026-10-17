@@ -58,6 +58,36 @@ automatically when you switch. All of them are abliterated/uncensored community 
 Keep the folder in sync: re-press 🔄 sync (incremental — only new/changed files
 are re-embedded), or run `start-rag-watch.bat` to auto-index changes every 30 s.
 
+## Practical workflows
+
+- **Document mode is on by default.** An empty index asks you to sync first;
+  it never silently switches to general answers. Guided tasks always require documents.
+- Choose **Troubleshoot equipment**, **Create a service checklist**, or **Draft an
+  escalation ticket** in “Help me with,” then describe the equipment and incident.
+  Missing incident details are marked `[To be provided]`; tickets are drafts only.
+- Click a numbered citation to expand its supporting passage, including its
+  file and page/sheet location. The displayed passages match those sent to the model.
+  Citations still need human verification; they do not guarantee every claim is supported.
+- Open **Document library** to see indexed files and extraction failures or empty
+  documents. Scanned PDFs need OCR before indexing; OCR is not included.
+- Chat transcripts and source passages are saved in this browser. **Copy answer**
+  includes the sources; **Export chat** downloads a text file. **New chat** clears
+  the current saved transcript. Follow-ups can use the previous equipment question.
+- Speech is off by default. Text chat is available while speech components load,
+  and remains available if speech components fail. Muting stops current playback;
+  requests sent while muted skip speech synthesis.
+- Uninstalled models are disabled in the selector. The watcher now uses the folder
+  saved in the app; an explicit folder can still be passed to `rag_watch.py`.
+
+Index syncs are serialized across the app and watcher. Renames and identical files
+reuse embeddings while preserving each source name. A paired index snapshot prevents
+readers from mixing chunks and vectors from different completed syncs. Existing
+indexes are readable; the next sync creates the snapshot automatically.
+
+Run regression checks with `.venv\Scripts\python.exe -m unittest discover -s tests -v`.
+These use temporary indexes and simulated model responses; they do not download
+models or change your document index.
+
 ## Architecture
 
 ```
@@ -75,6 +105,8 @@ the assistant knows.
 | File | Role |
 |---|---|
 | `bonsai_web.py` | web server, chat, voice, RAG wiring (port 8091) |
+| `assistant_logic.py` | bounded conversation context, task instructions, retrieval rules |
+| `web/` | interface HTML, styles, and browser interactions |
 | `bonsai_voice.py` | speech normalizer (markdown → natural prose), TTS speaker, server manager |
 | `rag_store.py` / `rag_ingest.py` / `rag_watch.py` | document index + incremental sync + folder watcher |
 | `setup.ps1` | one-command install of everything this repo doesn't ship |

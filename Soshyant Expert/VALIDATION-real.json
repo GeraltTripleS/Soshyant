@@ -1,0 +1,10 @@
+{
+  "real_english_grounded_answer": true,
+  "english_language_override_verified": true,
+  "persian_status": "answered",
+  "persian_answer": "برای استفاده از گارانتی، گزارش نصب و شماره سریال پمپ لازم است [1].",
+  "citations": 1,
+  "python_connections_loopback_only": true,
+  "elapsed_seconds": 20.2,
+  "limitations": "This guards Python socket connections only; clean-machine and OS-level egress isolation are not certified."
+}

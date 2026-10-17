@@ -23,9 +23,16 @@ def snapshot(folder: str) -> dict:
 
 
 def main():
-    if len(sys.argv) < 2:
-        sys.exit('usage: rag_watch.py "folder with documents" [interval_s]')
-    folder = os.path.abspath(sys.argv[1])
+    if len(sys.argv) >= 2:
+        folder = os.path.abspath(sys.argv[1])
+    else:
+        saved = os.path.join(rag_store.DB_DIR, "folder.txt")
+        if not os.path.isfile(saved):
+            sys.exit("Select and sync a document folder in Soshyant first, or pass a folder path.")
+        with open(saved, encoding="utf-8") as f:
+            folder = f.read().strip()
+    if not os.path.isdir(folder):
+        sys.exit("The document folder is unavailable. Select it again in Soshyant.")
     interval = int(sys.argv[2]) if len(sys.argv) > 2 else 30
     print(f"[watch] {folder}")
     print(f"[watch] polling every {interval}s — Ctrl+C to stop")
@@ -41,7 +48,9 @@ def main():
                 print(f"[watch] {time.strftime('%H:%M:%S')} change detected: "
                       f"+{len(added)} ~{len(changed)} -{len(removed)}")
                 rag_ingest.sync(folder)
-                last = rag_store.load_files()
+                # Empty/unsupported files are not indexed, but shouldn't cause
+                # an endless re-sync when nothing in the folder has changed.
+                last = now
             time.sleep(interval)
         except KeyboardInterrupt:
             print("[watch] stopped")

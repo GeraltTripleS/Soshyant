@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "verified_date": "2026-10-16",
+  "profiles": [
+    {
+      "id": "bonsai-27b",
+      "name": "Bonsai-2-27B (bundled ternary)",
+      "architecture": "hybrid_gqa_recurrent",
+      "layers": 64,
+      "attention_layers": 16,
+      "kv_heads": 4,
+      "head_dim": 256,
+      "max_context": 32768,
+      "weights_bytes": {
+        "PTQ1_0": 5946648928
+      },
+      "recurrent_gib_per_sequence": 0.2,
+      "sources": [
+        "Local assets/model.gguf metadata: qwen35, 64 layers, full_attention_interval=4, 4 KV heads, key/value length 256.",
+        "https://huggingface.co/BoldingBuilds/Ternary-Bonsai-2-27B-Abliterated-PTQ1_0-GGUF"
+      ],
+      "note": "Recurrent state reserve is a planning assumption of 0.20 GiB per active sequence, not a measured allocation."
+    },
+    {
+      "id": "qwen3-4b",
+      "name": "Qwen3-4B",
+      "architecture": "dense_gqa",
+      "layers": 36,
+      "kv_heads": 8,
+      "head_dim": 128,
+      "max_context": 32768,
+      "weights_bytes": {
+        "Q4_K_M": 2497280256,
+        "Q8_0": 4280404704
+      },
+      "recurrent_gib_per_sequence": 0,
+      "sources": [
+        "https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3-4B/1cfa9a7208912126459214e8b04321603b3df60c/config.json?%2FQwen%2FQwen3-4B%2Fresolve%2Fmain%2Fconfig.json=&etag=%22e49eccdc32f36da9c09cfa0e737084f9e0105e5e%22",
+        "https://huggingface.co/Qwen/Qwen3-4B-GGUF/tree/main"
+      ]
+    },
+    {
+      "id": "qwen3-8b",
+      "name": "Qwen3-8B",
+      "architecture": "dense_gqa",
+      "layers": 36,
+      "kv_heads": 8,
+      "head_dim": 128,
+      "max_context": 32768,
+      "weights_bytes": {
+        "Q4_K_M": 5027783488,
+        "Q8_0": 8709518112
+      },
+      "recurrent_gib_per_sequence": 0,
+      "sources": [
+        "https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3-8B/b968826d9c46dd6066d109eabc6255188de91218/config.json?%2FQwen%2FQwen3-8B%2Fresolve%2Fmain%2Fconfig.json=&etag=%22d46195ac87f837ad233d02b2f80f148bf7c005e0%22",
+        "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/main"
+      ]
+    },
+    {
+      "id": "qwen3-14b",
+      "name": "Qwen3-14B",
+      "architecture": "dense_gqa",
+      "layers": 40,
+      "kv_heads": 8,
+      "head_dim": 128,
+      "max_context": 32768,
+      "weights_bytes": {
+        "Q4_K_M": 9001752960,
+        "Q8_0": 15698533728
+      },
+      "recurrent_gib_per_sequence": 0,
+      "sources": [
+        "https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3-14B/40c069824f4251a91eefaf281ebe4c544efd3e18/config.json?%2FQwen%2FQwen3-14B%2Fresolve%2Fmain%2Fconfig.json=&etag=%2237e7491082573462e8545299cdf6938e8b684e31%22",
+        "https://huggingface.co/Qwen/Qwen3-14B-GGUF/tree/main"
+      ]
+    },
+    {
+      "id": "qwen3-32b",
+      "name": "Qwen3-32B",
+      "architecture": "dense_gqa",
+      "layers": 64,
+      "kv_heads": 8,
+      "head_dim": 128,
+      "max_context": 32768,
+      "weights_bytes": {
+        "Q4_K_M": 19762149024,
+        "Q8_0": 34817718912
+      },
+      "recurrent_gib_per_sequence": 0,
+      "sources": [
+        "https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3-32B/9216db5781bf21249d130ec9da846c4624c16137/config.json?%2FQwen%2FQwen3-32B%2Fresolve%2Fmain%2Fconfig.json=&etag=%22d66d65fbc7960c2b3c254293f74df73b47fef6d3%22",
+        "https://huggingface.co/Qwen/Qwen3-32B-GGUF/tree/main"
+      ]
+    }
+  ]
+}

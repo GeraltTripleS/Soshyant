@@ -10,6 +10,8 @@ import os
 import sys
 import re
 import html as htmllib
+import json
+import time
 
 import rag_store
 
@@ -20,7 +22,9 @@ EXTS = (".txt", ".md", ".pdf", ".docx", ".html", ".htm", ".xlsx")
 
 def walk_files(folder: str):
     """-> [(relpath, abspath)] for every ingestable file, vendor dirs skipped."""
-    for root, dirs, files in os.walk(folder):
+    def fail(error):
+        raise error
+    for root, dirs, files in os.walk(folder, onerror=fail):
         dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
         for name in files:
             if name.lower().endswith(EXTS):
@@ -29,7 +33,11 @@ def walk_files(folder: str):
 
 
 def file_md5(path: str) -> str:
-    return hashlib.md5(open(path, "rb").read()).hexdigest()
+    digest = hashlib.md5()
+    with open(path, "rb") as f:
+        for block in iter(lambda: f.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def extract(path: str) -> list[tuple[str, str]]:
@@ -62,7 +70,8 @@ def extract(path: str) -> list[tuple[str, str]]:
         wb.close()
         return out
     if ext in (".html", ".htm"):
-        raw = open(path, encoding="utf-8", errors="replace").read()
+        with open(path, encoding="utf-8", errors="replace") as f:
+            raw = f.read()
         raw = re.sub(r"(?is)<(script|style)[^>]*>.*?</\1>", " ", raw)
         text = htmllib.unescape(re.sub(r"<[^>]+>", "\n", raw))
         return [(re.sub(r"\n{3,}", "\n\n", text), "")]
@@ -84,6 +93,11 @@ def process_file(abs_path: str, rel: str, embed_progress=None):
 
 
 def sync(folder: str, progress=None):
+    with rag_store.sync_lock():
+        return _sync(folder, progress)
+
+
+def _sync(folder: str, progress=None):
     """Incremental sync with optional progress(dict) reporting.
 
     Phases: scanning -> indexing (files_done/files_total, current file,
@@ -94,14 +108,18 @@ def sync(folder: str, progress=None):
             progress(kw)
 
     folder = os.path.abspath(folder)
+    if not os.path.isdir(folder):
+        raise ValueError("Document folder does not exist or is unavailable.")
     report(phase="scanning")
     old = rag_store.load_files()
     now = {}
+    failures = []
     for rel, path in walk_files(folder):
         try:
             now[rel] = file_md5(path)
         except Exception as e:
             print(f"  SKIP {rel}: {e.__class__.__name__}: {e}")
+            failures.append({"source": rel, "status": "failed", "detail": str(e)})
     removed = sorted(r for r in old if r not in now)
     touched = sorted(r for r in now if force_or_new(old, now, r))
     print(f"[sync] {len(now)} ingestable files | "
@@ -110,13 +128,12 @@ def sync(folder: str, progress=None):
     report(phase="indexing", files_done=0, files_total=len(touched),
            current="")
 
-    seen_hashes = set(old.values())
+    empty = []
     for i, rel in enumerate(touched):
         report(current=rel, files_done=i)
         try:
-            if now[rel] in seen_hashes:
+            if rag_store.reuse_file(rel, now[rel]):
                 print(f"  DEDUPE {rel} (identical content already indexed)")
-                rag_store.remove_file(rel)
                 continue
             res = process_file(os.path.join(folder, rel), rel,
                                embed_progress=lambda d, t: report(
@@ -125,22 +142,31 @@ def sync(folder: str, progress=None):
                                    chunks_done=d, chunks_total=t))
         except Exception as e:
             print(f"  SKIP {rel}: {e.__class__.__name__}: {e}")
+            failures.append({"source": rel, "status": "failed", "detail": str(e)})
+            rag_store.remove_file(rel)
             continue
         if res is None:
             print(f"  EMPTY {rel}")
+            rag_store.remove_file(rel)
+            empty.append({"source": rel, "status": "empty", "detail": "No readable text. Scanned PDFs need OCR."})
             continue
         chunks, vecs = res
         rag_store.save_file(rel, now[rel], chunks, vecs)
-        seen_hashes.add(now[rel])
         print(f"  INDEXED {rel} ({len(chunks)} chunks)", flush=True)
     for rel in removed:
         rag_store.remove_file(rel)
         print(f"  REMOVED {rel}")
     report(phase="saving")
     total = rag_store.rebuild_index()
+    result = {"updated_at": time.time(), "folder": folder,
+              "issues": failures + empty}
+    with open(rag_store.REPORT_PATH + ".tmp", "w", encoding="utf-8") as f:
+        json.dump(result, f, ensure_ascii=False)
+    os.replace(rag_store.REPORT_PATH + ".tmp", rag_store.REPORT_PATH)
     report(phase="done", files_done=len(touched))
     print(f"[sync] DONE: {total} chunks indexed "
           f"({len(touched)} files re-embedded, {len(removed)} removed)")
+    return result
 
 
 def force_or_new(old: dict, now: dict, rel: str) -> bool:

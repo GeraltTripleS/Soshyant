@@ -1,0 +1,9 @@
+{
+  "name": "Your knowledge workspace",
+  "description": "A private specialist assistant grounded in your documents.",
+  "scope": "Answer questions about the documents provided by the administrator.",
+  "language": "English",
+  "glossary": {},
+  "clarification_fields": [],
+  "answer_style": "Clear, practical answers. Cite evidence after each factual claim."
+}

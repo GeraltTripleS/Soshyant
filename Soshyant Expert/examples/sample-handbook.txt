@@ -1,0 +1,16 @@
+Sample operations handbook — demonstration documents only
+
+Equipment identification
+The fictional Aurora X200 is a circulation pump. Use the model and serial number when reporting an incident.
+
+Warranty
+The Aurora X200 warranty is 36 months from the installation date. Claims require the installation report and the pump serial number.
+
+Error codes
+Error E-04 indicates a dry-run condition. The documented reset procedure is to restore inlet pressure and hold the reset button for 3 seconds.
+
+Escalation
+Unresolved incidents after two site visits must be escalated to the regional engineering manager. Record the serial number, firmware version and last three error codes.
+
+Demonstration notice
+These fictional instructions are test fixtures. They must not be used to operate real equipment.

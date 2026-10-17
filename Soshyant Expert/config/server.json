@@ -1,0 +1,18 @@
+{
+  "port": 8095,
+  "model_file": "C:\\Users\\asus\\.lmstudio\\models\\ornith-ai\\Ornith-1.5-9B-GGUF\\Ornith-1.5-9B-Q4_K_M.gguf",
+  "llama_executable": "assets/llama/llama-server.exe",
+  "model_port": 18195,
+  "gpu_layers": 99,
+  "context_size": 8192,
+  "max_answer_tokens": 900,
+  "embedding_directory": "assets/embeddings",
+  "embedding_mode": "hybrid",
+  "embedding_pooling": "mean",
+  "embedding_max_tokens": 128,
+  "semantic_floor": 0.45,
+  "max_document_mb": 20,
+  "max_chunks": 20000,
+  "queue_size": 8,
+  "session_hours": 8
+}

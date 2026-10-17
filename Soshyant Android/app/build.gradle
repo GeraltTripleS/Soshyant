@@ -1,0 +1,7 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.soshyant.expert'
+    compileSdk 35
+    defaultConfig { applicationId 'com.soshyant.expert'; minSdk 26; targetSdk 35; versionCode 2; versionName '1.1.0' }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }
+}

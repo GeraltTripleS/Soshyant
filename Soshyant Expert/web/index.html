@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Soshyant Expert · Your private knowledge</title><link rel="stylesheet" href="/style.css"><script src="/i18n.js" defer></script><script src="/app.js" defer></script><script src="/capacity.js" defer></script><script src="/library.js" defer></script></head>
+<body>
+<section id="auth" class="auth-screen">
+ <label class="language-control auth-language">Language <select class="language-select" aria-label="Language"><option value="en">English</option><option value="fa">Persian</option></select></label>
+ <div class="auth-story"><div class="wordmark"><span class="brand-icon">S</span> SOSHYANT <b>EXPERT</b></div>
+  <div class="eyebrow">KNOWLEDGE, IN YOUR HANDS</div><h1>Your documents.<br>Answers you can verify.</h1>
+  <p>A private workspace with local document storage and your choice of local or API models.</p>
+  <div class="privacy-stamp"><span class="dot"></span> Local storage · Optional API models · Evidence included</div>
+ </div>
+ <form id="authForm" class="auth-card"><span class="eyebrow" id="authEyebrow">WELCOME BACK</span>
+  <h2 id="authTitle">Sign in to your workspace</h2><p id="authDescription">Use the account provided by your administrator.</p>
+  <label id="setupCodeLabel" hidden>First-run setup code<input id="setupCode" autocomplete="off" dir="ltr"><small>Find the code in FIRST-ADMIN-CODE.txt in the server's data folder.</small></label>
+  <label>Username<input id="username" autocomplete="username" required minlength="3" maxlength="60" dir="ltr"></label>
+  <label>Password<input id="password" type="password" autocomplete="current-password" required minlength="12" maxlength="256" dir="ltr"></label>
+  <button type="submit" class="primary wide" id="authSubmit">Sign in</button><p id="authError" class="error" role="alert"></p>
+  <small>Sign-in stays on this server. API models send answer context to the selected provider.</small>
+ </form>
+</section>
+<div id="shell" class="shell" hidden>
+ <aside class="sidebar"><div class="wordmark"><span class="brand-icon">S</span><div>SOSHYANT<br><b>EXPERT</b></div></div>
+  <div class="workspace-label">PRIVATE KNOWLEDGE WORKSPACE</div><h2 id="workspaceName">Knowledge workspace</h2>
+  <button id="newConversation" class="primary wide">＋ New conversation</button>
+  <nav aria-label="Application sections">
+   <button data-view="dashboard" data-admin class="nav-item"><span>▦</span> Overview</button>
+   <button data-view="chat" class="nav-item active"><span>◌</span> Chat</button>
+   <button data-view="documents" class="nav-item"><span>▤</span> Documents <span id="docCount" class="count">0</span></button>
+   <button data-view="watched" data-admin class="nav-item"><span>↻</span> Watched folders</button>
+   <button data-view="reviews" data-admin class="nav-item"><span>✓</span> Answer review</button>
+   <button data-view="domain" data-admin class="nav-item"><span>◇</span> Domain settings</button>
+   <button data-view="models" data-admin class="nav-item"><span>◈</span> Language models</button>
+   <button data-view="groups" data-admin class="nav-item"><span>♧</span> Access groups</button>
+   <button data-view="users" data-admin class="nav-item"><span>♙</span> Users</button>
+   <button data-view="maintenance" class="nav-item"><span>⚙</span> Maintenance & account</button>
+   <button data-view="capacity" class="nav-item"><span>▦</span> Hardware planner</button>
+  </nav>
+  <div class="history-label">YOUR CONVERSATIONS</div><input id="chatSearch" type="search" placeholder="Search conversations" aria-label="Search conversations" maxlength="100"><div id="conversationList" class="conversation-list"></div>
+  <div class="sidebar-footer"><span class="dot"></span> Local storage · Selected model provider<br><small id="serverVersion"></small></div>
+ </aside>
+ <main>
+  <header><div><div class="eyebrow">YOUR SPECIALIST DOCUMENT ASSISTANT</div><h1 id="viewTitle">Talk to your knowledge</h1></div>
+   <div class="header-actions"><label class="language-control">Language <select class="language-select" aria-label="Language"><option value="en">English</option><option value="fa">Persian</option></select></label><span id="accountName" class="account-chip"></span><button id="logout" class="quiet">Sign out</button></div>
+  </header>
+  <div id="notice" class="notice" role="status" hidden></div>
+  <section id="view-dashboard" class="view content-view" hidden>
+   <div class="section-intro"><span class="eyebrow">YOUR WORKSPACE AT A GLANCE</span><h2>Knowledge overview</h2><p>Check your sources, model and pending work before your team starts asking questions.</p><button id="refreshDashboard" class="quiet">Refresh overview</button> <small id="dashboardTime" role="status"></small></div>
+   <div id="dashboardStats" class="stat-grid"></div>
+   <div class="card"><h3>Service readiness</h3><div id="dashboardReadiness"></div></div>
+   <div class="card"><div class="table-heading"><h3>Documents needing attention</h3><button type="button" id="dashboardDocuments" class="quiet">Open documents</button></div><div id="dashboardAttention"></div></div>
+   <div class="card"><h3>Next steps</h3><div class="model-actions"><button id="dashboardModels" class="quiet">Choose model</button><button id="dashboardBackup" class="quiet">Backups & account</button><button id="dashboardChat" class="primary">Ask a question</button></div><p>Document access can be shared with everyone or limited to selected groups.</p></div>
+  </section>
+  <section id="view-chat" class="view chat-view">
+   <div class="chat-toolbar"><span><span class="dot"></span> Grounded in your documents</span><div class="chat-tools"><button id="renameChat" class="quiet">Rename</button><button id="deleteChat" class="quiet destructive">Delete chat</button><button id="exportChat" class="quiet">Export conversation ↓</button></div></div>
+   <div id="messages" class="messages" aria-live="polite"></div>
+   <div class="composer-wrap"><form id="askForm" class="composer"><label class="sr-only" for="question">Your question</label>
+    <textarea id="question" rows="2" maxlength="4000" placeholder="What would you like to know from your documents?" dir="auto"></textarea>
+    <div class="composer-bottom"><span id="answerPhase">Verify answers against their supporting sources.</span><div><button type="button" id="cancelAnswer" class="quiet" hidden>Stop</button><button type="submit" id="askButton" class="primary">Send question →</button></div></div>
+   </form><small class="composer-note">Missing context? The assistant asks for clarification or explains the limits of the documents.</small><small class="composer-note">Administrators can review answers that need attention and submitted feedback.</small></div>
+  </section>
+  <section id="view-documents" class="view content-view" hidden>
+   <div class="section-intro"><span class="eyebrow">MANAGE YOUR KNOWLEDGE</span><h2>The sources behind your answers</h2><p>Track document versions, extraction status, and supporting evidence. Scanned files need readable text before upload.</p></div>
+   <form id="uploadForm" class="card upload-card" data-admin>
+    <div class="upload-symbol">↑</div><h3>Add a document to your knowledge</h3><p>PDF · DOCX · XLSX · TXT · Markdown · HTML</p>
+    <label class="file-label">Choose a document<input type="file" id="uploadFile" accept=".pdf,.docx,.xlsx,.txt,.md,.html,.htm" required></label>
+    <div class="inline-fields"><label>Source title<input id="uploadTitle" placeholder="Optional" maxlength="200"></label><label>Source priority<select id="uploadPriority"><option value="0">Normal</option><option value="5">Reference source</option><option value="-5">Supplementary source</option></select></label></div>
+    <label>Initial document access<select id="uploadAccess"><option value="0">All signed-in users</option><option value="1">Administrators only</option></select></label><button class="primary" id="uploadButton">Upload & index</button><p id="uploadPhase" role="status"></p>
+   </form>
+   <form id="folderForm" class="card" data-admin>
+    <div class="eyebrow">IMPORT A COLLECTION</div><h3>Add a document folder</h3>
+    <p>Choose a folder on this computer. Supported files are copied to this server and indexed one at a time. Nothing is sent to the internet.</p>
+    <label>Choose a folder<input id="folderFiles" type="file" webkitdirectory multiple required></label>
+    <label class="checkbox"><input id="folderRecursive" type="checkbox" checked> Include subfolders</label>
+    <small>PDF, DOCX, XLSX, TXT, Markdown and HTML. Up to 1,000 files per import; the usual per-file size limit applies. Identical indexed content is skipped. Scans need OCR first.</small>
+    <p id="folderSummary" role="status"></p>
+    <label>Initial document access<select id="folderAccess"><option value="0">All signed-in users</option><option value="1">Administrators only</option></select></label><button class="primary" id="folderStart">Import & index folder</button> <button class="quiet" type="button" id="folderStop" hidden>Stop after current file</button>
+    <p id="folderPhase" role="status"></p><div id="folderReport" class="folder-report" aria-live="polite"></div>
+   </form>
+   <div class="table-heading"><h3>Library</h3><label data-admin class="checkbox"><input id="includeArchived" type="checkbox"> Show archived</label><button class="quiet" id="refreshDocuments">Refresh</button></div>
+   <div id="documentList" class="document-list"></div>
+  </section>
+  <section id="view-watched" class="view content-view" hidden>
+   <div class="section-intro"><span class="eyebrow">KEEP YOUR KNOWLEDGE CURRENT</span><h2>Watched document folders</h2><p>Local folders are checked every minute while the server runs. Nothing is imported, replaced or archived until you approve it.</p></div>
+   <form id="watchForm" class="card form-card"><h3>Add a watched folder</h3><label>Folder on this server<input id="watchPath" maxlength="2000" dir="ltr" required placeholder="Choose a folder or enter its full path"></label><button id="watchBrowse" type="button" class="quiet">Choose folder…</button><label class="checkbox"><input id="watchRecursive" type="checkbox" checked> Include subfolders</label><p>PDF, DOCX, XLSX, TXT, Markdown and HTML. Scans do not run OCR. Choose a dedicated document folder outside the application data directory.</p><label>New file access<select id="watchAccess"><option value="0">All signed-in users</option><option value="1">Administrators only</option></select></label><button id="watchAdd" class="primary">Add folder & scan</button><p id="watchPhase" role="status"></p></form>
+   <div class="table-heading"><h3>Your watched folders</h3><button id="watchRefresh" type="button" class="quiet">Refresh</button></div><div id="watchFolders"></div>
+   <div class="table-heading"><h3>Changes awaiting review</h3></div><p>Changed documents keep their published version until replacement indexing succeeds. Missing source files stay in the library unless you approve archiving.</p><div id="watchChanges"></div>
+  </section>
+  <section id="view-reviews" class="view content-view" hidden>
+   <div class="section-intro"><span class="eyebrow">IMPROVE YOUR KNOWLEDGE</span><h2>Answer quality review</h2><p>Review missing information, clarification requests and user feedback. Resolving a review records your decision; it does not train the model or change documents.</p></div>
+   <div class="card"><div class="inline-fields"><label>Answer category<select id="reviewKind"><option value="attention">Needs attention</option><option value="insufficient">Missing information</option><option value="clarify">Clarification requests</option><option value="incorrect">Reported incorrect</option><option value="helpful">Helpful feedback</option><option value="all">All review items</option></select></label><label>Review status<select id="reviewState"><option value="open">Open</option><option value="resolved">Resolved</option><option value="all">All statuses</option></select></label></div><button id="reviewRefresh" type="button" class="quiet">Refresh</button><p id="reviewPhase" role="status"></p></div>
+   <div id="reviewItems"></div><button id="reviewMore" class="quiet" hidden>Load more</button>
+  </section>
+  <section id="view-domain" class="view content-view" hidden>
+   <div class="section-intro"><span class="eyebrow">SPECIALIZE WITHOUT CHANGING CODE</span><h2>Define your domain and answer style</h2><p>These settings guide the assistant. Answers must still be supported by your documents.</p></div>
+   <form id="domainForm" class="card form-card"><label>Workspace name<input id="domainName" required maxlength="100"></label>
+    <label>Short description<input id="domainDescription" maxlength="500"></label><label>Domain scope<textarea id="domainScope" rows="4" maxlength="3000" required></textarea></label>
+    <div class="inline-fields"><label>Default response language<select id="domainLanguage"><option value="auto">Match the question</option><option value="Persian">Persian</option><option value="English">English</option></select></label></div>
+    <label>Answer style<textarea id="domainStyle" rows="2" maxlength="1000"></textarea></label>
+    <label>Domain glossary; one term = meaning per line<textarea id="domainGlossary" rows="4" placeholder="Abbreviation = full meaning" dir="auto"></textarea></label>
+    <label>Context that may need clarification; one item per line<textarea id="domainFields" rows="3" placeholder="Equipment type, region, operating conditions, or other relevant context"></textarea></label>
+    <button class="primary">Save domain settings</button><span id="domainSaved" role="status"></span>
+   </form>
+  </section>
+  <section id="view-models" class="view content-view" hidden>
+   <div class="section-intro"><span class="eyebrow">YOUR MODEL PROVIDER</span><h2>Choose the model behind your answers</h2><p>Discover local models or add an API connection, then choose the model that answers your users.</p></div>
+   <form id="modelActivateForm" class="card form-card">
+    <h3>Language model</h3><p id="modelActiveInfo" role="status"></p>
+    <label>Model folder on this server<input id="modelFolderPath" dir="ltr" maxlength="2000" placeholder="Choose a folder or enter its full path"></label>
+    <div class="model-actions"><button type="button" id="modelBrowse" class="quiet">Choose folder…</button><button type="button" id="modelScan" class="quiet">Scan folder</button></div>
+    <label class="checkbox"><input id="modelRecursive" type="checkbox" checked> Include subfolders</label>
+    <small>Models stay in their original folder. Nothing is copied or downloaded. Use a folder on this server, including any local drive.</small>
+    <p id="modelScanResult" role="status" aria-live="polite"></p>
+    <details id="cloudConnectionFields" class="api-connection-fields"><summary>Add an API model</summary>
+     <p>Save a provider connection here, then select it in the same model menu. Saving does not activate it or send a request.</p>
+     <div class="inline-fields"><label>Connection name<input id="cloudName" maxlength="100" autocomplete="off"></label><label>Provider<select id="cloudProvider"><option value="openai">OpenAI</option><option value="compatible">OpenAI-compatible API</option></select></label></div>
+     <label id="cloudEndpointLabel" hidden>API base URL<input id="cloudEndpoint" type="text" inputmode="url" placeholder="https://provider.example/v1" dir="ltr"></label>
+     <label>Provider model ID<input id="cloudModel" maxlength="200" autocomplete="off" spellcheck="false" dir="ltr"></label>
+     <label>API key<input id="cloudKey" type="password" autocomplete="off" spellcheck="false" dir="ltr"></label>
+     <label>JSON output support<select id="cloudFormat"><option value="json_schema">Strict JSON schema (recommended)</option><option value="json_object">JSON object (compatible providers)</option></select></label>
+     <small>Keys are saved only on the server and never returned to the browser. On Windows they are encrypted for the server account. Use a model that supports chat completions and the selected JSON format.</small>
+     <button type="button" id="cloudSave" class="quiet">Save API model</button><p id="cloudSaveResult" role="status" aria-live="polite"></p>
+    </details>
+    <label>Available models — local & API<select id="localModelSelect" required></select></label>
+    <p id="modelChoiceInfo" class="model-path"></p>
+    <div id="cloudConsentBox" class="capacity-warning" hidden><p id="cloudDestination"></p><label class="checkbox"><input id="cloudConsent" type="checkbox"> I allow questions, retrieved document passages, domain settings, and recent conversation to be sent to this provider.</label><small>Activation sends a small test request without your documents and may incur provider charges. API models need internet access and are not offline.</small></div>
+    <button id="modelActivate" class="primary">Activate selected model</button>
+    <p id="modelPhase" role="status" aria-live="polite"></p>
+    <small>Activation loads and checks the selected model before saving it. Wait for pending answers to finish. Loading can take up to three minutes; incompatible models retain the previous selection.</small>
+   </form>
+  </section>
+  <section id="view-groups" class="view content-view" hidden><div class="section-intro"><span class="eyebrow">CONTROL KNOWLEDGE ACCESS</span><h2>Access groups</h2><p>Organize users into groups, then grant those groups access to restricted documents. Administrators can access every document.</p><button id="newAccessGroup" class="primary">Create group</button></div><div id="accessGroupList"></div></section>
+  <section id="view-users" class="view content-view" hidden>
+   <div class="section-intro"><span class="eyebrow">LOCAL ACCESS</span><h2>People, accounts, and private conversations</h2><p>Users can access shared documents and documents granted to their groups. Only administrators can manage documents and settings.</p></div>
+   <form id="userForm" class="card form-card"><h3>Add a user</h3><div class="inline-fields"><label>Username<input id="newUsername" required minlength="3" maxlength="60" dir="ltr"></label><label>Role<select id="newRole"><option value="user">User</option><option value="admin">Admin</option></select></label></div>
+    <label>Initial password; at least 12 characters<input id="newPassword" type="password" required minlength="12" maxlength="256" autocomplete="new-password" dir="ltr"></label><button class="primary">Create account</button></form>
+   <div id="userList" class="document-list"></div>
+  </section>
+  <section id="view-capacity" class="view content-view capacity-view" hidden>
+   <div class="section-intro"><span class="eyebrow">PLAN YOUR LOCAL DEPLOYMENT</span><h2>Size the hardware before you buy</h2><p>Choose a local model and concurrent demand. Get a transparent memory plan, CPU guidance, and a model comparison.</p></div>
+   <div class="capacity-layout"><form id="capacityForm" class="card capacity-form">
+    <div class="capacity-step"><span>01</span><h3>Your workload</h3></div>
+    <div class="inline-fields"><label>Concurrent users<input id="capacityUsers" type="number" min="1" max="10000" value="10" required></label><label>Generating answers at once<select id="capacityActivity"><option value="100">100% — all users</option><option value="50">50% of users</option><option value="25">25% of users</option><option value="10">10% of users</option></select></label></div>
+    <label>Local model<select id="capacityModel" required></select></label>
+    <div class="inline-fields"><label>Weight format<select id="capacityQuant" required></select></label><label>Total context per answer<select id="capacityContext"><option value="2048">2,048 tokens</option><option value="4096">4,096 tokens</option><option value="8192" selected>8,192 tokens</option><option value="16384">16,384 tokens</option><option value="32768">32,768 tokens</option></select></label></div>
+    <small>Context includes instructions, retrieved documents, conversation history, and the generated answer.</small>
+    <div class="capacity-step"><span>02</span><h3>GPU memory class</h3></div>
+    <label>Memory per GPU<select id="capacityGpu"><option value="8">8 GiB</option><option value="12">12 GiB</option><option value="16">16 GiB</option><option value="24" selected>24 GiB</option><option value="32">32 GiB</option><option value="48">48 GiB</option><option value="80">80 GiB</option><option value="96">96 GiB</option></select></label>
+    <details class="capacity-advanced"><summary>Workload & sizing assumptions</summary>
+     <div class="inline-fields"><label>Target tokens/sec per answer<input id="capacityTarget" type="number" min="1" max="200" value="12" required></label><label>Typical answer length (tokens)<input id="capacityOutput" type="number" min="32" max="4000" value="500" required></label></div>
+     <div class="inline-fields"><label>Memory headroom (%)<input id="capacityHeadroom" type="number" min="10" max="100" value="25" required></label><label>Search working RAM (GiB)<input id="capacityIndexRam" type="number" min="0.5" max="256" value="2" step="0.5" required></label></div>
+     <label>Measured aggregate tokens/sec per GPU (optional)<input id="capacityBenchmark" type="number" min="0.1" max="100000" step="0.1" placeholder="Leave blank if not benchmarked"></label>
+     <small>Use a sustained benchmark of this exact model, weight format, GPU, context, and batching workload. One speed measurement does not transfer to other models.</small>
+    </details>
+    <button class="primary wide" id="calculateCapacity">Calculate hardware plan →</button><p id="capacityError" class="error" role="alert"></p>
+   </form><div class="capacity-results" id="capacityResults" aria-live="polite"><div class="card capacity-placeholder"><div class="empty-symbol">▦</div><h3>Your hardware plan</h3><p>Adjust the inputs, then calculate.</p></div></div></div>
+   <section class="card capacity-comparison" id="capacityComparison" hidden><div class="table-heading"><h3>Compare model memory requirements</h3><button id="exportCapacity" type="button" class="quiet">Export plan ↓</button></div><p>Same workload and GPU class. GPU counts below cover memory capacity only.</p><div class="table-scroll"><table><thead><tr><th>Model</th><th>Weight format</th><th>Weights</th><th>GPU count</th><th>Host RAM</th><th>CPU cores</th></tr></thead><tbody id="capacityRows"></tbody></table></div></section>
+   <details class="card capacity-method"><summary>How the estimate works</summary><div id="capacityMethod"></div></details>
+  </section>
+  <section id="view-maintenance" class="view content-view" hidden>
+   <div class="section-intro"><span class="eyebrow">STAY IN CONTROL</span><h2>System health and continuity</h2><p>Backups and models remain under your organization's control.</p></div>
+   <div id="systemStatus" class="stat-grid"></div>
+   <div class="card" data-admin><h3>Back up knowledge and accounts</h3><p>Includes documents, conversations, accounts, and domain settings. Keep the models and application runtime separately.</p><button class="primary" id="createBackup">Create backup</button><div id="backupResult"></div><small>Restore using the local maintenance tool with the server stopped. The current data is preserved before restoration.</small></div>
+   <form id="passwordForm" class="card form-card"><h3>Change password</h3><label>Current password<input type="password" id="currentPassword" required autocomplete="current-password" dir="ltr"></label><label>New password<input type="password" id="changedPassword" required minlength="12" maxlength="256" autocomplete="new-password" dir="ltr"></label><button class="primary">Change password & end sessions</button></form>
+  </section>
+ </main>
+</div>
+<div id="toast" class="toast" role="status" hidden></div>
+<dialog id="modelFolderDialog" aria-labelledby="modelFolderTitle">
+ <h3 id="modelFolderTitle">Choose a model folder on this server</h3>
+ <label>Local drive<select id="modelFolderDrive"></select></label>
+ <div class="folder-browser-heading"><button type="button" id="modelFolderUp" class="quiet">Up one folder</button><span id="modelBrowserPath" class="model-path"></span></div>
+ <div id="modelFolderList" class="folder-browser-list"></div>
+ <p id="modelFolderError" class="error" role="alert"></p>
+ <div class="model-actions"><button type="button" id="modelFolderCancel" class="quiet">Cancel</button><button type="button" id="modelFolderChoose" class="primary">Use this folder & scan</button></div>
+</dialog>
+<dialog id="deleteDocumentDialog" aria-labelledby="deleteDocumentTitle">
+ <h3 id="deleteDocumentTitle">Permanently delete this archived document?</h3>
+ <p id="deleteDocumentName"></p>
+ <p>The document, all stored file versions, and its search index will be removed. This cannot be undone here. Excerpts in existing answers and copies in previous backups will remain.</p>
+ <div class="model-actions"><button type="button" id="cancelDeleteDocument" class="quiet">Cancel</button><button type="button" id="confirmDeleteDocument" class="danger-button">Delete permanently</button></div>
+ <p id="deleteDocumentError" class="error" role="alert"></p>
+</dialog>
+<dialog id="chatManageDialog" aria-labelledby="chatManageTitle"><form id="chatManageForm"><h3 id="chatManageTitle"></h3><p id="chatManageDescription"></p><label id="chatRenameLabel">Chat title<input id="chatRenameValue" maxlength="100" required dir="auto"></label><p id="chatManageError" class="error" role="alert"></p><div class="model-actions"><button type="button" id="chatManageCancel" class="quiet">Cancel</button><button id="chatManageSubmit" class="primary">Save</button></div></form></dialog>
+<dialog id="watchFolderDialog" aria-labelledby="watchFolderTitle"><h3 id="watchFolderTitle">Choose a document folder on this server</h3><label>Local drive<select id="watchDrive"></select></label><div class="folder-browser-heading"><button id="watchUp" type="button" class="quiet">Up one folder</button><span id="watchBrowserPath" class="model-path"></span></div><div id="watchDirectoryList" class="folder-browser-list"></div><p id="watchBrowserError" class="error" role="alert"></p><div class="model-actions"><button id="watchBrowserCancel" class="quiet" type="button">Cancel</button><button id="watchBrowserChoose" class="primary" type="button">Use this folder</button></div></dialog>
+<dialog id="watchApprovalDialog" aria-labelledby="watchApprovalTitle"><h3 id="watchApprovalTitle"></h3><p id="watchApprovalFile" class="model-path"></p><p id="watchApprovalText"></p><p id="watchApprovalError" class="error" role="alert"></p><div class="model-actions"><button id="watchApprovalCancel" type="button" class="quiet">Cancel</button><button id="watchApprovalConfirm" type="button" class="primary">Approve & index</button></div></dialog>
+<dialog id="accessGroupDialog" aria-labelledby="accessGroupTitle"><form id="accessGroupForm"><h3 id="accessGroupTitle">Access group</h3><label>Group name<input id="accessGroupName" required maxlength="80"></label><p>Group members</p><div id="accessGroupMembers" class="access-checks"></div><p class="access-warning">Changing access stops pending answers. Users can retry with their current permissions.</p><p id="accessGroupError" class="error" role="alert"></p><div class="model-actions"><button id="accessGroupCancel" type="button" class="quiet">Cancel</button><button id="accessGroupSave" class="primary">Save group</button></div></form></dialog>
+<dialog id="documentAccessDialog" aria-labelledby="documentAccessTitle"><form id="documentAccessForm"><h3 id="documentAccessTitle">Document access</h3><p id="documentAccessName"></p><label>Who can use this document?<select id="documentAccessScope"><option value="shared">All signed-in users</option><option value="restricted">Selected groups</option></select></label><div id="documentAccessGroups" class="access-checks"></div><p>With no groups selected, a restricted document is available only to administrators.</p><p class="access-warning">Changing access stops pending answers. Users can retry with their current permissions.</p><p id="documentAccessError" class="error" role="alert"></p><div class="model-actions"><button id="documentAccessCancel" type="button" class="quiet">Cancel</button><button id="documentAccessSave" class="primary">Save access</button></div></form></dialog>
+<dialog id="deleteAccessGroupDialog" aria-labelledby="deleteAccessGroupTitle"><h3 id="deleteAccessGroupTitle">Remove access group?</h3><p id="deleteAccessGroupName"></p><p>Removing this group removes its document grants. Restricted documents stay restricted, and users may still have access through other groups.</p><p id="deleteAccessGroupError" class="error" role="alert"></p><div class="model-actions"><button id="deleteAccessGroupCancel" type="button" class="quiet">Cancel</button><button id="deleteAccessGroupConfirm" type="button" class="danger-button">Remove group</button></div></dialog>
+</body></html>

@@ -1,0 +1,1 @@
+DEMONSTRATION ONLY. The Orion test pump operates between 10 and 35 degrees Celsius.

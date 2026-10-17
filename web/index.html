@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Soshyant Assistant</title>
+<link rel="stylesheet" href="/assets/style.css"></head><body>
+<div id="head"><h1>🌱 Soshyant Assistant</h1><span class="sub">local · spoken answers</span>
+ <select id="model" title="AI model">
+  <option value="bonsai">🌱 Bonsai-2-27B</option>
+  <option value="ornith">🐦 Ornith-1.5-9B</option>
+  <option value="gemma4">🧩 Gemma4-26B</option>
+  <option value="huihui4b">🐰 Huihui-4B · light</option>
+ </select>
+ <select id="voice" title="English voice"></select>
+ <button id="docs" title="answer from company documents">&#128218; docs</button>
+ <button id="mute" class="off" title="toggle voice">&#128263; voice off</button></div>
+<div id="ragpanel">
+ <input id="ragfolder" placeholder="C:\path\to\company documents" spellcheck="false">
+ <button id="syncbtn">&#128260; sync</button>
+ <div id="ragprog"><div id="ragfill"></div></div>
+ <span id="ragstat">checking&hellip;</span>
+</div>
+<details id="library"><summary>Document library <span id="libraryCount"></span></summary>
+ <p id="lastSync">Sync a folder to start. Scanned documents need readable text.</p>
+ <div id="documentList"></div>
+</details>
+<div id="workspace">
+ <label for="task">Help me with</label>
+ <select id="task"><option value="chat">Ask a question</option>
+  <option value="troubleshoot">Troubleshoot equipment</option>
+  <option value="checklist">Create a service checklist</option>
+  <option value="ticket">Draft an escalation ticket</option></select>
+ <button id="newchat">New chat</button><button id="export">Export chat</button>
+ <span id="taskHint">Answers from your company documents, with sources you can check.</span>
+</div>
+<div id="chat" aria-live="polite"><div class="msg ai">Ask about your company documents, or choose a task above. Expand any source to check the supporting passage.</div></div>
+<div id="bar"><button id="mic" title="hold conversation: click to record">&#127908;</button><input id="inp" placeholder="Ask anything... (or click 🎤 and speak)" autocomplete="off"><button id="send">Send</button></div>
+<script src="/assets/app.js" defer></script></body></html>

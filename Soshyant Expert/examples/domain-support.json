@@ -1,0 +1,9 @@
+{
+  "name": "Equipment support example",
+  "description": "A demonstration of changing domain using configuration.",
+  "scope": "Answer about the fictional equipment described in the supplied demonstration handbook.",
+  "language": "auto",
+  "glossary": {"X200": "Aurora X200 circulation pump"},
+  "clarification_fields": ["equipment model", "error code", "installation date"],
+  "answer_style": "Short answers with a citation after each factual claim."
+}
