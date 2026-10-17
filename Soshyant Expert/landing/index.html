@@ -3,18 +3,29 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Soshyant Expert — A private AI expert built from your own documents</title>
-  <meta name="description" content="Soshyant Expert turns your manuals, policies and procedures into a private AI expert that runs on your own server and cites the source of every answer.">
-  <meta name="theme-color" content="#06110d">
+  <title>Soshyant Expert — On-premise RAG engine for your company’s knowledge</title>
+  <meta name="description" content="Soshyant Expert is a retrieval-augmented generation (RAG) engine that runs on your own server. It retrieves the right passages from your manuals and policies and answers with every claim cited.">
+  <meta name="theme-color" content="#030507">
   <meta property="og:title" content="Soshyant Expert — Your company already wrote the answers">
-  <meta property="og:description" content="A private, on-premise AI expert that answers from your own documents — with citations.">
+  <meta property="og:description" content="An on-premise RAG engine: retrieves passages from your own documents and generates cited answers.">
   <meta property="og:type" content="website">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 44'%3E%3Cpath d='M15 0H35a5 5 0 0 1 5 5V29a15 15 0 0 1-15 15H5a5 5 0 0 1-5-5V15A15 15 0 0 1 15 0z' fill='%23245c47'/%3E%3Ctext x='20' y='32' font-family='Georgia,serif' font-style='italic' font-size='28' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M10 0H40V30L30 40H0V10Z' fill='%2319ffb0'/%3E%3Ctext x='20' y='31' font-family='Impact,Arial Black,sans-serif' font-size='28' fill='%23030507' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Vazirmatn:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <script>document.documentElement.classList.add('js')</script>
+  <script>
+    (function () {
+      var d = document.documentElement, seen = false;
+      d.classList.add('js');
+      var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      try { seen = sessionStorage.getItem('sx-boot') === '1'; } catch (e) {}
+      if (!still && !seen) {
+        d.classList.add('booting');
+        setTimeout(function () { d.classList.remove('booting'); }, 6000); // failsafe
+      }
+    })();
+  </script>
 </head>
 <body>
 
@@ -30,7 +41,7 @@
        A calendar.app.google/… share link also works (it opens in a new tab instead of inline). */
     bookingUrl: "",
 
-    /* Contact details shown in the contact card, booking section and footer. */
+    /* Contact details shown on the ID card, booking panel and footer. */
     contact: {
       name: "[Your Name]",
       role: "[Founder & CEO, Soshyant]",
@@ -44,398 +55,506 @@
 </script>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
-  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
-  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
-  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></symbol>
-  <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 5l7 7-7 7"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v15M5 13l7 7 7-7"/></symbol>
   <symbol id="i-external" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
-  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
-  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
   <symbol id="i-quote" viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></symbol>
-  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></symbol>
   <symbol id="i-files" viewBox="0 0 24 24"><path d="M15 2H8a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M15 2v5h5"/><path d="M4 7v13a2 2 0 0 0 2 2h10"/></symbol>
   <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
   <symbol id="i-lang" viewBox="0 0 24 24"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></symbol>
-  <symbol id="i-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></symbol>
-  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/><circle cx="12" cy="13" r="2.5"/><path d="m14 15 2 2"/></symbol>
+  <symbol id="i-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z"/><circle cx="12" cy="13" r="2.5"/><path d="m14 15 2 2"/></symbol>
   <symbol id="i-review" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="m9 10 2 2 4-4"/></symbol>
-  <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/></symbol>
+  <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/></symbol>
   <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></symbol>
-  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/><path d="M19 17v4M17 19h4"/></symbol>
-  <symbol id="i-phone-dev" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></symbol>
-  <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
-  <symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="7" rx="2"/><rect x="3" y="14" width="18" height="7" rx="2"/><path d="M7 6.5h.01M7 17.5h.01M11 6.5h6M11 17.5h6"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.6 5.6 1.9-5.6 1.9L12 18l-1.9-5.6-5.6-1.9 5.6-1.9z"/><path d="M19 17v4M17 19h4"/></symbol>
+  <symbol id="i-phone-dev" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14"/><path d="M8 21h8M12 17v4"/></symbol>
+  <symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="7"/><rect x="3" y="14" width="18" height="7"/><path d="M7 6.5h.01M7 17.5h.01M11 6.5h6M11 17.5h6"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.6-4.6"/></symbol>
   <symbol id="i-filter" viewBox="0 0 24 24"><path d="M22 3H2l8 9.5V19l4 2v-8.5z"/></symbol>
-  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2.5"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></symbol>
-  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="m22 7-10 6L2 7"/></symbol>
-  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
-  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
-  <symbol id="i-linkedin" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></symbol>
-  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16"/><path d="m22 7-10 6L2 7"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
-  <symbol id="i-video" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4z"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
-  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/></symbol>
-  <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M9.9 9.9a3 3 0 1 0 4.2 4.2M10.7 5.1A10.4 10.4 0 0 1 12 5c7 0 10 7 10 7a13 13 0 0 1-1.7 2.7M6.6 6.6A13.5 13.5 0 0 0 2 12s3 7 10 7a9.7 9.7 0 0 0 5.4-1.6M2 2l20 20"/></symbol>
-  <symbol id="i-user-lock" viewBox="0 0 24 24"><circle cx="10" cy="7" r="4"/><path d="M10.3 15H7a4 4 0 0 0-4 4v2"/><rect x="15" y="16" width="7" height="5" rx="1"/><path d="M16.5 16v-1.5a2 2 0 0 1 4 0V16"/></symbol>
-  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M5 12.6a10 10 0 0 1 14 0M8.5 16.1a5 5 0 0 1 7 0M2 8.8a15 15 0 0 1 20 0M12 20h.01"/></symbol>
-  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.8 9.8 0 0 1 6.7 2.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.8 9.8 0 0 1-6.7-2.7L3 16"/><path d="M8 16H3v5"/></symbol>
-  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4z"/><rect x="2" y="6" width="14" height="12"/></symbol>
   <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16.2 7.8-2.1 6.4-6.4 2.1 2.1-6.4z"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M5 12.6a10 10 0 0 1 14 0M8.5 16.1a5 5 0 0 1 7 0M2 8.8a15 15 0 0 1 20 0M12 20h.01"/></symbol>
+  <symbol id="i-terminal" viewBox="0 0 24 24"><path d="m4 17 6-5-6-5M12 19h8"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
 </svg>
+
+<!-- ======================= BOOT SEQUENCE ======================= -->
+<div id="boot" aria-hidden="true">
+  <span class="boot-skip">[ click to skip ]</span>
+  <div class="boot-big">SOSHYANT<span>//expert</span></div>
+  <div class="boot-lines">
+    <div class="boot-line"><span>mount knowledge index</span><i></i><b>sqlite · atomic</b></div>
+    <div class="boot-line"><span>load embedding model</span><i></i><b>384-d · local</b></div>
+    <div class="boot-line"><span>hybrid retrieval</span><i></i><b>lexical + semantic</b></div>
+    <div class="boot-line"><span>access control</span><i></i><b>enforced</b></div>
+    <div class="boot-line"><span>language model</span><i></i><b>on-premise</b></div>
+    <div class="boot-line warn"><span>external uplink</span><i></i><b>none</b></div>
+  </div>
+  <div class="boot-foot"><span>RAG engine ready</span><span id="bootPct">000%</span></div>
+  <div class="boot-bar"><i></i></div>
+</div>
+
+<!-- ======================= GLOBAL FX ======================= -->
+<div class="fx-scan" aria-hidden="true"></div>
+<div class="fx-noise" aria-hidden="true"></div>
+<div class="fx-vignette" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+<div id="cursor" aria-hidden="true"><div class="cur-dot"></div><div class="cur-ring brk"><span class="cur-label"></span></div></div>
+
+<nav class="rail" aria-label="Section index">
+  <a href="#top" data-sec="top"><span>Boot</span><b>00</b></a>
+  <a href="#console" data-sec="console"><span>Console</span><b>01</b></a>
+  <a href="#problem" data-sec="problem"><span>Signal</span><b>02</b></a>
+  <a href="#rag" data-sec="rag"><span>RAG</span><b>03</b></a>
+  <a href="#features" data-sec="features"><span>Modules</span><b>04</b></a>
+  <a href="#security" data-sec="security"><span>Perimeter</span><b>05</b></a>
+  <a href="#deploy" data-sec="deploy"><span>Deploy</span><b>06</b></a>
+  <a href="#book" data-sec="book"><span>Uplink</span><b>07</b></a>
+  <a href="#faq" data-sec="faq"><span>Query log</span><b>08</b></a>
+  <a href="#contact" data-sec="contact"><span>Contact</span><b>09</b></a>
+  <div class="rail-pct" id="railPct">000%</div>
+</nav>
 
 <!-- ======================= NAV ======================= -->
 <header class="nav" id="nav">
   <div class="container nav-inner">
-    <a class="brand" href="#top" aria-label="Soshyant Expert — home">
-      <span class="brand-mark" aria-hidden="true">S</span>
-      <span class="brand-word">SOSHYANT<b>EXPERT</b></span>
+    <a class="logo" href="#top" aria-label="Soshyant Expert — home" data-cursor="HOME">
+      <span class="logo-mark" aria-hidden="true">S</span>
+      <span class="logo-word" aria-hidden="true">
+        <span class="lw-en">SOSHYANT</span>
+        <span class="lw-fa fa">سوشیانت</span>
+        <small>expert // rag engine</small>
+      </span>
     </a>
     <nav class="nav-links" id="navLinks" aria-label="Main">
-      <a href="#features">Features</a>
-      <a href="#how">How it works</a>
+      <a href="#rag">RAG</a>
+      <a href="#features">Modules</a>
       <a href="#security">Security</a>
       <a href="#faq">FAQ</a>
       <a href="#contact">Contact</a>
     </nav>
-    <a class="btn btn-gold nav-cta" href="#book">Book a demo</a>
+    <span class="nav-status" aria-hidden="true"><i></i>local · online</span>
+    <a class="btn btn-neon btn-sm magnetic nav-cta" href="#book" data-cursor="BOOK"><span>Book demo</span></a>
     <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks"><span></span></button>
   </div>
 </header>
 
-<main id="top">
+<main>
 
   <!-- ======================= HERO ======================= -->
-  <section class="hero">
-    <div class="hero-bg" aria-hidden="true">
-      <div class="aurora a1"></div><div class="aurora a2"></div><div class="aurora a3"></div>
-      <div class="grid-lines"></div><div class="grain"></div>
+  <section class="hero" id="top">
+    <canvas id="vecField" aria-hidden="true"></canvas>
+    <div class="container hero-inner">
+      <p class="tag rv"><span class="tag-box">RAG</span><span data-scramble>Retrieval-augmented generation · on your own server</span></p>
+      <h1 class="hero-title" aria-label="Your company already wrote the answers.">
+        <span class="line rv" aria-hidden="true">Your company</span>
+        <span class="line rv" style="--d:.08s" aria-hidden="true">already wrote</span>
+        <span class="line l3 rv" style="--d:.16s" aria-hidden="true"><span class="glitch" data-text="the answers.">the answers.</span></span>
+      </h1>
+      <p class="hero-sub rv" style="--d:.24s">
+        Soshyant Expert is a <b>RAG engine</b> that runs on your own server. It <b>retrieves</b> the exact passages from your manuals, policies and procedures — then <b>generates</b> an answer grounded in them, with every claim cited.
+      </p>
+      <div class="hero-ctas rv" style="--d:.32s">
+        <a class="btn btn-neon magnetic" href="#book" data-cursor="BOOK"><span>Book a demo</span><svg class="i"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-ghost magnetic" href="#rag" data-cursor="DECODE"><span>Decode the pipeline</span><svg class="i"><use href="#i-down"/></svg></a>
+      </div>
+      <dl class="hero-stats rv" style="--d:.4s">
+        <div><dt>Retrieval</dt><dd>Hybrid</dd></div>
+        <div><dt>Embeddings</dt><dd>Local · 384-d</dd></div>
+        <div><dt>Citations</dt><dd>Enforced</dd></div>
+        <div><dt>Cloud uplink</dt><dd class="hot-t">None</dd></div>
+      </dl>
     </div>
 
+    <aside class="nn-panel hud rv" style="--d:.5s" aria-hidden="true">
+      <div class="nn-head"><span>Live retrieval</span><span>top-5</span></div>
+      <div class="nn-q">q = embed(<em>cursor</em>) <span id="qCoord">[+0.00, +0.00]</span></div>
+      <ol id="nnList"></ol>
+      <div class="nn-foot">› Move your cursor. You are the query vector.</div>
+    </aside>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-track">
+        <span>Hybrid retrieval</span><span>Lexical + semantic</span><span>Local ONNX embeddings</span><span>GGUF · llama.cpp</span><span>Citations enforced</span><span>Access-aware retrieval</span><span>EN / <span class="fa">فارسی</span></span><span>Atomic SQLite index</span><span>Local mode: no cloud uplink</span>
+        <span>Hybrid retrieval</span><span>Lexical + semantic</span><span>Local ONNX embeddings</span><span>GGUF · llama.cpp</span><span>Citations enforced</span><span>Access-aware retrieval</span><span>EN / <span class="fa">فارسی</span></span><span>Atomic SQLite index</span><span>Local mode: no cloud uplink</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= 01 CONSOLE ======================= -->
+  <section class="section" id="console">
     <div class="container">
-      <div class="hero-copy">
-        <a class="pill reveal" href="#security">
-          <span class="pill-tag">On-premise AI</span>
-          Runs entirely on your own server
-          <svg class="i"><use href="#i-arrow"/></svg>
-        </a>
-        <h1 class="display reveal" style="--d:.08s">Your company already wrote <em>the&nbsp;answers.</em></h1>
-        <p class="lead reveal" style="--d:.16s">
-          <strong>Soshyant Expert</strong> turns your manuals, policies and procedures into a private AI expert.
-          Your team asks in plain language and gets your company’s own answer — with the exact source cited.
-        </p>
-        <div class="hero-ctas reveal" style="--d:.24s">
-          <a class="btn btn-gold btn-lg" href="#book">Book a demo <svg class="i i-arrow"><use href="#i-arrow"/></svg></a>
-          <a class="btn btn-ghost btn-lg" href="#how">See how it works</a>
-        </div>
-        <ul class="hero-proof reveal" style="--d:.32s">
-          <li><svg class="i"><use href="#i-check"/></svg>Every answer cites its source</li>
-          <li><svg class="i"><use href="#i-check"/></svg>Documents never leave your network</li>
-          <li><svg class="i"><use href="#i-check"/></svg>English &amp; <span class="fa">فارسی</span></li>
-        </ul>
+      <div class="sec-head">
+        <p class="kicker rv"><span data-scramble>01 // Live console</span></p>
+        <h2 class="h2 rv">Ask. Retrieve.<br><span class="neon">Answer. Cite.</span></h2>
+        <p class="lede rv">Every answer is generated from passages pulled out of your own documents — and it shows you exactly which ones. Pick a session to replay it.</p>
       </div>
 
-      <!-- Animated product preview -->
-      <div class="showcase reveal" style="--d:.4s">
-        <div class="float-chip chip-a" aria-hidden="true">
-          <svg class="i"><use href="#i-search"/></svg>
-          <div>Hybrid search<small>keyword + meaning</small></div>
+      <div class="console hud rv" id="consoleBox">
+        <div class="con-bar">
+          <span class="con-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="con-path">ops@expert.internal:~/field-service</span>
+          <span class="con-pill"><i class="pulse"></i>local model</span>
+          <span class="con-pill dim">knowledge v14</span>
         </div>
-        <div class="float-chip chip-b" aria-hidden="true">
-          <svg class="i"><use href="#i-lock"/></svg>
-          <div>Inference on your server<small>no cloud round-trip</small></div>
-        </div>
-
-        <figure class="app" aria-label="Preview: Soshyant Expert answering questions with cited sources">
-          <div class="app-bar">
-            <span class="traffic" aria-hidden="true"><i></i><i></i><i></i></span>
-            <span class="app-url"><svg class="i"><use href="#i-lock"/></svg>expert.internal</span>
-            <span class="app-model"><i class="live"></i>Local model ready</span>
-          </div>
-          <div class="app-body">
-            <aside class="app-side">
-              <div class="app-brand"><span class="brand-mark" aria-hidden="true">S</span><span>SOSHYANT<b>EXPERT</b></span></div>
-              <div class="app-new">+ New conversation</div>
-              <div class="app-label">Conversations</div>
-              <button class="app-conv active" type="button" data-scenario="0">Pump housing torque</button>
-              <button class="app-conv" type="button" data-scenario="1">Contractor parental leave</button>
-              <button class="app-conv fa" type="button" data-scenario="2" lang="fa" dir="rtl">شرایط گارانتی دستگاه</button>
-              <div class="app-label">Workspace</div>
-              <div class="app-navitem">Documents <span>412</span></div>
-              <div class="app-navitem">Access groups <span>6</span></div>
-              <div class="app-navitem">Answer review <span>3</span></div>
-              <div class="app-foot"><i class="live"></i>Private · on-premise</div>
-            </aside>
-            <div class="app-main">
-              <div class="app-head">
-                <div><small>Field Service Expert</small><strong id="convTitle" dir="auto">Pump housing torque</strong></div>
-                <span class="app-kv">Knowledge v14</span>
-              </div>
-              <div class="app-stream" id="stream" aria-live="off">
-                <div class="m-user" id="mQ" dir="auto">What’s the torque spec for the M12 bolts on the pump housing?</div>
-                <div class="m-bot" id="mA">
-                  <div class="m-meta" id="mMeta"><span class="m-status ok" id="mStatus">Answered</span><span id="mMetaText">1 source cited</span></div>
-                  <div class="m-searching" id="mSearch" hidden><span class="spinner"></span><span id="mSearchText">Searching 412 documents…</span></div>
-                  <div class="m-text" id="mText">Tighten them to 60 N·m in a star pattern, in two passes — 30 N·m first, then 60 N·m. Re-check the torque after the first heat cycle.<span class="cite">1</span></div>
-                  <div class="m-source" id="mSource">
-                    <div class="m-source-head"><span class="cite" id="sCite">1</span><strong id="sTitle">Pump Manual rev. 4</strong><span class="loc" id="sLoc">§7.2 Assembly · version 4</span></div>
-                    <blockquote id="sQuote">Torque the M12 housing bolts to <mark>60 N·m in a star pattern, in two passes (30 N·m, then 60 N·m)</mark>. Re-torque after the first heat cycle.</blockquote>
-                  </div>
-                </div>
-              </div>
-              <div class="app-compose" aria-hidden="true"><span>Ask about your documents…</span><span class="send"><svg class="i"><use href="#i-arrow-up"/></svg></span></div>
+        <aside class="con-side">
+          <div class="con-label">// sessions</div>
+          <button class="con-sess active" type="button" data-cursor="REPLAY">torque_spec.m12</button>
+          <button class="con-sess" type="button" data-cursor="REPLAY">contractor_leave</button>
+          <button class="con-sess fa" type="button" data-cursor="REPLAY" lang="fa">گارانتی دستگاه</button>
+          <div class="con-label">// workspace</div>
+          <div class="con-stat"><span>documents</span><b>412</b></div>
+          <div class="con-stat"><span>access groups</span><b>6</b></div>
+          <div class="con-stat"><span>to review</span><b>3</b></div>
+          <div class="con-foot"><i class="pulse"></i>private · on-premise</div>
+        </aside>
+        <div class="con-main" id="stream">
+          <div class="con-q"><span class="prompt">you ›</span><span id="mQ" dir="auto">What’s the torque spec for the M12 bolts on the pump housing?</span></div>
+          <ol class="con-log" id="mLog"></ol>
+          <div class="con-ans" id="mA">
+            <div class="con-meta"><span class="status ok" id="mStatus">ANSWERED</span><span id="mMetaText">1 source cited</span></div>
+            <div class="con-text" id="mText">Tighten them to 60 N·m in a star pattern, in two passes — 30 N·m first, then 60 N·m. Re-check the torque after the first heat cycle.<span class="cite">1</span></div>
+            <div class="con-src" id="mSource">
+              <div class="src-head"><span class="cite" id="sCite">1</span><strong id="sTitle">Pump Manual rev. 4</strong><span id="sLoc">§7.2 Assembly · version 4</span></div>
+              <blockquote id="sQuote">Torque the M12 housing bolts to <mark>60 N·m in a star pattern, in two passes (30 N·m, then 60 N·m)</mark>. Re-torque after the first heat cycle.</blockquote>
             </div>
           </div>
-        </figure>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ======================= INDUSTRIES ======================= -->
-  <section class="industries" aria-label="Who it is for">
-    <p class="kicker">Built for teams where a wrong answer is expensive</p>
-    <div class="marquee">
-      <div class="marquee-track">
-        <span>Manufacturing</span><span>Field service</span><span>Energy &amp; utilities</span><span>Healthcare</span><span>Defense suppliers</span><span>Customer support</span><span>Engineering</span><span>HR &amp; onboarding</span>
-        <span aria-hidden="true">Manufacturing</span><span aria-hidden="true">Field service</span><span aria-hidden="true">Energy &amp; utilities</span><span aria-hidden="true">Healthcare</span><span aria-hidden="true">Defense suppliers</span><span aria-hidden="true">Customer support</span><span aria-hidden="true">Engineering</span><span aria-hidden="true">HR &amp; onboarding</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================= PROBLEM ======================= -->
+  <!-- ======================= 02 PROBLEM ======================= -->
   <section class="section problem" id="problem">
-    <div class="container problem-grid">
-      <div class="stat-card reveal">
-        <div class="stat-num">19<span>%</span></div>
-        <p>of the average workweek is spent searching for and gathering internal information.</p>
+    <div class="container prob-grid">
+      <div class="prob-stat rv">
+        <p class="kicker kicker-hot"><span data-scramble>02 // Signal loss</span></p>
+        <div class="big-num"><span class="glitch" data-text="19%"><span data-count="19">19</span>%</span></div>
+        <p class="prob-cap">of the average workweek is spent searching for and gathering internal information.</p>
         <div class="week" aria-hidden="true">
           <div class="week-bar"><i></i><i></i><i></i><i></i><i></i></div>
-          <div class="week-labels"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span></div>
-          <div class="week-note">≈ one full day, every week, per person.</div>
+          <div class="week-lbl"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span></div>
+          <p>≈ one full day, every week, per person.</p>
         </div>
-        <small>Source: McKinsey Global Institute, “The Social Economy” (2012)</small>
+        <small class="src-note">Source: McKinsey Global Institute, “The Social Economy” (2012)</small>
+      </div>
+      <div>
+        <h2 class="h2 rv">Your knowledge is <span class="hot">buried alive.</span></h2>
+        <ul class="errlog">
+          <li class="rv"><span class="err-code">ERR_01 · repeat_query</span><h3>Experts answer the same questions, again and again</h3><p>Senior staff spend hours repeating what the manual already says.</p></li>
+          <li class="rv" style="--d:.08s"><span class="err-code">ERR_02 · keyword_miss</span><h3>Keyword search misses the answer</h3><p>It fails on procedures, part numbers and questions phrased differently from the document.</p></li>
+          <li class="rv" style="--d:.16s"><span class="err-code">ERR_03 · knowledge_drain</span><h3>Expertise walks out the door</h3><p>When people leave, their know-how leaves with them. The documents stay — but stop being usable.</p></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= 03 RAG ======================= -->
+  <section class="section rag" id="rag">
+    <div class="container">
+      <div class="sec-head">
+        <p class="kicker rv"><span data-scramble>03 // RAG, decoded</span></p>
+        <h2 class="h2 rv">Retrieval-augmented<br><span class="neon">generation.</span></h2>
+        <p class="lede rv">A language model on its own answers from memory — and memory can be wrong. <b>RAG</b> changes the order: first <b>retrieve</b> the passages that matter from your documents, then <b>augment</b> the prompt with that evidence, and only then <b>generate</b> the answer. Run the pipeline yourself:</p>
       </div>
 
-      <div class="reveal" style="--d:.1s">
-        <span class="eyebrow">The problem</span>
-        <h2 class="h2">Critical knowledge is buried where people <em>can’t use it.</em></h2>
-        <div class="pains">
-          <div class="pain"><span class="pain-n">01</span><div><h3>Experts answer the same questions, again and again</h3><p>Senior staff spend hours repeating what the manual already says.</p></div></div>
-          <div class="pain"><span class="pain-n">02</span><div><h3>Keyword search misses the answer</h3><p>It fails on procedures, part numbers and questions phrased differently from the document.</p></div></div>
-          <div class="pain"><span class="pain-n">03</span><div><h3>Expertise walks out the door</h3><p>When people leave, their know-how leaves with them. The documents stay — but stop being usable.</p></div></div>
+      <div class="sim hud rv" id="sim">
+        <div class="sim-top">
+          <div class="sim-presets" role="group" aria-label="Choose a question">
+            <button class="chip-btn active" type="button" data-cursor="LOAD">Q1 · torque spec</button>
+            <button class="chip-btn" type="button" data-cursor="LOAD">Q2 · filter interval</button>
+            <button class="chip-btn" type="button" data-cursor="LOAD">Q3 · contractor leave</button>
+          </div>
+          <button class="btn btn-neon btn-sm magnetic" type="button" id="simRun" data-cursor="RUN"><span>▶ Run pipeline</span></button>
+        </div>
+        <ol class="tracker">
+          <li class="trk"><span>01</span><b>Embed</b><small>question → vector</small></li>
+          <li class="trk"><span>02</span><b>Retrieve</b><small>hybrid search</small></li>
+          <li class="trk"><span>03</span><b>Filter</b><small>access control</small></li>
+          <li class="trk"><span>04</span><b>Augment</b><small>build the prompt</small></li>
+          <li class="trk"><span>05</span><b>Generate</b><small>cited answer</small></li>
+        </ol>
+        <div class="sim-body">
+          <div class="sim-col">
+            <div class="col-h">// query</div>
+            <div class="sim-query"><span class="prompt">›</span><span id="simQuery">What torque for the M12 pump housing bolts?</span></div>
+            <div class="col-h">// embedding <span class="col-note">384-d · multilingual · local</span></div>
+            <div class="emb" id="emb" aria-hidden="true"></div>
+            <div class="emb-vec" id="embVec">[ … ]</div>
+          </div>
+          <div class="sim-col">
+            <div class="col-h">// knowledge base <span class="col-note" id="kbNote"></span></div>
+            <div class="kb" id="kb"></div>
+            <div class="kb-legend"><span><i class="lg lex"></i>lexical</span><span><i class="lg sem"></i>semantic</span><span><i class="lg den"></i>access denied</span></div>
+          </div>
+          <div class="sim-col sim-out">
+            <div class="ctx-wrap">
+              <div class="col-h">// context window <span class="col-note" id="tokNote">0 / 8,192 tokens</span></div>
+              <div class="tok-meter"><i id="tokBar"></i></div>
+              <div class="ctx" id="ctx"></div>
+            </div>
+            <div class="ans-wrap">
+              <div class="col-h">// answer</div>
+              <div class="sim-ans" id="simAns"><span class="sim-idle">Waiting for pipeline…</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="why">
+        <h3 class="why-h rv">Why RAG — <span class="neon">not fine-tuning?</span></h3>
+        <div class="why-grid">
+          <article class="why-card hud tilt rv">
+            <span class="why-n">A</span>
+            <h4>Documents change. Answers follow.</h4>
+            <p class="vs"><s>fine-tune: retrain the model</s><b>rag: re-index the changed file</b></p>
+            <p>Update a manual and answers use the new version as soon as it’s re-indexed.</p>
+          </article>
+          <article class="why-card hud tilt rv" style="--d:.08s">
+            <span class="why-n">B</span>
+            <h4>Knowledge is data, not weights.</h4>
+            <p class="vs"><s>fine-tune: baked into weights</s><b>rag: versioned records you control</b></p>
+            <p>Your content stays in a database on your server — versioned and backed up like any business record.</p>
+          </article>
+          <article class="why-card hud tilt rv" style="--d:.16s">
+            <span class="why-n">C</span>
+            <h4>Citations need sources.</h4>
+            <p class="vs"><s>fine-tune: can’t point to a source</s><b>rag: every claim → a passage</b></p>
+            <p>Answers point at real passages — document, section and version — so people can check them.</p>
+          </article>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ======================= FEATURES + HOW ======================= -->
-  <div class="panel">
-    <section class="section" id="features">
-      <div class="container">
-        <div class="section-head center reveal">
-          <span class="eyebrow">Features</span>
-          <h2 class="h2">An expert that answers from <em>your</em> documents — and shows its work.</h2>
-          <p class="sub">Soshyant Expert reads the material your company already trusts, answers in plain language, and backs every answer with the passage it came from.</p>
-        </div>
-
-        <div class="bento">
-          <!-- Evidence -->
-          <article class="card card-evidence span2 reveal">
-            <div class="card-copy">
-              <div class="card-icon"><svg class="i"><use href="#i-quote"/></svg></div>
-              <h3>Answers you can check</h3>
-              <p>Every claim links to the passage it came from — document, section and version. Click a citation number and read the evidence yourself.</p>
-            </div>
-            <div class="vis-evidence" aria-hidden="true">
-              <div class="ve-answer">Replace the filter cartridge every <b>500 operating hours</b><span class="cite">1</span>, or sooner if the pressure drop exceeds <b>0.8 bar</b><span class="cite">2</span>.</div>
-              <div class="ve-src s1"><span class="cite">1</span><div><strong>Maintenance Schedule</strong><small>§3.4 Filters · version 6</small></div></div>
-              <div class="ve-src s2"><span class="cite">2</span><div><strong>Hydraulic Unit Manual</strong><small>Table 5.2 · version 3</small></div></div>
-            </div>
-          </article>
-
-          <!-- Private -->
-          <article class="card card-dark tall reveal" style="--d:.08s">
-            <div class="vis-private" aria-hidden="true">
-              <div class="ring r3"></div>
-              <div class="ring r2"></div>
-              <div class="ring r1"><svg class="i"><use href="#i-server"/></svg></div>
-              <span class="orbit o1">LLM</span>
-              <span class="orbit o2">Index</span>
-              <span class="orbit o3">Documents</span>
-              <span class="boundary-label">Your network</span>
-            </div>
-            <h3>Private by default</h3>
-            <p>The language model, the search index and every document live on your own server. In local mode nothing is sent to the cloud — no CDN calls, no automatic downloads.</p>
-            <ul class="mini-checks">
-              <li><svg class="i"><use href="#i-check"/></svg>Bundled local language model</li>
-              <li><svg class="i"><use href="#i-check"/></svg>Local multilingual search model</li>
-              <li><svg class="i"><use href="#i-check"/></svg>Cloud models only with explicit admin approval</li>
-            </ul>
-          </article>
-
-          <!-- Limits -->
-          <article class="card reveal">
-            <div class="card-icon"><svg class="i"><use href="#i-compass"/></svg></div>
-            <h3>Says when it doesn’t know</h3>
-            <p>If your documents don’t cover a question, it says so — or asks a clarifying question — instead of guessing.</p>
-            <div class="vis-status" aria-hidden="true">
-              <div class="st"><i class="ok"></i>Answered<small>with citations</small></div>
-              <div class="st"><i class="clar"></i>Needs clarification<small>asks back</small></div>
-              <div class="st"><i class="ins"></i>Insufficient evidence<small>no guessing</small></div>
-            </div>
-          </article>
-
-          <!-- Documents -->
-          <article class="card reveal" style="--d:.08s">
-            <div class="card-icon"><svg class="i"><use href="#i-files"/></svg></div>
-            <h3>Works with the files you have</h3>
-            <p>Versioning, source priority and reversible archiving. A failed import never half-publishes your knowledge base.</p>
-            <div class="chips" aria-label="Supported formats">
-              <span class="chip c1">PDF</span><span class="chip c2">DOCX</span><span class="chip c3">XLSX</span><span class="chip">TXT</span><span class="chip">Markdown</span><span class="chip">HTML</span>
-            </div>
-          </article>
-
-          <!-- Access -->
-          <article class="card card-access span2 reveal">
-            <div class="card-copy">
-              <div class="card-icon"><svg class="i"><use href="#i-users"/></svg></div>
-              <h3>Permission-aware answers</h3>
-              <p>Access groups decide who can use each document. Restricted passages are filtered on the server before ranking — so the model never sees what the user isn’t allowed to.</p>
-            </div>
-            <table class="matrix" aria-label="Example: document access by group">
-              <thead><tr><th scope="col">Document</th><th scope="col">Field service</th><th scope="col">Sales</th><th scope="col">Engineering</th></tr></thead>
-              <tbody>
-                <tr><th scope="row">Safety procedures</th><td class="yes"><svg class="i" aria-label="allowed"><use href="#i-check"/></svg></td><td class="yes"><svg class="i" aria-label="allowed"><use href="#i-check"/></svg></td><td class="yes"><svg class="i" aria-label="allowed"><use href="#i-check"/></svg></td></tr>
-                <tr><th scope="row">Pricing 2026</th><td class="no"><svg class="i" aria-label="no access"><use href="#i-minus"/></svg></td><td class="yes"><svg class="i" aria-label="allowed"><use href="#i-check"/></svg></td><td class="no"><svg class="i" aria-label="no access"><use href="#i-minus"/></svg></td></tr>
-                <tr><th scope="row">Design specs</th><td class="no"><svg class="i" aria-label="no access"><use href="#i-minus"/></svg></td><td class="no"><svg class="i" aria-label="no access"><use href="#i-minus"/></svg></td><td class="yes"><svg class="i" aria-label="allowed"><use href="#i-check"/></svg></td></tr>
-              </tbody>
-            </table>
-          </article>
-
-          <!-- Language -->
-          <article class="card reveal" style="--d:.08s">
-            <div class="card-icon"><svg class="i"><use href="#i-lang"/></svg></div>
-            <h3>English &amp; <span class="fa">فارسی</span></h3>
-            <p>Switch the interface and answer language instantly, with a full right-to-left layout.</p>
-            <div class="lang-vis" aria-hidden="true">
-              <div class="lang-toggle"><span>English</span><span class="fa">فارسی</span></div>
-            </div>
-          </article>
-        </div>
-
-        <!-- Admin features -->
-        <div class="admin">
-          <div class="admin-head reveal">
-            <h3>Built for the people <em>who run it.</em></h3>
-            <p>A complete admin console — so your knowledge base stays current, controlled and accountable.</p>
-          </div>
-          <div class="admin-grid">
-            <div class="admin-item reveal"><div class="card-icon"><svg class="i"><use href="#i-dashboard"/></svg></div><div><h4>Admin overview</h4><p>Documents, searchable passages, running jobs, accounts, the active model and latest backup — at a glance.</p></div></div>
-            <div class="admin-item reveal" style="--d:.06s"><div class="card-icon"><svg class="i"><use href="#i-folder"/></svg></div><div><h4>Watched folders</h4><p>New and changed files are detected automatically and wait for your approval before anything is published.</p></div></div>
-            <div class="admin-item reveal" style="--d:.12s"><div class="card-icon"><svg class="i"><use href="#i-review"/></svg></div><div><h4>Answer review</h4><p>Triage unanswered questions and user feedback, and note which document needs fixing.</p></div></div>
-            <div class="admin-item reveal"><div class="card-icon"><svg class="i"><use href="#i-spark"/></svg></div><div><h4>Choose your model</h4><p>Use the bundled local model, any GGUF model on your server, or an OpenAI-compatible API.</p></div></div>
-            <div class="admin-item reveal" style="--d:.06s"><div class="card-icon"><svg class="i"><use href="#i-cpu"/></svg></div><div><h4>Hardware planner</h4><p>Estimate GPUs, RAM and CPU for your number of users before you buy anything.</p></div></div>
-            <div class="admin-item reveal" style="--d:.12s"><div class="card-icon"><svg class="i"><use href="#i-db"/></svg></div><div><h4>Backup &amp; restore</h4><p>Back up documents, conversations, accounts and settings; restores are validated before they replace anything.</p></div></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section how" id="how">
-      <div class="container">
-        <div class="section-head center reveal">
-          <span class="eyebrow">How it works</span>
-          <h2 class="h2">From documents to <em>trusted answers</em> in four steps.</h2>
-        </div>
-
-        <ol class="steps">
-          <li class="step reveal"><span class="step-n">01</span><h3>Define the expertise</h3><p>Set the topic, answer scope, language and glossary. One installation, one focused domain.</p></li>
-          <li class="step reveal" style="--d:.08s"><span class="step-n">02</span><h3>Add your documents</h3><p>Upload files, import a folder or watch one for changes. Each document is versioned and prioritized.</p></li>
-          <li class="step reveal" style="--d:.16s"><span class="step-n">03</span><h3>Ask in plain language</h3><p>From the browser, the Windows app or Android. Follow-up questions keep their context.</p></li>
-          <li class="step reveal" style="--d:.24s"><span class="step-n">04</span><h3>Check the evidence</h3><p>Click any citation to open the exact passage, document and version behind the answer.</p></li>
-        </ol>
-
-        <div class="pipeline reveal">
-          <div class="pipeline-head">
-            <h3>Under the hood: <em>retrieval, not guesswork.</em></h3>
-            <p>Every question runs through the same grounded pipeline.</p>
-          </div>
-          <div class="flow">
-            <div class="node"><div class="node-icon"><svg class="i"><use href="#i-files"/></svg></div><h4>Your documents</h4><p>Extracted, versioned and stored atomically.</p><span class="tag">PDF · DOCX · XLSX</span></div>
-            <div class="node"><div class="node-icon"><svg class="i"><use href="#i-search"/></svg></div><h4>Hybrid search</h4><p>Keyword and semantic retrieval combined.</p><span class="tag">lexical + vector</span></div>
-            <div class="node"><div class="node-icon"><svg class="i"><use href="#i-filter"/></svg></div><h4>Access filter</h4><p>Only passages this user is allowed to see.</p><span class="tag">server-side</span></div>
-            <div class="node"><div class="node-icon"><svg class="i"><use href="#i-cpu"/></svg></div><h4>Language model</h4><p>Writes the answer from the retrieved evidence.</p><span class="tag">on your hardware</span></div>
-            <div class="node"><div class="node-icon"><svg class="i"><use href="#i-quote"/></svg></div><h4>Cited answer</h4><p>Or a clear “not in the documents”.</p><span class="tag">with sources</span></div>
-          </div>
-        </div>
-
-        <div class="nofine">
-          <h3 class="reveal">Retrieval-grounded — <em>not fine-tuned.</em></h3>
-          <div class="nofine-item reveal" style="--d:.06s"><h4>Documents change. Answers follow.</h4><p>Update a document and answers use the new version as soon as it’s re-indexed. No retraining runs.</p></div>
-          <div class="nofine-item reveal" style="--d:.12s"><h4>Knowledge is data, not weights.</h4><p>Your content stays in a database you control — versioned and backed up like any other business record.</p></div>
-          <div class="nofine-item reveal" style="--d:.18s"><h4>Citations need sources.</h4><p>Answers point at real passages — something a fine-tuned model on its own can’t do.</p></div>
-        </div>
-      </div>
-    </section>
+  <div class="kinetic" aria-hidden="true">
+    <div class="kin-track" id="kinTrack">
+      <span>Retrieve</span><span class="o">Augment</span><span>Generate</span><span class="o">Cite</span><span>Retrieve</span><span class="o">Augment</span><span>Generate</span><span class="o">Cite</span>
+      <span>Retrieve</span><span class="o">Augment</span><span>Generate</span><span class="o">Cite</span><span>Retrieve</span><span class="o">Augment</span><span>Generate</span><span class="o">Cite</span>
+    </div>
   </div>
 
-  <!-- ======================= SECURITY ======================= -->
-  <section class="section security" id="security">
+  <!-- ======================= 04 MODULES ======================= -->
+  <section class="section" id="features">
     <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow">Privacy &amp; security</span>
-        <h2 class="h2">Nothing leaves <em>the building.</em></h2>
-        <p class="sub">For manufacturers, energy, healthcare and defense suppliers, keeping documents in-house is a requirement — not a feature. Soshyant Expert is built around it.</p>
+      <div class="sec-head">
+        <p class="kicker rv"><span data-scramble>04 // System modules</span></p>
+        <h2 class="h2 rv">Built like infrastructure.<br><span class="neon">Feels like an expert.</span></h2>
       </div>
 
-      <div class="compare reveal">
-        <div class="compare-col them">
-          <h3>Typical cloud AI assistant</h3>
-          <div class="compare-row"><svg class="i"><use href="#i-x"/></svg><div><small>Your documents</small>Uploaded to a third-party cloud</div></div>
-          <div class="compare-row"><svg class="i"><use href="#i-x"/></svg><div><small>The model</small>Runs on the vendor’s servers</div></div>
-          <div class="compare-row"><svg class="i"><use href="#i-x"/></svg><div><small>Cost</small>Per-token fees that grow with usage</div></div>
-          <div class="compare-row"><svg class="i"><use href="#i-x"/></svg><div><small>Answers from</small>General knowledge that doesn’t know your product</div></div>
-          <div class="compare-row"><svg class="i"><use href="#i-x"/></svg><div><small>Proof</small>Answers without a verifiable source</div></div>
-        </div>
-        <div class="compare-col us">
-          <h3><span class="brand-mark" aria-hidden="true">S</span>Soshyant Expert, on-premise</h3>
-          <div class="compare-row"><svg class="i"><use href="#i-check"/></svg><div><small>Your documents</small>Stay on your own server and network</div></div>
-          <div class="compare-row"><svg class="i"><use href="#i-check"/></svg><div><small>The model</small>Runs on your hardware — local by default</div></div>
-          <div class="compare-row"><svg class="i"><use href="#i-check"/></svg><div><small>Cost</small>No per-question API fees in local mode</div></div>
-          <div class="compare-row"><svg class="i"><use href="#i-check"/></svg><div><small>Answers from</small>Only your approved company documents</div></div>
-          <div class="compare-row"><svg class="i"><use href="#i-check"/></svg><div><small>Proof</small>Every answer cites document, section and version</div></div>
-        </div>
-      </div>
+      <div class="mods">
+        <article class="mod hud tilt split span2 rv">
+          <div class="mod-top"><span>mod.01 // cite</span><svg class="i"><use href="#i-quote"/></svg></div>
+          <h3>Answers you can check</h3>
+          <p>Every claim links to the passage it came from — document, section and version. Click a citation and read the evidence yourself.</p>
+          <div class="mod-vis v-cite" aria-hidden="true">
+            <p class="vc-ans">Replace the filter every <mark>500 operating hours</mark><span class="cite">1</span>, or sooner if the pressure drop exceeds <mark>0.8 bar</mark><span class="cite">2</span>.</p>
+            <div class="vc-src"><span class="cite">1</span><b>MAINT_SCHEDULE v6</b><span>§3.4 Filters</span></div>
+            <div class="vc-src"><span class="cite">2</span><b>HYDRAULIC_UNIT v3</b><span>Table 5.2</span></div>
+          </div>
+        </article>
 
-      <div class="sec-grid">
-        <div class="sec-item reveal"><svg class="i"><use href="#i-key"/></svg><h4>No default accounts</h4><p>The first administrator is created with a one-time code from the server itself.</p></div>
-        <div class="sec-item reveal" style="--d:.05s"><svg class="i"><use href="#i-lock"/></svg><h4>Hashed passwords, server sessions</h4><p>Role-based access with CSRF protection on every change.</p></div>
-        <div class="sec-item reveal" style="--d:.1s"><svg class="i"><use href="#i-user-lock"/></svg><h4>Private conversations</h4><p>Users never see each other’s chats — identity always comes from the server session.</p></div>
-        <div class="sec-item reveal" style="--d:.15s"><svg class="i"><use href="#i-shield"/></svg><h4>TLS on your intranet</h4><p>Serve it across your network with your own certificate and allowed host names.</p></div>
-        <div class="sec-item reveal"><svg class="i"><use href="#i-filter"/></svg><h4>Checks before retrieval</h4><p>Permissions are enforced before search, model context, downloads and history.</p></div>
-        <div class="sec-item reveal" style="--d:.05s"><svg class="i"><use href="#i-eye-off"/></svg><h4>Quiet logs</h4><p>Question and document text are kept out of HTTP logs by default.</p></div>
-        <div class="sec-item reveal" style="--d:.1s"><svg class="i"><use href="#i-key"/></svg><h4>Protected API keys</h4><p>Optional cloud keys stay on the server, encrypted with Windows DPAPI, never sent to the browser.</p></div>
-        <div class="sec-item reveal" style="--d:.15s"><svg class="i"><use href="#i-refresh"/></svg><h4>Atomic publishing</h4><p>Documents and evidence are committed in one transaction — no half-built index.</p></div>
+        <article class="mod hud tilt rv" style="--d:.06s">
+          <div class="mod-top"><span>mod.02 // limits</span><svg class="i"><use href="#i-compass"/></svg></div>
+          <h3>Says when it doesn’t know</h3>
+          <p>No evidence, no answer. It asks a clarifying question or says the documents don’t cover it.</p>
+          <ul class="mod-vis v-status" aria-hidden="true">
+            <li class="ok"><i></i>answered</li>
+            <li class="clar"><i></i>needs clarification</li>
+            <li class="ins"><i></i>insufficient evidence</li>
+          </ul>
+        </article>
+
+        <article class="mod hud tilt rv" style="--d:.12s">
+          <div class="mod-top"><span>mod.03 // hybrid</span><svg class="i"><use href="#i-search"/></svg></div>
+          <h3>Hybrid search</h3>
+          <p>Keywords catch part numbers and exact terms. Vectors catch meaning. Soshyant fuses both.</p>
+          <div class="mod-vis v-hyb" aria-hidden="true">
+            <div class="hy-row lex"><span>lex</span><i></i><i class="on"></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i class="on"></i><i></i></div>
+            <div class="hy-row sem"><span>sem</span><i></i><i class="on"></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i></div>
+            <div class="hy-row fus"><span>hyb</span><i></i><i class="on"></i><i></i><i></i><i class="half"></i><i class="half"></i><i></i><i></i><i class="on"></i><i class="half"></i></div>
+          </div>
+        </article>
+
+        <article class="mod hud tilt split span2 rv">
+          <div class="mod-top"><span>mod.04 // private</span><svg class="i"><use href="#i-lock"/></svg></div>
+          <h3>Private by default</h3>
+          <p>The language model, the embedding model, the index and every document live on your server. In local mode: no CDN calls, no automatic downloads, no cloud.</p>
+          <div class="mod-vis v-radar" aria-hidden="true">
+            <div class="radar"><i class="sweep"></i><span class="blip b1">LLM</span><span class="blip b2">INDEX</span><span class="blip b3">DOCS</span><span class="blip b4">USERS</span></div>
+            <span class="radar-lbl">perimeter: your network</span>
+          </div>
+        </article>
+
+        <article class="mod hud tilt split span2 rv" style="--d:.06s">
+          <div class="mod-top"><span>mod.05 // access</span><svg class="i"><use href="#i-users"/></svg></div>
+          <h3>Permission-aware retrieval</h3>
+          <p>Access groups decide who can use each document. Restricted passages are removed on the server before ranking — the model never sees what the user can’t.</p>
+          <table class="mod-vis matrix" aria-label="Example: document access by group">
+            <thead><tr><th scope="col">doc</th><th scope="col">field</th><th scope="col">sales</th><th scope="col">eng</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Safety proc.</th><td class="y"><svg class="i" aria-label="allowed"><use href="#i-check"/></svg></td><td class="y"><svg class="i" aria-label="allowed"><use href="#i-check"/></svg></td><td class="y"><svg class="i" aria-label="allowed"><use href="#i-check"/></svg></td></tr>
+              <tr><th scope="row">Pricing 2026</th><td class="n"><svg class="i" aria-label="no access"><use href="#i-minus"/></svg></td><td class="y"><svg class="i" aria-label="allowed"><use href="#i-check"/></svg></td><td class="n"><svg class="i" aria-label="no access"><use href="#i-minus"/></svg></td></tr>
+              <tr><th scope="row">Design specs</th><td class="n"><svg class="i" aria-label="no access"><use href="#i-minus"/></svg></td><td class="n"><svg class="i" aria-label="no access"><use href="#i-minus"/></svg></td><td class="y"><svg class="i" aria-label="allowed"><use href="#i-check"/></svg></td></tr>
+            </tbody>
+          </table>
+        </article>
+
+        <article class="mod hud tilt rv">
+          <div class="mod-top"><span>mod.06 // lang</span><svg class="i"><use href="#i-lang"/></svg></div>
+          <h3>English &amp; <span class="fa">فارسی</span></h3>
+          <p>Switch interface and answer language instantly, with a full right-to-left layout.</p>
+          <div class="mod-vis v-lang" aria-hidden="true"><span>EN</span><span class="fa">فا</span></div>
+        </article>
+
+        <article class="mod hud tilt rv" style="--d:.06s">
+          <div class="mod-top"><span>mod.07 // watch</span><svg class="i"><use href="#i-folder"/></svg></div>
+          <h3>Watched folders</h3>
+          <p>New and changed files are detected and wait for an admin’s approval before anything is published.</p>
+          <div class="mod-line">scan ./manuals <b>· 2 changed · awaiting approval</b></div>
+        </article>
+
+        <article class="mod hud tilt rv" style="--d:.12s">
+          <div class="mod-top"><span>mod.08 // review</span><svg class="i"><use href="#i-review"/></svg></div>
+          <h3>Answer review</h3>
+          <p>Triage unanswered questions and user feedback, and note which document needs fixing.</p>
+          <div class="mod-line">queue <b>· insufficient · clarify · feedback</b></div>
+        </article>
+
+        <article class="mod hud tilt rv" style="--d:.18s">
+          <div class="mod-top"><span>mod.09 // ops</span><svg class="i"><use href="#i-dashboard"/></svg></div>
+          <h3>Admin overview</h3>
+          <p>Documents, passages, jobs, accounts, the active model and the latest backup — at a glance.</p>
+          <div class="mod-line">status <b>· refreshes every 20s</b></div>
+        </article>
+
+        <article class="mod hud tilt split span2 rv">
+          <div class="mod-top"><span>mod.10 // models</span><svg class="i"><use href="#i-spark"/></svg></div>
+          <h3>Bring your model</h3>
+          <p>Use the bundled local model, any GGUF model on your server, or an OpenAI-compatible API — only after an admin explicitly approves sending context.</p>
+          <ul class="mod-vis v-models" aria-hidden="true">
+            <li><span>bundled model</span><b>local</b></li>
+            <li><span>any gguf · llama.cpp</span><b>local</b></li>
+            <li><span>openai-compatible api</span><b class="amb">consent</b></li>
+          </ul>
+        </article>
+
+        <article class="mod hud tilt rv" style="--d:.06s">
+          <div class="mod-top"><span>mod.11 // plan</span><svg class="i"><use href="#i-cpu"/></svg></div>
+          <h3>Hardware planner</h3>
+          <p>Estimate GPUs, RAM and CPU for your number of users — before you buy anything.</p>
+          <div class="mod-line">users → <b>gpu · ram · cpu</b></div>
+        </article>
+
+        <article class="mod hud tilt rv" style="--d:.12s">
+          <div class="mod-top"><span>mod.12 // backup</span><svg class="i"><use href="#i-db"/></svg></div>
+          <h3>Backup &amp; restore</h3>
+          <p>Back up documents, chats, accounts and settings. Restores are validated before they replace anything.</p>
+          <div class="mod-line">backup.zip <b>· verified</b></div>
+        </article>
       </div>
     </div>
   </section>
 
-  <!-- ======================= DEPLOY ======================= -->
+  <!-- ======================= 05 SECURITY ======================= -->
+  <section class="section" id="security">
+    <div class="container">
+      <div class="sec-head">
+        <p class="kicker rv"><span data-scramble>05 // Perimeter</span></p>
+        <h2 class="h2 rv">Nothing leaves<br><span class="neon">the building.</span></h2>
+        <p class="lede rv">For manufacturers, energy, healthcare and defense suppliers, keeping documents in-house is a requirement — not a feature. Flip the switch to see the difference.</p>
+      </div>
+
+      <div class="perim hud rv" id="perim" data-mode="local">
+        <div class="perim-top">
+          <div class="switch" role="group" aria-label="Compare deployments">
+            <button type="button" data-mode="cloud" aria-pressed="false" data-cursor="SWITCH">Cloud AI</button>
+            <button type="button" data-mode="local" aria-pressed="true" data-cursor="SWITCH">Soshyant</button>
+            <i class="switch-thumb" aria-hidden="true"></i>
+          </div>
+          <span class="perim-state" id="perimState">uplink: none · perimeter sealed</span>
+        </div>
+        <div class="perim-body">
+          <svg class="perim-svg" viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Data flow: with Soshyant, documents, index and model stay inside your network; with a cloud assistant, documents leave it.">
+            <defs>
+              <path id="pLocal" d="M96 150 L226 78 L356 150 L226 222 Z"/>
+              <path id="pCloud" d="M96 150 L226 78 L356 150 L560 150"/>
+            </defs>
+            <rect class="perim-wall" x="18" y="22" width="442" height="256"/>
+            <text class="perim-lbl" x="34" y="44">YOUR NETWORK</text>
+            <path class="link" d="M96 150 L226 78 L356 150 L226 222 Z"/>
+            <path class="link-out" d="M356 150 L560 150"/>
+            <g class="node" transform="translate(96 150)"><rect x="-44" y="-19" width="88" height="38"/><text y="4">DOCS</text></g>
+            <g class="node" transform="translate(226 78)"><rect x="-44" y="-19" width="88" height="38"/><text y="4">INDEX</text></g>
+            <g class="node" transform="translate(356 150)"><rect x="-44" y="-19" width="88" height="38"/><text y="4">LLM</text></g>
+            <g class="node" transform="translate(226 222)"><rect x="-44" y="-19" width="88" height="38"/><text y="4">USERS</text></g>
+            <g class="node cloud" transform="translate(560 150)"><rect x="-58" y="-28" width="116" height="56"/><text y="-3">3RD-PARTY</text><text y="14">CLOUD AI</text></g>
+            <g class="seal" transform="translate(460 150)"><rect x="-10" y="-10" width="20" height="20"/><path d="M-4 0 L-1 3 L5 -4"/><text y="-20">SEALED</text></g>
+            <g class="breach" transform="translate(460 150)"><circle r="10"/><circle class="core" r="4"/><text y="-22">EXPOSED</text></g>
+            <g class="pk pk-local">
+              <circle r="4"><animateMotion dur="5s" repeatCount="indefinite" begin="0s"><mpath xlink:href="#pLocal"/></animateMotion></circle>
+              <circle r="4"><animateMotion dur="5s" repeatCount="indefinite" begin="-1.25s"><mpath xlink:href="#pLocal"/></animateMotion></circle>
+              <circle r="4"><animateMotion dur="5s" repeatCount="indefinite" begin="-2.5s"><mpath xlink:href="#pLocal"/></animateMotion></circle>
+              <circle r="4"><animateMotion dur="5s" repeatCount="indefinite" begin="-3.75s"><mpath xlink:href="#pLocal"/></animateMotion></circle>
+            </g>
+            <g class="pk pk-cloud">
+              <circle r="4"><animateMotion dur="2.4s" repeatCount="indefinite" begin="0s"><mpath xlink:href="#pCloud"/></animateMotion></circle>
+              <circle r="4"><animateMotion dur="2.4s" repeatCount="indefinite" begin="-.6s"><mpath xlink:href="#pCloud"/></animateMotion></circle>
+              <circle r="4"><animateMotion dur="2.4s" repeatCount="indefinite" begin="-1.2s"><mpath xlink:href="#pCloud"/></animateMotion></circle>
+              <circle r="4"><animateMotion dur="2.4s" repeatCount="indefinite" begin="-1.8s"><mpath xlink:href="#pCloud"/></animateMotion></circle>
+            </g>
+          </svg>
+          <ul class="perim-read">
+            <li><small>Your documents</small><b data-cloud="Uploaded to a third-party cloud" data-local="Stay on your own server">Stay on your own server</b></li>
+            <li><small>The model</small><b data-cloud="Runs on the vendor’s servers" data-local="Runs on your hardware">Runs on your hardware</b></li>
+            <li><small>Cost</small><b data-cloud="Per-token fees that grow with use" data-local="No per-question API fees (local mode)">No per-question API fees (local mode)</b></li>
+            <li><small>Answers from</small><b data-cloud="General knowledge, not your product" data-local="Only your approved documents">Only your approved documents</b></li>
+            <li><small>Proof</small><b data-cloud="No verifiable source" data-local="Document, section and version cited">Document, section and version cited</b></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="term hud rv" id="secTerm">
+        <div class="term-h">security --audit</div>
+        <ul>
+          <li><b>[ OK ]</b>No default accounts — the first admin is created with a one-time code from the server</li>
+          <li><b>[ OK ]</b>Hashed passwords, server-side sessions, CSRF protection on every change</li>
+          <li><b>[ OK ]</b>Conversations isolated per user — identity always comes from the session</li>
+          <li><b>[ OK ]</b>TLS on your intranet with your own certificate and allowed host names</li>
+          <li><b>[ OK ]</b>Permissions enforced before search, model context, downloads and history</li>
+          <li><b>[ OK ]</b>Question and document text kept out of HTTP logs by default</li>
+          <li><b>[ OK ]</b>Optional API keys stay server-side, encrypted with Windows DPAPI</li>
+          <li><b>[ OK ]</b>Documents and evidence published in one atomic transaction</li>
+          <li class="ready">› audit complete · 8/8 checks passed<i class="caret"></i></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= 06 DEPLOY ======================= -->
   <section class="section deploy" id="deploy">
     <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow">Deployment</span>
-        <h2 class="h2">Runs where <em>your team works.</em></h2>
+      <div class="sec-head">
+        <p class="kicker rv"><span data-scramble>06 // Deployment targets</span></p>
+        <h2 class="h2 rv">Runs where <span class="neon">your team works.</span></h2>
       </div>
       <div class="deploy-grid">
-        <article class="dcard reveal">
+        <article class="dcard hud tilt rv">
           <div class="dvis" aria-hidden="true"><div class="mock-win"><div class="bar"><i></i><i></i><i></i></div><div class="rows"><b></b><b></b><b></b></div></div></div>
+          <span class="d-code">target.01</span>
           <h3>Windows desktop launcher</h3>
-          <p>Double-click to start. It runs quietly in the system tray with clean start, stop and server logs — no command window needed.</p>
-          <div class="tag-row"><span>System tray</span><span>Offline install</span></div>
+          <p>Double-click to start. It runs quietly in the system tray with clean start, stop and server logs — no command window.</p>
+          <div class="tag-row"><span>system tray</span><span>offline install</span></div>
         </article>
-        <article class="dcard reveal" style="--d:.08s">
+        <article class="dcard hud tilt rv" style="--d:.08s">
           <div class="dvis" aria-hidden="true">
             <div class="lan">
               <svg class="lines" viewBox="0 0 200 110" preserveAspectRatio="none"><path d="M15 19 100 55M185 19 100 55M23 95 100 55M177 95 100 55"/></svg>
@@ -446,156 +565,160 @@
               <span class="hub"><svg class="i"><use href="#i-server"/></svg></span>
             </div>
           </div>
+          <span class="d-code">target.02</span>
           <h3>Your internal network</h3>
           <p>Every browser on your intranet connects over HTTPS. The language model itself only ever listens on the server.</p>
-          <div class="tag-row"><span>HTTPS / TLS</span><span>Browser-based</span></div>
+          <div class="tag-row"><span>https / tls</span><span>browser-based</span></div>
         </article>
-        <article class="dcard reveal" style="--d:.16s">
+        <article class="dcard hud tilt rv" style="--d:.16s">
           <div class="dvis" aria-hidden="true"><div class="phone"><b class="me"></b><b class="bot"></b><b class="bot2"></b></div></div>
+          <span class="d-code">target.03</span>
           <h3>Android companion app</h3>
           <p>Answers on the shop floor. A native app that connects over your Wi-Fi with your private certificate — and blocks screenshots.</p>
-          <div class="tag-row"><span>Native Android</span><span>Wi-Fi + HTTPS</span></div>
+          <div class="tag-row"><span>native android</span><span>wi-fi + https</span></div>
         </article>
       </div>
     </div>
   </section>
 
-  <!-- ======================= BOOK + FAQ ======================= -->
-  <div class="panel">
-    <section class="section" id="book">
-      <div class="container book-grid">
-        <div class="book-copy reveal">
-          <span class="eyebrow">Book a demo</span>
-          <h2 class="h2">See it answer from documents <em>like yours.</em></h2>
-          <p class="sub">Pick a time that suits you. We’ll walk through the product live and talk about what a pilot would look like for your team.</p>
+  <!-- ======================= 07 BOOK ======================= -->
+  <section class="section book" id="book">
+    <div class="container book-grid">
+      <div class="book-copy">
+        <p class="kicker rv"><span data-scramble>07 // Establish uplink</span></p>
+        <h2 class="h2 rv">Book a <span class="neon">live demo.</span></h2>
+        <p class="lede rv">Pick a slot. We’ll run the pipeline live and talk about what a pilot would look like for your team.</p>
+        <ol class="agenda rv">
+          <li><span>01</span><div><h4>Live pipeline run</h4><p>Ask questions, open citations, and watch it refuse when the evidence isn’t there.</p></div></li>
+          <li><span>02</span><div><h4>The admin console</h4><p>Documents, watched folders, access groups and answer review.</p></div></li>
+          <li><span>03</span><div><h4>Your deployment</h4><p>Users, languages, hardware sizing and data boundaries.</p></div></li>
+          <li><span>04</span><div><h4>A pilot plan</h4><p>How to measure answer quality on your own questions.</p></div></li>
+        </ol>
+        <div class="book-meta rv">
+          <span><svg class="i"><use href="#i-video"/></svg>live &amp; online</span>
+          <span><svg class="i"><use href="#i-clock"/></svg>your time zone</span>
+          <span><svg class="i"><use href="#i-check"/></svg>no commitment</span>
+        </div>
+      </div>
 
-          <ul class="agenda">
-            <li><div class="card-icon"><svg class="i"><use href="#i-msg"/></svg></div><div><h4>A live walkthrough</h4><p>Ask questions, open citations, and see what happens when the answer isn’t in the documents.</p></div></li>
-            <li><div class="card-icon"><svg class="i"><use href="#i-dashboard"/></svg></div><div><h4>The admin console</h4><p>Documents, watched folders, access groups and answer review.</p></div></li>
-            <li><div class="card-icon"><svg class="i"><use href="#i-server"/></svg></div><div><h4>Your deployment</h4><p>Users, languages, hardware sizing and data boundaries.</p></div></li>
-            <li><div class="card-icon"><svg class="i"><use href="#i-compass"/></svg></div><div><h4>A pilot plan</h4><p>How to measure answer quality on your own questions.</p></div></li>
-          </ul>
-
-          <div class="book-meta">
-            <span><svg class="i"><use href="#i-video"/></svg>Live &amp; online</span>
-            <span><svg class="i"><use href="#i-clock"/></svg>Shown in your time zone</span>
-            <span><svg class="i"><use href="#i-check"/></svg>No commitment</span>
-          </div>
+      <div class="cal hud rv" style="--d:.1s">
+        <div class="cal-top">
+          <span class="cal-ico"><svg class="i"><use href="#i-calendar"/></svg></span>
+          <div><strong>Schedule your demo</strong><small>google calendar · secure booking</small></div>
+          <a id="calOpen" href="#" target="_blank" rel="noopener" hidden data-cursor="OPEN">new tab <svg class="i"><use href="#i-external"/></svg></a>
         </div>
 
-        <div class="cal-card reveal" style="--d:.1s">
-          <div class="cal-top">
-            <div class="card-icon"><svg class="i"><use href="#i-calendar"/></svg></div>
-            <div><strong>Schedule your demo</strong><small>Powered by Google Calendar</small></div>
-            <a id="calOpen" href="#" target="_blank" rel="noopener" hidden>Open in new tab <svg class="i"><use href="#i-external"/></svg></a>
-          </div>
+        <div class="cal-embed" id="calEmbed" hidden></div>
 
-          <div class="cal-embed" id="calEmbed" hidden></div>
-
-          <div class="cal-ph" id="calPlaceholder">
-            <div class="cal-mock" aria-hidden="true">
-              <div>
-                <div class="cal-month"><span id="calMonth">Month</span><span>‹ ›</span></div>
-                <div class="cal-grid" id="calGrid"></div>
-              </div>
-              <div class="cal-slots"><div class="day" id="calDay">Available times</div><span>10:00</span><span>11:30</span><span>14:00</span><span>15:30</span><span>17:00</span></div>
+        <div class="cal-ph" id="calPlaceholder">
+          <div class="cal-mock" aria-hidden="true">
+            <div>
+              <div class="cal-month"><span id="calMonth">Month</span><span>‹ ›</span></div>
+              <div class="cal-grid" id="calGrid"></div>
             </div>
-            <div class="cal-overlay">
-              <!-- Shown until a booking link is added in window.SOSHYANT.bookingUrl -->
-              <div class="cal-msg" id="calUnset">
-                <span class="badge"><svg class="i" style="width:14px;height:14px"><use href="#i-calendar"/></svg>Booking calendar not connected yet</span>
-                <h3>Your Google Calendar booking page goes here.</h3>
-                <p>Paste your appointment schedule link into <code>bookingUrl</code> at the top of <code>index.html</code> and visitors can book straight from this panel.</p>
-                <div class="btns">
-                  <a class="btn btn-ink" data-contact-href="email" href="#contact">Email us to schedule <svg class="i i-arrow"><use href="#i-arrow"/></svg></a>
-                </div>
-              </div>
-              <!-- Shown when the link can't be embedded (e.g. a calendar.app.google short link) -->
-              <div class="cal-msg" id="calExternal" hidden>
-                <span class="badge" style="background:#e1f0e6;color:#1f6b4b"><svg class="i" style="width:14px;height:14px"><use href="#i-check"/></svg>Times available</span>
-                <h3>Choose a time that works for you.</h3>
-                <p>Our booking page opens in a new tab and shows every open slot in your time zone.</p>
-                <div class="btns">
-                  <a class="btn btn-ink" id="calExternalBtn" href="#" target="_blank" rel="noopener">Open booking page <svg class="i i-arrow"><use href="#i-arrow"/></svg></a>
-                  <a class="btn btn-line" data-contact-href="email" href="#contact">Email us</a>
-                </div>
+            <div class="cal-slots"><div class="day" id="calDay">Available</div><span>10:00</span><span>11:30</span><span>14:00</span><span>15:30</span><span>17:00</span></div>
+          </div>
+          <div class="cal-overlay">
+            <!-- Shown until a booking link is added in window.SOSHYANT.bookingUrl -->
+            <div class="cal-msg" id="calUnset">
+              <span class="badge warn">signal pending</span>
+              <h3>Your Google Calendar booking page plugs in here.</h3>
+              <p>Paste your appointment schedule link into <code>bookingUrl</code> at the top of <code>index.html</code> and visitors can book straight from this panel.</p>
+              <div class="btns"><a class="btn btn-neon btn-sm" data-contact-href="email" href="#contact" data-cursor="EMAIL"><span>Email to schedule</span></a></div>
+            </div>
+            <!-- Shown when the link can't be embedded (e.g. a calendar.app.google short link) -->
+            <div class="cal-msg" id="calExternal" hidden>
+              <span class="badge">slots available</span>
+              <h3>Choose a time that works for you.</h3>
+              <p>Our booking page opens in a new tab and shows every open slot in your time zone.</p>
+              <div class="btns">
+                <a class="btn btn-neon btn-sm" id="calExternalBtn" href="#" target="_blank" rel="noopener" data-cursor="OPEN"><span>Open booking page</span></a>
+                <a class="btn btn-ghost btn-sm" data-contact-href="email" href="#contact"><span>Email us</span></a>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="section" id="faq" style="padding-top:0">
-      <div class="container faq-wrap">
-        <div class="reveal">
-          <span class="eyebrow">FAQ</span>
-          <h2 class="h2">Questions, <em>answered.</em></h2>
-          <p class="sub">Something else on your mind? <a href="#contact" style="color:var(--green);text-decoration:underline;text-underline-offset:3px">Get in touch</a> — we’re happy to go into detail.</p>
-        </div>
-        <div class="faq-list reveal" style="--d:.08s">
-          <details>
-            <summary>Does Soshyant Expert train the model on our documents?<span class="plus" aria-hidden="true"></span></summary>
-            <div class="answer">No. Documents are indexed for retrieval; the model’s weights are never changed. When you update a document, answers use the new version as soon as it’s re-indexed — no retraining, and your knowledge stays a database you control.</div>
-          </details>
-          <details>
-            <summary>Does it need an internet connection?<span class="plus" aria-hidden="true"></span></summary>
-            <div class="answer">Not in local mode. The language model, the search model and the interface files all load from the server’s own disk — no CDN, web fonts or automatic downloads. If an administrator chooses to connect a cloud model, the server then needs internet access and the question plus retrieved passages go to that provider — only after explicit approval.</div>
-          </details>
-          <details>
-            <summary>Which documents can it read?<span class="plus" aria-hidden="true"></span></summary>
-            <div class="answer">PDF (with a text layer), Word (DOCX), Excel (XLSX), plain text, Markdown and HTML. Scanned documents need OCR before they’re imported. Documents can be uploaded one by one, imported as a folder, or picked up from a watched folder.</div>
-          </details>
-          <details>
-            <summary>Which languages are supported?<span class="plus" aria-hidden="true"></span></summary>
-            <div class="answer">The interface and answers are available in English and Persian (<span class="fa">فارسی</span>), with a full right-to-left layout. As with any AI system, we recommend validating answer quality on a set of real questions from your own domain and language during a pilot.</div>
-          </details>
-          <details>
-            <summary>Can different teams see different documents?<span class="plus" aria-hidden="true"></span></summary>
-            <div class="answer">Yes. Administrators create access groups and choose which groups can use each document. Restricted passages are filtered on the server before search ranking and before anything reaches the model. Confidential files can be imported as “administrators only” from the very first second.</div>
-          </details>
-          <details>
-            <summary>What hardware do we need?<span class="plus" aria-hidden="true"></span></summary>
-            <div class="answer">It runs on a single Windows server or workstation. A GPU is recommended for responsive answers, and CPU-only operation is possible. The built-in hardware planner estimates GPUs, RAM and CPU cores for your number of users — and we’ll size it with you during the demo.</div>
-          </details>
-          <details>
-            <summary>Is there a mobile app?<span class="plus" aria-hidden="true"></span></summary>
-            <div class="answer">Yes — a native Android app that connects to your own server over your Wi-Fi using HTTPS and your private certificate. The model never runs on the phone, passwords aren’t stored on it, and screenshots are blocked to protect confidential content.</div>
-          </details>
-          <details>
-            <summary>Where is our data stored?<span class="plus" aria-hidden="true"></span></summary>
-            <div class="answer">Documents, conversations and accounts live in a local database on your server, and backups are written to your server too. You decide how that storage is protected and retained under your own policies.</div>
-          </details>
+  <!-- ======================= 08 FAQ ======================= -->
+  <section class="section faq" id="faq">
+    <div class="container faq-grid">
+      <div class="faq-head">
+        <p class="kicker rv"><span data-scramble>08 // Query log</span></p>
+        <h2 class="h2 rv">Questions, <span class="neon">answered.</span></h2>
+        <p class="lede rv">Something else on your mind? <a class="link-neon" href="#contact">Open a channel</a> — we’re happy to go deep.</p>
+      </div>
+      <div class="faq-list rv">
+        <details>
+          <summary><span class="q-id">Q.01</span><span class="q-t">What does “RAG” mean here?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id">A ›</span><p>Retrieval-augmented generation. When someone asks a question, Soshyant first searches your indexed documents (keyword and semantic), keeps only the passages that person is allowed to see, and hands them to the language model with instructions to answer only from that evidence and cite it. If the passages don’t support an answer, it says so.</p></div>
+        </details>
+        <details>
+          <summary><span class="q-id">Q.02</span><span class="q-t">Does it train the model on our documents?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id">A ›</span><p>No. Documents are indexed for retrieval; the model’s weights are never changed. When you update a document, answers use the new version as soon as it’s re-indexed — no retraining.</p></div>
+        </details>
+        <details>
+          <summary><span class="q-id">Q.03</span><span class="q-t">Does it need an internet connection?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id">A ›</span><p>Not in local mode. The language model, the embedding model and the interface files all load from the server’s own disk — no CDN, web fonts or automatic downloads. If an administrator chooses to connect a cloud model, the server then needs internet and the question plus retrieved passages go to that provider — only after explicit approval.</p></div>
+        </details>
+        <details>
+          <summary><span class="q-id">Q.04</span><span class="q-t">Which documents can it read?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id">A ›</span><p>PDF (with a text layer), Word (DOCX), Excel (XLSX), plain text, Markdown and HTML. Scanned documents need OCR before import. Upload files one by one, import a folder, or watch a folder for changes.</p></div>
+        </details>
+        <details>
+          <summary><span class="q-id">Q.05</span><span class="q-t">Which languages are supported?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id">A ›</span><p>The interface and answers are available in English and Persian (<span class="fa">فارسی</span>), with a full right-to-left layout. We recommend validating answer quality on real questions from your own domain and language during a pilot.</p></div>
+        </details>
+        <details>
+          <summary><span class="q-id">Q.06</span><span class="q-t">Can different teams see different documents?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id">A ›</span><p>Yes. Administrators create access groups and choose which groups can use each document. Restricted passages are filtered on the server before ranking and before anything reaches the model. Confidential files can be imported as “administrators only” from the first second.</p></div>
+        </details>
+        <details>
+          <summary><span class="q-id">Q.07</span><span class="q-t">What hardware do we need?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id">A ›</span><p>A single Windows server or workstation. A GPU is recommended for responsive answers; CPU-only operation is possible. The built-in hardware planner estimates GPUs, RAM and CPU cores for your number of users — and we’ll size it with you during the demo.</p></div>
+        </details>
+        <details>
+          <summary><span class="q-id">Q.08</span><span class="q-t">Is there a mobile app?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id">A ›</span><p>Yes — a native Android app that connects to your own server over Wi-Fi using HTTPS and your private certificate. The model never runs on the phone, passwords aren’t stored on it, and screenshots are blocked.</p></div>
+        </details>
+        <details>
+          <summary><span class="q-id">Q.09</span><span class="q-t">Where is our data stored?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id">A ›</span><p>Documents, conversations and accounts live in a local database on your server, and backups are written there too. You decide how that storage is protected and retained under your own policies.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= 09 CONTACT ======================= -->
+  <section class="section contact" id="contact">
+    <div class="container contact-grid">
+      <div>
+        <p class="kicker rv"><span data-scramble>09 // Open a channel</span></p>
+        <h2 class="closing rv">The companies that wrote the manuals deserve an expert that <span class="neon glitch" data-text="never forgets.">never forgets.</span></h2>
+        <p class="lede rv">Tell us about your documents and your team — we’ll show you what a RAG expert running on your own hardware can do with them.</p>
+        <div class="hero-ctas rv">
+          <a class="btn btn-neon magnetic" href="#book" data-cursor="BOOK"><span>Book a demo</span><svg class="i"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn-ghost magnetic" data-contact-href="email" href="#contact" data-cursor="EMAIL"><span>Send an email</span></a>
         </div>
       </div>
-    </section>
-  </div>
 
-  <!-- ======================= CLOSING + CONTACT ======================= -->
-  <section class="section closing" id="contact">
-    <div class="container closing-grid">
-      <div class="reveal">
-        <span class="eyebrow">Get in touch</span>
-        <h2 class="closing-quote" style="margin-top:20px">The companies that wrote the manuals deserve an expert that <em>never forgets.</em></h2>
-        <p class="sub">Tell us about your documents and your team — we’ll show you what Soshyant Expert can do with them.</p>
-        <div class="hero-ctas">
-          <a class="btn btn-gold btn-lg" href="#book">Book a demo <svg class="i i-arrow"><use href="#i-arrow"/></svg></a>
-          <a class="btn btn-ghost btn-lg" data-contact-href="email" href="#contact">Send an email</a>
-        </div>
-      </div>
-
-      <div class="contact-card reveal" style="--d:.1s">
-        <div class="person">
-          <div class="avatar" id="avatar" aria-hidden="true">S</div>
+      <div class="idcard tilt rv" style="--d:.1s">
+        <div class="id-holo" aria-hidden="true"></div>
+        <div class="id-top"><span>operator id</span><span>soshyant // expert</span></div>
+        <div class="id-person">
+          <div class="id-avatar" id="avatar" aria-hidden="true">S</div>
           <div><strong data-contact="name">[Your Name]</strong><span data-contact="role">[Founder &amp; CEO, Soshyant]</span></div>
         </div>
-        <div class="contact-list">
-          <a data-contact-href="email" href="#contact"><span class="ci"><svg class="i"><use href="#i-mail"/></svg></span><span><small>Email</small><b data-contact="email">[you@yourcompany.com]</b></span><svg class="i go"><use href="#i-arrow"/></svg></a>
-          <a data-contact-href="phone" href="#contact"><span class="ci"><svg class="i"><use href="#i-phone"/></svg></span><span><small>Phone</small><b data-contact="phone">[+00 000 000 0000]</b></span><svg class="i go"><use href="#i-arrow"/></svg></a>
-          <div><span class="ci"><svg class="i"><use href="#i-pin"/></svg></span><span><small>Location</small><b data-contact="location">[City, Country]</b></span></div>
-          <a data-contact-href="linkedin" href="#contact" target="_blank" rel="noopener"><span class="ci"><svg class="i"><use href="#i-linkedin"/></svg></span><span><small>LinkedIn</small><b data-contact="linkedin">[linkedin.com/in/your-profile]</b></span><svg class="i go"><use href="#i-arrow"/></svg></a>
-          <a data-contact-href="website" href="#contact" target="_blank" rel="noopener"><span class="ci"><svg class="i"><use href="#i-globe"/></svg></span><span><small>Website</small><b data-contact="website">[www.yourcompany.com]</b></span><svg class="i go"><use href="#i-arrow"/></svg></a>
-        </div>
+        <ul class="id-fields">
+          <li><small>email</small><a data-contact-href="email" data-contact="email" href="#contact">[you@yourcompany.com]</a><button class="copy" type="button" data-copy="email" data-cursor="COPY">copy</button></li>
+          <li><small>phone</small><a data-contact-href="phone" data-contact="phone" href="#contact">[+00 000 000 0000]</a><button class="copy" type="button" data-copy="phone" data-cursor="COPY">copy</button></li>
+          <li><small>location</small><span data-contact="location">[City, Country]</span></li>
+          <li><small>linkedin</small><a data-contact-href="linkedin" data-contact="linkedin" href="#contact" target="_blank" rel="noopener">[linkedin.com/in/your-profile]</a></li>
+          <li><small>website</small><a data-contact-href="website" data-contact="website" href="#contact" target="_blank" rel="noopener">[www.yourcompany.com]</a></li>
+        </ul>
+        <div class="id-bottom"><span class="barcode" aria-hidden="true"></span><span>clearance: public</span></div>
       </div>
     </div>
   </section>
@@ -604,32 +727,19 @@
 <!-- ======================= FOOTER ======================= -->
 <footer class="footer">
   <div class="container">
-    <div class="footer-grid">
+    <div class="foot-word" id="footWord" aria-hidden="true"><span class="fw-en">SOSHYANT</span><span class="fw-fa fa">سوشیانت</span></div>
+    <div class="foot-grid">
       <div>
-        <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">S</span><span class="brand-word">SOSHYANT<b>EXPERT</b></span></a>
-        <p>A private, on-premise AI expert that answers from your company’s own documents — and cites every source.</p>
+        <a class="logo" href="#top"><span class="logo-mark" aria-hidden="true">S</span><span class="logo-word"><span class="lw-en">SOSHYANT</span><small>expert // rag engine</small></span></a>
+        <p>An on-premise RAG engine that answers from your company’s own documents — and cites every source.</p>
       </div>
-      <div>
-        <h5>Product</h5>
-        <ul><li><a href="#features">Features</a></li><li><a href="#how">How it works</a></li><li><a href="#security">Security</a></li><li><a href="#deploy">Deployment</a></li></ul>
-      </div>
-      <div>
-        <h5>Company</h5>
-        <ul><li><a href="#book">Book a demo</a></li><li><a href="#faq">FAQ</a></li><li><a href="#contact">Contact</a></li></ul>
-      </div>
-      <div>
-        <h5>Contact</h5>
-        <ul>
-          <li><a data-contact-href="email" href="#contact" data-contact="email">[you@yourcompany.com]</a></li>
-          <li><a data-contact-href="phone" href="#contact" data-contact="phone">[+00 000 000 0000]</a></li>
-          <li data-contact="location">[City, Country]</li>
-        </ul>
-      </div>
+      <div><h5>// product</h5><ul><li><a href="#console">Console</a></li><li><a href="#rag">How RAG works</a></li><li><a href="#features">Modules</a></li><li><a href="#security">Security</a></li></ul></div>
+      <div><h5>// company</h5><ul><li><a href="#book">Book a demo</a></li><li><a href="#faq">FAQ</a></li><li><a href="#contact">Contact</a></li></ul></div>
+      <div><h5>// contact</h5><ul><li><a data-contact-href="email" data-contact="email" href="#contact">[you@yourcompany.com]</a></li><li><a data-contact-href="phone" data-contact="phone" href="#contact">[+00 000 000 0000]</a></li><li data-contact="location">[City, Country]</li></ul></div>
     </div>
-    <div class="footer-word" aria-hidden="true">Soshyant</div>
-    <div class="footer-base">
+    <div class="foot-base">
       <span>© <span id="year">2026</span> Soshyant. All rights reserved.</span>
-      <span>Your knowledge. Your server. Your answers.</span>
+      <span>sys.status: online · uplink: none</span>
     </div>
   </div>
 </footer>
