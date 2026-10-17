@@ -579,6 +579,20 @@ class HTTPTests(Fixture):
         self.csrf = 'wrong'
         self.assertEqual(self.request('/api/capacity/estimate', {})[0], 403)
 
+    def test_ocr_setting_requires_admin_and_csrf_and_persists(self):
+        self.login("other", "test-password-other")
+        self.assertEqual(self.request("/api/ocr", {"enabled": False})[0], 403)
+        self.login()
+        self.assertEqual(self.request("/api/ocr", {"enabled": False}, {"X-CSRF-Token": "wrong"})[0], 403)
+        self.assertEqual(self.request("/api/ocr", {"enabled": "no"})[0], 400)
+        status, result = self.request("/api/ocr", {"enabled": False})
+        self.assertEqual(status, 200)
+        self.assertEqual(result["enabled"], False)
+        self.assertEqual(result["languages"], ["en"])
+        self.assertFalse(json.loads((self.root / "config/server.json").read_text())["ocr_enabled"])
+        self.assertFalse(self.request("/api/status")[1]["ocr"]["enabled"])
+        self.assertTrue(self.request("/api/ocr", {"enabled": True})[1]["enabled"])
+
     def test_csrf_is_required(self):
         self.login()
         self.csrf = "wrong"

@@ -21,7 +21,7 @@ Open **Documents → Add a document folder** as an administrator and select a fo
 
 Subfolders are included by default; uncheck **Include subfolders** to use only files directly in the chosen folder. The page shows selected and supported counts before import. Start with **Import & index folder**. Each file uploads and finishes indexing before the next begins, so a large collection does not fill the bounded indexing queue. Relative names are preserved as source titles; original filenames remain simple filenames.
 
-- PDF, DOCX, XLSX, TXT, Markdown, and HTML are accepted. Scanned images/PDFs need OCR before import.
+- PDF, DOCX, XLSX, TXT, Markdown, HTML and scanned images (PNG, JPG, TIFF) are accepted. Scanned English pages are read with local OCR when it is on; see [OCR.md](OCR.md).
 - At most 1,000 selected files are accepted per import. The configured per-file size limit and global knowledge chunk limit still apply.
 - Identical content already indexed in an active document is skipped using a SHA-256 comparison. A changed file is added as a new source; folder import does not infer document revisions from filenames. Use **New version** for deliberate replacement.
 - A failed file does not stop the remaining collection. The per-file report shows successful, duplicate, unsupported, and failed entries.

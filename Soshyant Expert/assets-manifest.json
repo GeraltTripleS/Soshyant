@@ -106,5 +106,17 @@
   "assets/llama/mtmd.dll": {
     "bytes": 2377728,
     "sha256": "5cc9f3ca0e7abb29ab0eaa2896d2823ca528c9d653eedd7a48e67a92cfa2f402"
+  },
+  "assets/ocr/mmproj-unlimited-ocr-bf16.gguf": {
+    "bytes": 826425824,
+    "sha256": "2bd6b27e24f76bce79099c21c4985bf3d69dc18accbf58ca055d4147ef6c3cd2"
+  },
+  "assets/ocr/provenance.json": {
+    "bytes": 722,
+    "sha256": "4dc2f64541b42792c5c1ef5b2f30c464a1964fcb33956c5d4f6d4c4ca3d4c9e1"
+  },
+  "assets/ocr/unlimited-ocr-Q4_K_M.gguf": {
+    "bytes": 1950326592,
+    "sha256": "9953a7b064f3bec4edb7b8934db7d27b854774471a60c350067f11c4e58189fe"
   }
 }

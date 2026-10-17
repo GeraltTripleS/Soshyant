@@ -146,11 +146,40 @@ async function refreshStatus() {
     card.append(element('small', '', label), element('strong', '', value), element('small', '', detail));
     $('systemStatus').append(card);
   }
+  renderOcr();
   const missing = !state.status.model.installed || (state.status.search.mode === 'hybrid' && !state.status.search.installed);
   const cloud=state.status.model.kind==='cloud';
   $('notice').hidden = !missing && !cloud;
   $('notice').textContent = cloud?t('API model active: questions, relevant document passages, domain settings, and recent conversation are sent to the selected provider.')+' '+state.status.model.name+' · '+state.status.model.base_url+(missing?' · '+t('The selected model or search assets are unavailable.'):''):
     t('بعضی فایل‌های اجرای محلی موجود نیستند. پیش از استفاده، ابزار بررسی نصب را روی سرور اجرا کنید.');
+}
+
+function ocrSummary() {
+  const ocr = state.status?.ocr;
+  if (!ocr) return '';
+  if (!ocr.installed) return t('OCR model files are not installed on this server.');
+  if (!ocr.enabled) return t('OCR is off. Scanned pages without text are not indexed.');
+  return t(ocr.device === 'gpu' ? 'On · runs on this server’s GPU · English only' : 'On · runs on this server’s CPU · English only');
+}
+function renderOcr() {
+  const ocr = state.status?.ocr;
+  if (!ocr) return;
+  $('ocrEnabled').checked = ocr.enabled && ocr.installed;
+  $('ocrEnabled').disabled = !ocr.installed;
+  $('ocrStatus').textContent = ocrSummary();
+}
+$('ocrEnabled').addEventListener('change', async event => {
+  const enabled = event.target.checked;
+  try {
+    state.status.ocr = await api('/api/ocr', {method: 'POST', data: {enabled}});
+    toast(t(enabled ? 'English OCR turned on.' : 'English OCR turned off.'));
+  } catch (error) {toast(error.message);}
+  renderOcr();
+});
+function translatePhase(phase) {
+  const page = /^Reading scanned page (\d+) of (\d+) with OCR$/.exec(phase || '');
+  if (page && currentLanguage() === 'fa') return `خواندن صفحه اسکن‌شده ${page[1]} از ${page[2]} با OCR`;
+  return t(phase);
 }
 
 let chatRows = [];
@@ -296,7 +325,7 @@ function renderMessages() {
 async function watchJob(identity, progress) {
   for (;;) {
     const job = await api('/api/jobs/' + identity);
-    progress(t(job.phase || job.status));
+    progress(translatePhase(job.phase || job.status));
     if (job.status === 'done') return job.result;
     if (job.status === 'failed') throw new Error(job.error || t('پردازش انجام نشد.'));
     if (job.status === 'canceled') throw new Error(t('درخواست متوقف شد.'));
@@ -390,7 +419,7 @@ async function loadDocuments() {
           await loadDocuments();
         }));
         actions.append(button(t('نسخه جدید'), () => {
-          const input = element('input'); input.type = 'file'; input.accept = '.pdf,.docx,.xlsx,.txt,.md,.html,.htm';
+          const input = element('input'); input.type = 'file'; input.accept = '.pdf,.docx,.xlsx,.txt,.md,.html,.htm,.png,.jpg,.jpeg,.tif,.tiff';
           input.onchange = async () => {
             const file = input.files[0]; if (!file) return;
             try {
@@ -519,7 +548,7 @@ window.addEventListener('expert-language-change', () => {
   }
   if (state.account) {
     $('accountName').textContent = state.account.username + (state.account.role === 'admin' ? t(' · مدیر') : '');
-    renderMessages();renderConversations();
+    renderMessages();renderConversations();renderOcr();
     $('watchPhase').textContent=t($('watchPhase').textContent);
     if (state.view === 'watched') loadWatched().catch(error => toast(error.message));
     if (state.view === 'reviews') loadReviews().catch(error => toast(error.message));
@@ -551,6 +580,7 @@ async function loadDashboard() {
     [state.status.model.installed,'Selected model available',state.status.model.name+' · '+(t(statusNames[state.status.model.state])||state.status.model.state)],
     [state.status.search.mode!=='hybrid'||state.status.search.installed,'Document search available',state.status.search.mode],
     [(overview.documents.by_status.indexed||0)>0,'Indexed knowledge available',t('Upload and index documents to support answers.')],
+    [state.status.ocr.installed||!state.status.ocr.enabled,'English OCR for scans',ocrSummary()],
     [Boolean(overview.backup.latest),'Backup available',date]
   ];
   for(const [ok,label,detail] of checks){const row=element('div','readiness-row');row.append(element('span',ok?'health-good':'health-warn',t(ok?'Available':'Needs attention')),element('div','',t(label)),element('small','',detail));ready.append(row);}

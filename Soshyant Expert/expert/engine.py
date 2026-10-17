@@ -237,3 +237,4 @@ class Engine:
         for worker in self.workers:
             worker.join(timeout=3)
         self.model.close()
+        self.knowledge.ocr.shutdown()

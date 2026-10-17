@@ -14,5 +14,16 @@
   "max_document_mb": 20,
   "max_chunks": 20000,
   "queue_size": 8,
-  "session_hours": 8
+  "session_hours": 8,
+  "ocr_enabled": true,
+  "ocr_model": "assets/ocr/unlimited-ocr-Q4_K_M.gguf",
+  "ocr_projector": "assets/ocr/mmproj-unlimited-ocr-bf16.gguf",
+  "ocr_port": 18196,
+  "ocr_gpu_layers": 0,
+  "ocr_threads": 0,
+  "ocr_max_pages": 200,
+  "ocr_max_side": 1600,
+  "ocr_max_tokens": 2048,
+  "ocr_page_seconds": 300,
+  "ocr_idle_seconds": 120
 }

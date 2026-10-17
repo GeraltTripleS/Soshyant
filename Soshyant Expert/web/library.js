@@ -126,7 +126,7 @@ function folderCandidates(){
 function folderSummary(){
   if(folderRunning)return;
   const files=folderCandidates();
-  const supported=files.filter(file=>/\.(pdf|docx|xlsx|txt|md|html|htm)$/i.test(file.name));
+  const supported=files.filter(file=>/\.(pdf|docx|xlsx|txt|md|html|htm|png|jpe?g|tiff?)$/i.test(file.name));
   $('folderSummary').textContent=files.length+' '+t('selected files')+' · '+supported.length+' '+t('supported documents');
 }
 $('folderFiles').onchange=folderSummary;

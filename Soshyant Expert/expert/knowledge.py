@@ -15,8 +15,11 @@ import uuid
 import zipfile
 import xml.etree.ElementTree as ET
 
+from .ocr import MIN_TEXT_CHARS, LocalOCR, image_page_count, image_pages, pdf_page_images
 
-EXTENSIONS = {".txt", ".md", ".pdf", ".docx", ".xlsx", ".html", ".htm"}
+
+IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".tif", ".tiff"}
+EXTENSIONS = {".txt", ".md", ".pdf", ".docx", ".xlsx", ".html", ".htm"} | IMAGE_EXTENSIONS
 STOP = set("the a an and or of to for in on is are was were be with this that what how "
            "does do can could would should please tell me about my your it its "
            "از به در و یا که این آن را با برای یک چه چگونه است هست می من شما".split())
@@ -57,10 +60,22 @@ def check_zip(body):
             raise ValueError("The document expands beyond the safe extraction limit.")
 
 
-def extract(filename, body):
+def extract(filename, body, ocr=None, progress=lambda value: None, canceled=lambda: False, report=None):
+    """Return (text, location) parts. With a usable `ocr`, scanned PDF pages and image files are
+    read with English OCR; `report` (a dict) then receives scanned/OCR page counts and skipped pages."""
     extension = Path(filename).suffix.lower()
+    report = {} if report is None else report
     if extension not in EXTENSIONS:
         raise ValueError("Unsupported document type.")
+    if extension in IMAGE_EXTENSIONS:
+        if ocr is None:
+            raise ValueError("Images are read with English OCR. Turn on OCR in Documents and make sure its model files are installed.")
+        count = image_page_count(body)
+        report["scanned"] = count
+        texts, skipped = ocr.read_pages(image_pages(body, ocr.settings["ocr_max_side"], ocr.settings["ocr_max_pages"]),
+                                        count, progress, canceled)
+        report.update(ocr_pages=len(texts), **skipped)
+        return [(text, f"page {number} (OCR)") for number, text in sorted(texts.items())]
     if extension in (".txt", ".md"):
         return [(body.decode("utf-8-sig", errors="replace"), "text")]
     if extension in (".html", ".htm"):
@@ -74,7 +89,19 @@ def extract(filename, body):
             raise ValueError("Password-protected PDFs must be unlocked before upload.")
         if len(reader.pages) > 2000:
             raise ValueError("Split PDFs longer than 2,000 pages before upload.")
-        return [(page.extract_text() or "", f"page {i + 1}") for i, page in enumerate(reader.pages)]
+        parts = [(page.extract_text() or "", f"page {i + 1}") for i, page in enumerate(reader.pages)]
+        scanned = [i + 1 for i, (text, _) in enumerate(parts) if len(text.strip()) < MIN_TEXT_CHARS]
+        report["scanned"] = len(scanned)
+        if scanned and ocr is not None:
+            limit = ocr.settings["ocr_max_pages"]
+            if len(scanned) > limit:
+                raise ValueError(f"This PDF has {len(scanned)} scanned pages; OCR reads at most {limit} per document. Split it first.")
+            texts, skipped = ocr.read_pages(pdf_page_images(body, scanned, ocr.settings["ocr_max_side"]),
+                                            len(scanned), progress, canceled)
+            report.update(ocr_pages=len(texts), **skipped)
+            for number, text in texts.items():
+                parts[number - 1] = (text, f"page {number} (OCR)")
+        return parts
     check_zip(body)
     if extension == ".docx":
         with zipfile.ZipFile(io.BytesIO(body)) as archive:
@@ -96,6 +123,25 @@ def extract(filename, body):
         return output
     finally:
         workbook.close()
+
+
+def _page_list(numbers):
+    shown = ", ".join(str(n) for n in numbers[:10]) + (f" and {len(numbers) - 10} more" if len(numbers) > 10 else "")
+    return ("page " if len(numbers) == 1 else "pages ") + shown
+
+
+def ocr_note(report):
+    """Admin-facing note about scanned pages that OCR did not index."""
+    notes = []
+    if report.get("language"):
+        pages = report["language"]
+        notes.append(f"OCR skipped {_page_list(pages)}: OCR supports English only, so "
+                     f"{'that page was' if len(pages) == 1 else 'those pages were'} not indexed.")
+    if report.get("unreadable"):
+        pages = report["unreadable"]
+        notes.append(f"OCR could not read {_page_list(pages)} reliably, so "
+                     f"{'it was' if len(pages) == 1 else 'they were'} not indexed.")
+    return " ".join(notes)
 
 
 def chunk_parts(parts, size=650, overlap=80):
@@ -165,6 +211,7 @@ class Knowledge:
     def __init__(self, store, config):
         self.store, self.config = store, config
         self.embeddings = LocalEmbeddings(config.settings)
+        self.ocr = LocalOCR(config)
         self.publication_lock = threading.RLock()
 
     def list_documents(self, include_archived=False, owner=None):
@@ -181,7 +228,7 @@ class Knowledge:
         if not filename or Path(filename).name != filename or "\\" in filename:
             raise ValueError("Use a simple filename without folders.")
         if Path(filename).suffix.lower() not in EXTENSIONS:
-            raise ValueError("Supported: PDF, DOCX, XLSX, TXT, MD and HTML.")
+            raise ValueError("Supported: PDF, DOCX, XLSX, TXT, MD, HTML and scanned images (PNG, JPG, TIFF).")
         if not body or len(body) > self.config.settings["max_document_mb"] * 1024 * 1024:
             raise ValueError("The document is empty or exceeds the upload limit.")
         if not -10 <= priority <= 10:
@@ -204,9 +251,15 @@ class Knowledge:
         self.store.execute("UPDATE documents SET status='indexing',error='' WHERE id=?", (identity,))
         try:
             progress("Extracting readable text")
-            chunks = chunk_parts(extract(document["filename"], document["content"]))
+            report = {}
+            ocr = self.ocr if self.ocr.usable() else None
+            chunks = chunk_parts(extract(document["filename"], document["content"], ocr, progress, canceled, report))
+            note = ocr_note(report)
             if not chunks:
-                raise ValueError("No readable text found. Scanned documents require OCR before upload.")
+                if report.get("scanned") and ocr is None:
+                    raise ValueError("No readable text found. This looks like a scan: turn on English OCR in Documents "
+                                     "(its model files must be installed) or upload a text version.")
+                raise ValueError(("No readable text found. " + note).strip())
             existing = self.store.one("SELECT count(*) AS n FROM chunks WHERE document_id<>?", (identity,))["n"]
             if staged:
                 existing -= self.store.one('SELECT count(*) AS n FROM chunks WHERE document_id=(SELECT document_id FROM watched_files WHERE stage_id=?)', (identity,))['n']
@@ -230,7 +283,7 @@ class Knowledge:
                 db.executemany("INSERT INTO chunks VALUES(?,?,?,?,?,?)", [
                     (uuid.uuid4().hex, identity, document["version"], c["location"], c["text"],
                      vector.tobytes() if vector is not None else None) for c, vector in zip(chunks, vectors)])
-                db.execute("UPDATE documents SET status='indexed',error='',updated=? WHERE id=?", (time.time(), identity))
+                db.execute("UPDATE documents SET status='indexed',error=?,updated=? WHERE id=?", (note, time.time(), identity))
                 version = db.execute("SELECT value FROM meta WHERE key='knowledge_version'").fetchone()[0] if staged else self.store.version(db)
             return {"document_id": identity, "passages": len(chunks), "knowledge_version": version}
         except Exception as exc:

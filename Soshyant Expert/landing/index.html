@@ -12,14 +12,22 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M10 0H40V30L30 40H0V10Z' fill='%2319ffb0'/%3E%3Ctext x='20' y='31' font-family='Impact,Arial Black,sans-serif' font-size='28' fill='%23030507' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script>
     (function () {
-      var d = document.documentElement, seen = false;
+      var d = document.documentElement, seen = false, lang = 'en';
       d.classList.add('js');
       var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
       try { seen = sessionStorage.getItem('sx-boot') === '1'; } catch (e) {}
+      try { lang = localStorage.getItem('soshyant-landing-lang') || 'en'; } catch (e) {}
+      var asked = /[?&]lang=(fa|en)\b/.exec(location.search);
+      if (asked) lang = asked[1];
+      if (lang === 'fa') {
+        // Persian: set direction before first paint and hide text until it is swapped in.
+        d.lang = 'fa'; d.dir = 'rtl'; d.classList.add('i18n-pending');
+        setTimeout(function () { d.classList.remove('i18n-pending'); }, 3000); // failsafe
+      }
       if (!still && !seen) {
         d.classList.add('booting');
         setTimeout(function () { d.classList.remove('booting'); }, 6000); // failsafe
@@ -52,6 +60,8 @@
       website: "[www.yourcompany.com]"
     }
   };
+  /* The page is English by default; visitors switch to Persian with the EN / فا button.
+     Persian text lives in fa.js. Link straight to Persian with ?lang=fa */
 </script>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -62,12 +72,11 @@
   <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
   <symbol id="i-quote" viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></symbol>
-  <symbol id="i-files" viewBox="0 0 24 24"><path d="M15 2H8a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M15 2v5h5"/><path d="M4 7v13a2 2 0 0 0 2 2h10"/></symbol>
   <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
   <symbol id="i-lang" viewBox="0 0 24 24"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></symbol>
-  <symbol id="i-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></symbol>
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z"/><circle cx="12" cy="13" r="2.5"/><path d="m14 15 2 2"/></symbol>
   <symbol id="i-review" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="m9 10 2 2 4-4"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4M7 9h10M7 12h10M7 15h6"/></symbol>
   <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/></symbol>
   <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></symbol>
   <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.6 5.6 1.9-5.6 1.9L12 18l-1.9-5.6-5.6-1.9 5.6-1.9z"/><path d="M19 17v4M17 19h4"/></symbol>
@@ -75,30 +84,25 @@
   <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14"/><path d="M8 21h8M12 17v4"/></symbol>
   <symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="7"/><rect x="3" y="14" width="18" height="7"/><path d="M7 6.5h.01M7 17.5h.01M11 6.5h6M11 17.5h6"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.6-4.6"/></symbol>
-  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M22 3H2l8 9.5V19l4 2v-8.5z"/></symbol>
   <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></symbol>
-  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16"/><path d="m22 7-10 6L2 7"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
   <symbol id="i-video" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4z"/><rect x="2" y="6" width="14" height="12"/></symbol>
   <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16.2 7.8-2.1 6.4-6.4 2.1 2.1-6.4z"/></symbol>
-  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M5 12.6a10 10 0 0 1 14 0M8.5 16.1a5 5 0 0 1 7 0M2 8.8a15 15 0 0 1 20 0M12 20h.01"/></symbol>
-  <symbol id="i-terminal" viewBox="0 0 24 24"><path d="m4 17 6-5-6-5M12 19h8"/></symbol>
-  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
 </svg>
 
 <!-- ======================= BOOT SEQUENCE ======================= -->
 <div id="boot" aria-hidden="true">
-  <span class="boot-skip">[ click to skip ]</span>
+  <span class="boot-skip" data-i18n="boot.skip">[ click to skip ]</span>
   <div class="boot-big">SOSHYANT<span>//expert</span></div>
   <div class="boot-lines">
-    <div class="boot-line"><span>mount knowledge index</span><i></i><b>sqlite · atomic</b></div>
-    <div class="boot-line"><span>load embedding model</span><i></i><b>384-d · local</b></div>
-    <div class="boot-line"><span>hybrid retrieval</span><i></i><b>lexical + semantic</b></div>
-    <div class="boot-line"><span>access control</span><i></i><b>enforced</b></div>
-    <div class="boot-line"><span>language model</span><i></i><b>on-premise</b></div>
-    <div class="boot-line warn"><span>external uplink</span><i></i><b>none</b></div>
+    <div class="boot-line" data-i18n="boot.1"><span>mount knowledge index</span><i></i><b>sqlite · atomic</b></div>
+    <div class="boot-line" data-i18n="boot.2"><span>load embedding model</span><i></i><b>384-d · local</b></div>
+    <div class="boot-line" data-i18n="boot.3"><span>hybrid retrieval</span><i></i><b>lexical + semantic</b></div>
+    <div class="boot-line" data-i18n="boot.4"><span>access control</span><i></i><b>enforced</b></div>
+    <div class="boot-line" data-i18n="boot.5"><span>language model</span><i></i><b>on-premise</b></div>
+    <div class="boot-line warn" data-i18n="boot.6"><span>external uplink</span><i></i><b>none</b></div>
   </div>
-  <div class="boot-foot"><span>RAG engine ready</span><span id="bootPct">000%</span></div>
+  <div class="boot-foot"><span data-i18n="boot.ready">RAG engine ready</span><span id="bootPct">000%</span></div>
   <div class="boot-bar"><i></i></div>
 </div>
 
@@ -109,24 +113,24 @@
 <div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
 <div id="cursor" aria-hidden="true"><div class="cur-dot"></div><div class="cur-ring brk"><span class="cur-label"></span></div></div>
 
-<nav class="rail" aria-label="Section index">
-  <a href="#top" data-sec="top"><span>Boot</span><b>00</b></a>
-  <a href="#console" data-sec="console"><span>Console</span><b>01</b></a>
-  <a href="#problem" data-sec="problem"><span>Signal</span><b>02</b></a>
+<nav class="rail" aria-label="Section index" data-i18n-attr="aria-label:rail.aria">
+  <a href="#top" data-sec="top"><span data-i18n="rail.top">Boot</span><b>00</b></a>
+  <a href="#console" data-sec="console"><span data-i18n="rail.console">Console</span><b>01</b></a>
+  <a href="#problem" data-sec="problem"><span data-i18n="rail.problem">Signal</span><b>02</b></a>
   <a href="#rag" data-sec="rag"><span>RAG</span><b>03</b></a>
-  <a href="#features" data-sec="features"><span>Modules</span><b>04</b></a>
-  <a href="#security" data-sec="security"><span>Perimeter</span><b>05</b></a>
-  <a href="#deploy" data-sec="deploy"><span>Deploy</span><b>06</b></a>
-  <a href="#book" data-sec="book"><span>Uplink</span><b>07</b></a>
-  <a href="#faq" data-sec="faq"><span>Query log</span><b>08</b></a>
-  <a href="#contact" data-sec="contact"><span>Contact</span><b>09</b></a>
+  <a href="#features" data-sec="features"><span data-i18n="rail.features">Modules</span><b>04</b></a>
+  <a href="#security" data-sec="security"><span data-i18n="rail.security">Perimeter</span><b>05</b></a>
+  <a href="#deploy" data-sec="deploy"><span data-i18n="rail.deploy">Deploy</span><b>06</b></a>
+  <a href="#book" data-sec="book"><span data-i18n="rail.book">Uplink</span><b>07</b></a>
+  <a href="#faq" data-sec="faq"><span data-i18n="rail.faq">Query log</span><b>08</b></a>
+  <a href="#contact" data-sec="contact"><span data-i18n="rail.contact">Contact</span><b>09</b></a>
   <div class="rail-pct" id="railPct">000%</div>
 </nav>
 
 <!-- ======================= NAV ======================= -->
 <header class="nav" id="nav">
   <div class="container nav-inner">
-    <a class="logo" href="#top" aria-label="Soshyant Expert — home" data-cursor="HOME">
+    <a class="logo" href="#top" aria-label="Soshyant Expert — home" data-i18n-attr="aria-label:logo.aria" data-cursor="HOME">
       <span class="logo-mark" aria-hidden="true">S</span>
       <span class="logo-word" aria-hidden="true">
         <span class="lw-en">SOSHYANT</span>
@@ -134,15 +138,18 @@
         <small>expert // rag engine</small>
       </span>
     </a>
-    <nav class="nav-links" id="navLinks" aria-label="Main">
+    <nav class="nav-links" id="navLinks" aria-label="Main" data-i18n-attr="aria-label:nav.aria">
       <a href="#rag">RAG</a>
-      <a href="#features">Modules</a>
-      <a href="#security">Security</a>
-      <a href="#faq">FAQ</a>
-      <a href="#contact">Contact</a>
+      <a href="#features" data-i18n="nav.features">Modules</a>
+      <a href="#security" data-i18n="nav.security">Security</a>
+      <a href="#faq" data-i18n="nav.faq">FAQ</a>
+      <a href="#contact" data-i18n="nav.contact">Contact</a>
     </nav>
-    <span class="nav-status" aria-hidden="true"><i></i>local · online</span>
-    <a class="btn btn-neon btn-sm magnetic nav-cta" href="#book" data-cursor="BOOK"><span>Book demo</span></a>
+    <span class="nav-status" aria-hidden="true" data-i18n="nav.status"><i></i>local · online</span>
+    <button class="lang-btn" id="langBtn" type="button" data-cursor="LANG" aria-label="Show this page in Persian (فارسی)" data-i18n-attr="aria-label:lang.aria">
+      <span class="lang-opt" data-lang="en" lang="en">EN</span><span class="lang-opt fa" data-lang="fa" lang="fa">فا</span>
+    </button>
+    <a class="btn btn-neon btn-sm magnetic nav-cta" href="#book" data-cursor="BOOK"><span data-i18n="nav.cta">Book demo</span></a>
     <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks"><span></span></button>
   </div>
 </header>
@@ -153,38 +160,39 @@
   <section class="hero" id="top">
     <canvas id="vecField" aria-hidden="true"></canvas>
     <div class="container hero-inner">
-      <p class="tag rv"><span class="tag-box">RAG</span><span data-scramble>Retrieval-augmented generation · on your own server</span></p>
-      <h1 class="hero-title" aria-label="Your company already wrote the answers.">
-        <span class="line rv" aria-hidden="true">Your company</span>
-        <span class="line rv" style="--d:.08s" aria-hidden="true">already wrote</span>
-        <span class="line l3 rv" style="--d:.16s" aria-hidden="true"><span class="glitch" data-text="the answers.">the answers.</span></span>
+      <p class="tag rv"><span class="tag-box">RAG</span><span data-scramble data-i18n="hero.tag">Retrieval-augmented generation · on your own server</span></p>
+      <h1 class="hero-title" aria-label="Your company already wrote the answers." data-i18n-attr="aria-label:hero.aria">
+        <span class="line rv" aria-hidden="true" data-i18n="hero.l1">Your company</span>
+        <span class="line rv" style="--d:.08s" aria-hidden="true" data-i18n="hero.l2">already wrote</span>
+        <span class="line l3 rv" style="--d:.16s" aria-hidden="true"><span class="glitch" data-text="the answers." data-i18n="hero.l3" data-i18n-attr="data-text:hero.l3">the answers.</span></span>
       </h1>
-      <p class="hero-sub rv" style="--d:.24s">
+      <p class="hero-sub rv" style="--d:.24s" data-i18n="hero.sub">
         Soshyant Expert is a <b>RAG engine</b> that runs on your own server. It <b>retrieves</b> the exact passages from your manuals, policies and procedures — then <b>generates</b> an answer grounded in them, with every claim cited.
       </p>
       <div class="hero-ctas rv" style="--d:.32s">
-        <a class="btn btn-neon magnetic" href="#book" data-cursor="BOOK"><span>Book a demo</span><svg class="i"><use href="#i-arrow"/></svg></a>
-        <a class="btn btn-ghost magnetic" href="#rag" data-cursor="DECODE"><span>Decode the pipeline</span><svg class="i"><use href="#i-down"/></svg></a>
+        <a class="btn btn-neon magnetic" href="#book" data-cursor="BOOK"><span data-i18n="cta.book">Book a demo</span><svg class="i"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-ghost magnetic" href="#rag" data-cursor="DECODE"><span data-i18n="hero.decode">Decode the pipeline</span><svg class="i"><use href="#i-down"/></svg></a>
       </div>
       <dl class="hero-stats rv" style="--d:.4s">
-        <div><dt>Retrieval</dt><dd>Hybrid</dd></div>
-        <div><dt>Embeddings</dt><dd>Local · 384-d</dd></div>
-        <div><dt>Citations</dt><dd>Enforced</dd></div>
-        <div><dt>Cloud uplink</dt><dd class="hot-t">None</dd></div>
+        <div><dt data-i18n="stat.retrieval">Retrieval</dt><dd data-i18n="stat.hybrid">Hybrid</dd></div>
+        <div><dt data-i18n="stat.embeddings">Embeddings</dt><dd data-i18n="stat.local">Local · 384-d</dd></div>
+        <div><dt data-i18n="stat.citations">Citations</dt><dd data-i18n="stat.enforced">Enforced</dd></div>
+        <div><dt data-i18n="stat.uplink">Cloud uplink</dt><dd class="hot-t" data-i18n="stat.none">None</dd></div>
+        <div><dt data-i18n="stat.scans">Scans</dt><dd data-i18n="stat.ocr">English OCR</dd></div>
       </dl>
     </div>
 
     <aside class="nn-panel hud rv" style="--d:.5s" aria-hidden="true">
-      <div class="nn-head"><span>Live retrieval</span><span>top-5</span></div>
-      <div class="nn-q">q = embed(<em>cursor</em>) <span id="qCoord">[+0.00, +0.00]</span></div>
+      <div class="nn-head"><span data-i18n="nn.head">Live retrieval</span><span data-i18n="nn.top">top-5</span></div>
+      <div class="nn-q">q = embed(<em data-i18n="nn.cursor">cursor</em>) <span id="qCoord">[+0.00, +0.00]</span></div>
       <ol id="nnList"></ol>
-      <div class="nn-foot">› Move your cursor. You are the query vector.</div>
+      <div class="nn-foot" data-i18n="nn.foot">› Move your cursor. You are the query vector.</div>
     </aside>
 
     <div class="ticker" aria-hidden="true">
       <div class="ticker-track">
-        <span>Hybrid retrieval</span><span>Lexical + semantic</span><span>Local ONNX embeddings</span><span>GGUF · llama.cpp</span><span>Citations enforced</span><span>Access-aware retrieval</span><span>EN / <span class="fa">فارسی</span></span><span>Atomic SQLite index</span><span>Local mode: no cloud uplink</span>
-        <span>Hybrid retrieval</span><span>Lexical + semantic</span><span>Local ONNX embeddings</span><span>GGUF · llama.cpp</span><span>Citations enforced</span><span>Access-aware retrieval</span><span>EN / <span class="fa">فارسی</span></span><span>Atomic SQLite index</span><span>Local mode: no cloud uplink</span>
+        <span data-i18n="tick.1">Hybrid retrieval</span><span data-i18n="tick.2">Lexical + semantic</span><span data-i18n="tick.3">Local ONNX embeddings</span><span>GGUF · llama.cpp</span><span data-i18n="tick.4">Citations enforced</span><span data-i18n="tick.5">Access-aware retrieval</span><span data-i18n="tick.6">Local OCR for English scans</span><span>EN / <span class="fa">فارسی</span></span><span data-i18n="tick.7">Atomic SQLite index</span><span data-i18n="tick.8">Local mode: no cloud uplink</span>
+        <span data-i18n="tick.1">Hybrid retrieval</span><span data-i18n="tick.2">Lexical + semantic</span><span data-i18n="tick.3">Local ONNX embeddings</span><span>GGUF · llama.cpp</span><span data-i18n="tick.4">Citations enforced</span><span data-i18n="tick.5">Access-aware retrieval</span><span data-i18n="tick.6">Local OCR for English scans</span><span>EN / <span class="fa">فارسی</span></span><span data-i18n="tick.7">Atomic SQLite index</span><span data-i18n="tick.8">Local mode: no cloud uplink</span>
       </div>
     </div>
   </section>
@@ -193,31 +201,31 @@
   <section class="section" id="console">
     <div class="container">
       <div class="sec-head">
-        <p class="kicker rv"><span data-scramble>01 // Live console</span></p>
-        <h2 class="h2 rv">Ask. Retrieve.<br><span class="neon">Answer. Cite.</span></h2>
-        <p class="lede rv">Every answer is generated from passages pulled out of your own documents — and it shows you exactly which ones. Pick a session to replay it.</p>
+        <p class="kicker rv"><span data-scramble data-i18n="console.kicker">01 // Live console</span></p>
+        <h2 class="h2 rv" data-i18n="console.h2">Ask. Retrieve.<br><span class="neon">Answer. Cite.</span></h2>
+        <p class="lede rv" data-i18n="console.lede">Every answer is generated from passages pulled out of your own documents — and it shows you exactly which ones. Pick a session to replay it.</p>
       </div>
 
       <div class="console hud rv" id="consoleBox">
         <div class="con-bar">
           <span class="con-dots" aria-hidden="true"><i></i><i></i><i></i></span>
           <span class="con-path">ops@expert.internal:~/field-service</span>
-          <span class="con-pill"><i class="pulse"></i>local model</span>
-          <span class="con-pill dim">knowledge v14</span>
+          <span class="con-pill" data-i18n="console.local"><i class="pulse"></i>local model</span>
+          <span class="con-pill dim" data-i18n="console.version">knowledge v14</span>
         </div>
         <aside class="con-side">
-          <div class="con-label">// sessions</div>
-          <button class="con-sess active" type="button" data-cursor="REPLAY">torque_spec.m12</button>
-          <button class="con-sess" type="button" data-cursor="REPLAY">contractor_leave</button>
+          <div class="con-label" data-i18n="console.sessions">// sessions</div>
+          <button class="con-sess active" type="button" data-cursor="REPLAY" data-i18n="console.s1">torque_spec.m12</button>
+          <button class="con-sess" type="button" data-cursor="REPLAY" data-i18n="console.s2">contractor_leave</button>
           <button class="con-sess fa" type="button" data-cursor="REPLAY" lang="fa">گارانتی دستگاه</button>
-          <div class="con-label">// workspace</div>
-          <div class="con-stat"><span>documents</span><b>412</b></div>
-          <div class="con-stat"><span>access groups</span><b>6</b></div>
-          <div class="con-stat"><span>to review</span><b>3</b></div>
-          <div class="con-foot"><i class="pulse"></i>private · on-premise</div>
+          <div class="con-label" data-i18n="console.workspace">// workspace</div>
+          <div class="con-stat"><span data-i18n="console.docs">documents</span><b data-num>412</b></div>
+          <div class="con-stat"><span data-i18n="console.groups">access groups</span><b data-num>6</b></div>
+          <div class="con-stat"><span data-i18n="console.review">to review</span><b data-num>3</b></div>
+          <div class="con-foot" data-i18n="console.private"><i class="pulse"></i>private · on-premise</div>
         </aside>
         <div class="con-main" id="stream">
-          <div class="con-q"><span class="prompt">you ›</span><span id="mQ" dir="auto">What’s the torque spec for the M12 bolts on the pump housing?</span></div>
+          <div class="con-q"><span class="prompt" data-i18n="console.you">you ›</span><span id="mQ" dir="auto">What’s the torque spec for the M12 bolts on the pump housing?</span></div>
           <ol class="con-log" id="mLog"></ol>
           <div class="con-ans" id="mA">
             <div class="con-meta"><span class="status ok" id="mStatus">ANSWERED</span><span id="mMetaText">1 source cited</span></div>
@@ -236,22 +244,22 @@
   <section class="section problem" id="problem">
     <div class="container prob-grid">
       <div class="prob-stat rv">
-        <p class="kicker kicker-hot"><span data-scramble>02 // Signal loss</span></p>
-        <div class="big-num"><span class="glitch" data-text="19%"><span data-count="19">19</span>%</span></div>
-        <p class="prob-cap">of the average workweek is spent searching for and gathering internal information.</p>
+        <p class="kicker kicker-hot"><span data-scramble data-i18n="problem.kicker">02 // Signal loss</span></p>
+        <div class="big-num"><span class="glitch" data-text="19%" data-i18n-attr="data-text:problem.num"><span data-count="19">19</span><span data-i18n="problem.pct">%</span></span></div>
+        <p class="prob-cap" data-i18n="problem.cap">of the average workweek is spent searching for and gathering internal information.</p>
         <div class="week" aria-hidden="true">
           <div class="week-bar"><i></i><i></i><i></i><i></i><i></i></div>
-          <div class="week-lbl"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span></div>
-          <p>≈ one full day, every week, per person.</p>
+          <div class="week-lbl" data-i18n="problem.days"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span></div>
+          <p data-i18n="problem.week">≈ one full day, every week, per person.</p>
         </div>
-        <small class="src-note">Source: McKinsey Global Institute, “The Social Economy” (2012)</small>
+        <small class="src-note" data-i18n="problem.source">Source: McKinsey Global Institute, “The Social Economy” (2012)</small>
       </div>
       <div>
-        <h2 class="h2 rv">Your knowledge is <span class="hot">buried alive.</span></h2>
+        <h2 class="h2 rv" data-i18n="problem.h2">Your knowledge is <span class="hot">buried alive.</span></h2>
         <ul class="errlog">
-          <li class="rv"><span class="err-code">ERR_01 · repeat_query</span><h3>Experts answer the same questions, again and again</h3><p>Senior staff spend hours repeating what the manual already says.</p></li>
-          <li class="rv" style="--d:.08s"><span class="err-code">ERR_02 · keyword_miss</span><h3>Keyword search misses the answer</h3><p>It fails on procedures, part numbers and questions phrased differently from the document.</p></li>
-          <li class="rv" style="--d:.16s"><span class="err-code">ERR_03 · knowledge_drain</span><h3>Expertise walks out the door</h3><p>When people leave, their know-how leaves with them. The documents stay — but stop being usable.</p></li>
+          <li class="rv"><span class="err-code">ERR_01 · repeat_query</span><h3 data-i18n="problem.e1">Experts answer the same questions, again and again</h3><p data-i18n="problem.e1p">Senior staff spend hours repeating what the manual already says.</p></li>
+          <li class="rv" style="--d:.08s"><span class="err-code">ERR_02 · keyword_miss</span><h3 data-i18n="problem.e2">Keyword search misses the answer</h3><p data-i18n="problem.e2p">It fails on procedures, part numbers and questions phrased differently from the document.</p></li>
+          <li class="rv" style="--d:.16s"><span class="err-code">ERR_03 · knowledge_drain</span><h3 data-i18n="problem.e3">Expertise walks out the door</h3><p data-i18n="problem.e3p">When people leave, their know-how leaves with them. The documents stay — but stop being usable.</p></li>
         </ul>
       </div>
     </div>
@@ -261,48 +269,48 @@
   <section class="section rag" id="rag">
     <div class="container">
       <div class="sec-head">
-        <p class="kicker rv"><span data-scramble>03 // RAG, decoded</span></p>
-        <h2 class="h2 rv">Retrieval-augmented<br><span class="neon">generation.</span></h2>
-        <p class="lede rv">A language model on its own answers from memory — and memory can be wrong. <b>RAG</b> changes the order: first <b>retrieve</b> the passages that matter from your documents, then <b>augment</b> the prompt with that evidence, and only then <b>generate</b> the answer. Run the pipeline yourself:</p>
+        <p class="kicker rv"><span data-scramble data-i18n="rag.kicker">03 // RAG, decoded</span></p>
+        <h2 class="h2 rv" data-i18n="rag.h2">Retrieval-augmented<br><span class="neon">generation.</span></h2>
+        <p class="lede rv" data-i18n="rag.lede">A language model on its own answers from memory — and memory can be wrong. <b>RAG</b> changes the order: first <b>retrieve</b> the passages that matter from your documents, then <b>augment</b> the prompt with that evidence, and only then <b>generate</b> the answer. Run the pipeline yourself:</p>
       </div>
 
       <div class="sim hud rv" id="sim">
         <div class="sim-top">
-          <div class="sim-presets" role="group" aria-label="Choose a question">
-            <button class="chip-btn active" type="button" data-cursor="LOAD">Q1 · torque spec</button>
-            <button class="chip-btn" type="button" data-cursor="LOAD">Q2 · filter interval</button>
-            <button class="chip-btn" type="button" data-cursor="LOAD">Q3 · contractor leave</button>
+          <div class="sim-presets" role="group" aria-label="Choose a question" data-i18n-attr="aria-label:rag.choose">
+            <button class="chip-btn active" type="button" data-cursor="LOAD" data-i18n="rag.q1">Q1 · torque spec</button>
+            <button class="chip-btn" type="button" data-cursor="LOAD" data-i18n="rag.q2">Q2 · filter interval</button>
+            <button class="chip-btn" type="button" data-cursor="LOAD" data-i18n="rag.q3">Q3 · contractor leave</button>
           </div>
           <button class="btn btn-neon btn-sm magnetic" type="button" id="simRun" data-cursor="RUN"><span>▶ Run pipeline</span></button>
         </div>
         <ol class="tracker">
-          <li class="trk"><span>01</span><b>Embed</b><small>question → vector</small></li>
-          <li class="trk"><span>02</span><b>Retrieve</b><small>hybrid search</small></li>
-          <li class="trk"><span>03</span><b>Filter</b><small>access control</small></li>
-          <li class="trk"><span>04</span><b>Augment</b><small>build the prompt</small></li>
-          <li class="trk"><span>05</span><b>Generate</b><small>cited answer</small></li>
+          <li class="trk" data-i18n="rag.t1"><span>01</span><b>Embed</b><small>question → vector</small></li>
+          <li class="trk" data-i18n="rag.t2"><span>02</span><b>Retrieve</b><small>hybrid search</small></li>
+          <li class="trk" data-i18n="rag.t3"><span>03</span><b>Filter</b><small>access control</small></li>
+          <li class="trk" data-i18n="rag.t4"><span>04</span><b>Augment</b><small>build the prompt</small></li>
+          <li class="trk" data-i18n="rag.t5"><span>05</span><b>Generate</b><small>cited answer</small></li>
         </ol>
         <div class="sim-body">
           <div class="sim-col">
-            <div class="col-h">// query</div>
+            <div class="col-h" data-i18n="rag.query">// query</div>
             <div class="sim-query"><span class="prompt">›</span><span id="simQuery">What torque for the M12 pump housing bolts?</span></div>
-            <div class="col-h">// embedding <span class="col-note">384-d · multilingual · local</span></div>
+            <div class="col-h"><span data-i18n="rag.embedding">// embedding</span> <span class="col-note" data-i18n="rag.embnote">384-d · multilingual · local</span></div>
             <div class="emb" id="emb" aria-hidden="true"></div>
             <div class="emb-vec" id="embVec">[ … ]</div>
           </div>
           <div class="sim-col">
-            <div class="col-h">// knowledge base <span class="col-note" id="kbNote"></span></div>
+            <div class="col-h"><span data-i18n="rag.kb">// knowledge base</span> <span class="col-note" id="kbNote"></span></div>
             <div class="kb" id="kb"></div>
-            <div class="kb-legend"><span><i class="lg lex"></i>lexical</span><span><i class="lg sem"></i>semantic</span><span><i class="lg den"></i>access denied</span></div>
+            <div class="kb-legend" data-i18n="rag.legend"><span><i class="lg lex"></i>lexical</span><span><i class="lg sem"></i>semantic</span><span><i class="lg den"></i>access denied</span></div>
           </div>
           <div class="sim-col sim-out">
             <div class="ctx-wrap">
-              <div class="col-h">// context window <span class="col-note" id="tokNote">0 / 8,192 tokens</span></div>
+              <div class="col-h"><span data-i18n="rag.context">// context window</span> <span class="col-note" id="tokNote">0 / 8,192 tokens</span></div>
               <div class="tok-meter"><i id="tokBar"></i></div>
               <div class="ctx" id="ctx"></div>
             </div>
             <div class="ans-wrap">
-              <div class="col-h">// answer</div>
+              <div class="col-h" data-i18n="rag.answer">// answer</div>
               <div class="sim-ans" id="simAns"><span class="sim-idle">Waiting for pipeline…</span></div>
             </div>
           </div>
@@ -310,25 +318,25 @@
       </div>
 
       <div class="why">
-        <h3 class="why-h rv">Why RAG — <span class="neon">not fine-tuning?</span></h3>
+        <h3 class="why-h rv" data-i18n="why.h">Why RAG — <span class="neon">not fine-tuning?</span></h3>
         <div class="why-grid">
           <article class="why-card hud tilt rv">
             <span class="why-n">A</span>
-            <h4>Documents change. Answers follow.</h4>
-            <p class="vs"><s>fine-tune: retrain the model</s><b>rag: re-index the changed file</b></p>
-            <p>Update a manual and answers use the new version as soon as it’s re-indexed.</p>
+            <h4 data-i18n="why.a">Documents change. Answers follow.</h4>
+            <p class="vs" data-i18n="why.avs"><s>fine-tune: retrain the model</s><b>rag: re-index the changed file</b></p>
+            <p data-i18n="why.ap">Update a manual and answers use the new version as soon as it’s re-indexed.</p>
           </article>
           <article class="why-card hud tilt rv" style="--d:.08s">
             <span class="why-n">B</span>
-            <h4>Knowledge is data, not weights.</h4>
-            <p class="vs"><s>fine-tune: baked into weights</s><b>rag: versioned records you control</b></p>
-            <p>Your content stays in a database on your server — versioned and backed up like any business record.</p>
+            <h4 data-i18n="why.b">Knowledge is data, not weights.</h4>
+            <p class="vs" data-i18n="why.bvs"><s>fine-tune: baked into weights</s><b>rag: versioned records you control</b></p>
+            <p data-i18n="why.bp">Your content stays in a database on your server — versioned and backed up like any business record.</p>
           </article>
           <article class="why-card hud tilt rv" style="--d:.16s">
             <span class="why-n">C</span>
-            <h4>Citations need sources.</h4>
-            <p class="vs"><s>fine-tune: can’t point to a source</s><b>rag: every claim → a passage</b></p>
-            <p>Answers point at real passages — document, section and version — so people can check them.</p>
+            <h4 data-i18n="why.c">Citations need sources.</h4>
+            <p class="vs" data-i18n="why.cvs"><s>fine-tune: can’t point to a source</s><b>rag: every claim → a passage</b></p>
+            <p data-i18n="why.cp">Answers point at real passages — document, section and version — so people can check them.</p>
           </article>
         </div>
       </div>
@@ -337,8 +345,8 @@
 
   <div class="kinetic" aria-hidden="true">
     <div class="kin-track" id="kinTrack">
-      <span>Retrieve</span><span class="o">Augment</span><span>Generate</span><span class="o">Cite</span><span>Retrieve</span><span class="o">Augment</span><span>Generate</span><span class="o">Cite</span>
-      <span>Retrieve</span><span class="o">Augment</span><span>Generate</span><span class="o">Cite</span><span>Retrieve</span><span class="o">Augment</span><span>Generate</span><span class="o">Cite</span>
+      <span data-i18n="kin.1">Retrieve</span><span class="o" data-i18n="kin.2">Augment</span><span data-i18n="kin.3">Generate</span><span class="o" data-i18n="kin.4">Cite</span><span data-i18n="kin.1">Retrieve</span><span class="o" data-i18n="kin.2">Augment</span><span data-i18n="kin.3">Generate</span><span class="o" data-i18n="kin.4">Cite</span>
+      <span data-i18n="kin.1">Retrieve</span><span class="o" data-i18n="kin.2">Augment</span><span data-i18n="kin.3">Generate</span><span class="o" data-i18n="kin.4">Cite</span><span data-i18n="kin.1">Retrieve</span><span class="o" data-i18n="kin.2">Augment</span><span data-i18n="kin.3">Generate</span><span class="o" data-i18n="kin.4">Cite</span>
     </div>
   </div>
 
@@ -346,16 +354,16 @@
   <section class="section" id="features">
     <div class="container">
       <div class="sec-head">
-        <p class="kicker rv"><span data-scramble>04 // System modules</span></p>
-        <h2 class="h2 rv">Built like infrastructure.<br><span class="neon">Feels like an expert.</span></h2>
+        <p class="kicker rv"><span data-scramble data-i18n="mods.kicker">04 // System modules</span></p>
+        <h2 class="h2 rv" data-i18n="mods.h2">Built like infrastructure.<br><span class="neon">Feels like an expert.</span></h2>
       </div>
 
       <div class="mods">
         <article class="mod hud tilt split span2 rv">
           <div class="mod-top"><span>mod.01 // cite</span><svg class="i"><use href="#i-quote"/></svg></div>
-          <h3>Answers you can check</h3>
-          <p>Every claim links to the passage it came from — document, section and version. Click a citation and read the evidence yourself.</p>
-          <div class="mod-vis v-cite" aria-hidden="true">
+          <h3 data-i18n="mod1.h">Answers you can check</h3>
+          <p data-i18n="mod1.p">Every claim links to the passage it came from — document, section and version. Click a citation and read the evidence yourself.</p>
+          <div class="mod-vis v-cite" aria-hidden="true" data-i18n="mod1.vis">
             <p class="vc-ans">Replace the filter every <mark>500 operating hours</mark><span class="cite">1</span>, or sooner if the pressure drop exceeds <mark>0.8 bar</mark><span class="cite">2</span>.</p>
             <div class="vc-src"><span class="cite">1</span><b>MAINT_SCHEDULE v6</b><span>§3.4 Filters</span></div>
             <div class="vc-src"><span class="cite">2</span><b>HYDRAULIC_UNIT v3</b><span>Table 5.2</span></div>
@@ -364,19 +372,19 @@
 
         <article class="mod hud tilt rv" style="--d:.06s">
           <div class="mod-top"><span>mod.02 // limits</span><svg class="i"><use href="#i-compass"/></svg></div>
-          <h3>Says when it doesn’t know</h3>
-          <p>No evidence, no answer. It asks a clarifying question or says the documents don’t cover it.</p>
+          <h3 data-i18n="mod2.h">Says when it doesn’t know</h3>
+          <p data-i18n="mod2.p">No evidence, no answer. It asks a clarifying question or says the documents don’t cover it.</p>
           <ul class="mod-vis v-status" aria-hidden="true">
-            <li class="ok"><i></i>answered</li>
-            <li class="clar"><i></i>needs clarification</li>
-            <li class="ins"><i></i>insufficient evidence</li>
+            <li class="ok" data-i18n="mod2.ok"><i></i>answered</li>
+            <li class="clar" data-i18n="mod2.clar"><i></i>needs clarification</li>
+            <li class="ins" data-i18n="mod2.ins"><i></i>insufficient evidence</li>
           </ul>
         </article>
 
         <article class="mod hud tilt rv" style="--d:.12s">
           <div class="mod-top"><span>mod.03 // hybrid</span><svg class="i"><use href="#i-search"/></svg></div>
-          <h3>Hybrid search</h3>
-          <p>Keywords catch part numbers and exact terms. Vectors catch meaning. Soshyant fuses both.</p>
+          <h3 data-i18n="mod3.h">Hybrid search</h3>
+          <p data-i18n="mod3.p">Keywords catch part numbers and exact terms. Vectors catch meaning. Soshyant fuses both.</p>
           <div class="mod-vis v-hyb" aria-hidden="true">
             <div class="hy-row lex"><span>lex</span><i></i><i class="on"></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i class="on"></i><i></i></div>
             <div class="hy-row sem"><span>sem</span><i></i><i class="on"></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i class="on"></i><i class="on"></i></div>
@@ -386,24 +394,24 @@
 
         <article class="mod hud tilt split span2 rv">
           <div class="mod-top"><span>mod.04 // private</span><svg class="i"><use href="#i-lock"/></svg></div>
-          <h3>Private by default</h3>
-          <p>The language model, the embedding model, the index and every document live on your server. In local mode: no CDN calls, no automatic downloads, no cloud.</p>
+          <h3 data-i18n="mod4.h">Private by default</h3>
+          <p data-i18n="mod4.p">The language model, the embedding model, the index and every document live on your server. In local mode: no CDN calls, no automatic downloads, no cloud.</p>
           <div class="mod-vis v-radar" aria-hidden="true">
-            <div class="radar"><i class="sweep"></i><span class="blip b1">LLM</span><span class="blip b2">INDEX</span><span class="blip b3">DOCS</span><span class="blip b4">USERS</span></div>
-            <span class="radar-lbl">perimeter: your network</span>
+            <div class="radar"><i class="sweep"></i><span class="blip b1" data-i18n="mod4.b1">LLM</span><span class="blip b2" data-i18n="mod4.b2">INDEX</span><span class="blip b3" data-i18n="mod4.b3">DOCS</span><span class="blip b4" data-i18n="mod4.b4">USERS</span></div>
+            <span class="radar-lbl" data-i18n="mod4.lbl">perimeter: your network</span>
           </div>
         </article>
 
         <article class="mod hud tilt split span2 rv" style="--d:.06s">
           <div class="mod-top"><span>mod.05 // access</span><svg class="i"><use href="#i-users"/></svg></div>
-          <h3>Permission-aware retrieval</h3>
-          <p>Access groups decide who can use each document. Restricted passages are removed on the server before ranking — the model never sees what the user can’t.</p>
-          <table class="mod-vis matrix" aria-label="Example: document access by group">
-            <thead><tr><th scope="col">doc</th><th scope="col">field</th><th scope="col">sales</th><th scope="col">eng</th></tr></thead>
+          <h3 data-i18n="mod5.h">Permission-aware retrieval</h3>
+          <p data-i18n="mod5.p">Access groups decide who can use each document. Restricted passages are removed on the server before ranking — the model never sees what the user can’t.</p>
+          <table class="mod-vis matrix" aria-label="Example: document access by group" data-i18n-attr="aria-label:mod5.aria">
+            <thead><tr><th scope="col" data-i18n="mod5.doc">doc</th><th scope="col" data-i18n="mod5.field">field</th><th scope="col" data-i18n="mod5.sales">sales</th><th scope="col" data-i18n="mod5.eng">eng</th></tr></thead>
             <tbody>
-              <tr><th scope="row">Safety proc.</th><td class="y"><svg class="i" aria-label="allowed"><use href="#i-check"/></svg></td><td class="y"><svg class="i" aria-label="allowed"><use href="#i-check"/></svg></td><td class="y"><svg class="i" aria-label="allowed"><use href="#i-check"/></svg></td></tr>
-              <tr><th scope="row">Pricing 2026</th><td class="n"><svg class="i" aria-label="no access"><use href="#i-minus"/></svg></td><td class="y"><svg class="i" aria-label="allowed"><use href="#i-check"/></svg></td><td class="n"><svg class="i" aria-label="no access"><use href="#i-minus"/></svg></td></tr>
-              <tr><th scope="row">Design specs</th><td class="n"><svg class="i" aria-label="no access"><use href="#i-minus"/></svg></td><td class="n"><svg class="i" aria-label="no access"><use href="#i-minus"/></svg></td><td class="y"><svg class="i" aria-label="allowed"><use href="#i-check"/></svg></td></tr>
+              <tr><th scope="row" data-i18n="mod5.r1">Safety proc.</th><td class="y"><svg class="i" aria-label="allowed" data-i18n-attr="aria-label:mod5.yes"><use href="#i-check"/></svg></td><td class="y"><svg class="i" aria-label="allowed" data-i18n-attr="aria-label:mod5.yes"><use href="#i-check"/></svg></td><td class="y"><svg class="i" aria-label="allowed" data-i18n-attr="aria-label:mod5.yes"><use href="#i-check"/></svg></td></tr>
+              <tr><th scope="row" data-i18n="mod5.r2">Pricing 2026</th><td class="n"><svg class="i" aria-label="no access" data-i18n-attr="aria-label:mod5.no"><use href="#i-minus"/></svg></td><td class="y"><svg class="i" aria-label="allowed" data-i18n-attr="aria-label:mod5.yes"><use href="#i-check"/></svg></td><td class="n"><svg class="i" aria-label="no access" data-i18n-attr="aria-label:mod5.no"><use href="#i-minus"/></svg></td></tr>
+              <tr><th scope="row" data-i18n="mod5.r3">Design specs</th><td class="n"><svg class="i" aria-label="no access" data-i18n-attr="aria-label:mod5.no"><use href="#i-minus"/></svg></td><td class="n"><svg class="i" aria-label="no access" data-i18n-attr="aria-label:mod5.no"><use href="#i-minus"/></svg></td><td class="y"><svg class="i" aria-label="allowed" data-i18n-attr="aria-label:mod5.yes"><use href="#i-check"/></svg></td></tr>
             </tbody>
           </table>
         </article>
@@ -411,54 +419,63 @@
         <article class="mod hud tilt rv">
           <div class="mod-top"><span>mod.06 // lang</span><svg class="i"><use href="#i-lang"/></svg></div>
           <h3>English &amp; <span class="fa">فارسی</span></h3>
-          <p>Switch interface and answer language instantly, with a full right-to-left layout.</p>
+          <p data-i18n="mod6.p">Switch interface and answer language instantly, with a full right-to-left layout.</p>
           <div class="mod-vis v-lang" aria-hidden="true"><span>EN</span><span class="fa">فا</span></div>
         </article>
 
         <article class="mod hud tilt rv" style="--d:.06s">
           <div class="mod-top"><span>mod.07 // watch</span><svg class="i"><use href="#i-folder"/></svg></div>
-          <h3>Watched folders</h3>
-          <p>New and changed files are detected and wait for an admin’s approval before anything is published.</p>
-          <div class="mod-line">scan ./manuals <b>· 2 changed · awaiting approval</b></div>
+          <h3 data-i18n="mod7.h">Watched folders</h3>
+          <p data-i18n="mod7.p">New and changed files are detected and wait for an admin’s approval before anything is published.</p>
+          <div class="mod-line" data-i18n="mod7.line">scan ./manuals <b>· 2 changed · awaiting approval</b></div>
         </article>
 
-        <article class="mod hud tilt rv" style="--d:.12s">
-          <div class="mod-top"><span>mod.08 // review</span><svg class="i"><use href="#i-review"/></svg></div>
-          <h3>Answer review</h3>
-          <p>Triage unanswered questions and user feedback, and note which document needs fixing.</p>
-          <div class="mod-line">queue <b>· insufficient · clarify · feedback</b></div>
+        <article class="mod hud tilt split span2 rv" style="--d:.12s">
+          <div class="mod-top"><span>mod.08 // ocr</span><svg class="i"><use href="#i-scan"/></svg></div>
+          <h3 data-i18n="mod9.h">Reads scanned English pages</h3>
+          <p data-i18n="mod9.p">Scanned PDFs and phone photos are read by a local OCR model, then indexed and cited like any other page — as “page 4 (OCR)”. Pages it can’t read reliably, and Persian scans, are flagged for an admin instead of guessed.</p>
+          <div class="mod-vis v-ocr" aria-hidden="true">
+            <div class="ocr-page"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><span class="ocr-beam"></span></div>
+            <div class="ocr-out">
+              <span class="ocr-tag">scan.pdf → page 4 (OCR)</span>
+              <b>Torque the M12 bolts to 60 Nm.</b>
+              <b>Re-check after the first heat cycle.</b>
+              <b>Replace gasket GS-450 when opened.</b>
+              <span class="ocr-flag" data-i18n="mod9.flag">persian scan → flagged, not guessed</span>
+            </div>
+          </div>
         </article>
 
-        <article class="mod hud tilt rv" style="--d:.18s">
-          <div class="mod-top"><span>mod.09 // ops</span><svg class="i"><use href="#i-dashboard"/></svg></div>
-          <h3>Admin overview</h3>
-          <p>Documents, passages, jobs, accounts, the active model and the latest backup — at a glance.</p>
-          <div class="mod-line">status <b>· refreshes every 20s</b></div>
-        </article>
-
-        <article class="mod hud tilt split span2 rv">
-          <div class="mod-top"><span>mod.10 // models</span><svg class="i"><use href="#i-spark"/></svg></div>
-          <h3>Bring your model</h3>
-          <p>Use the bundled local model, any GGUF model on your server, or an OpenAI-compatible API — only after an admin explicitly approves sending context.</p>
-          <ul class="mod-vis v-models" aria-hidden="true">
-            <li><span>bundled model</span><b>local</b></li>
-            <li><span>any gguf · llama.cpp</span><b>local</b></li>
-            <li><span>openai-compatible api</span><b class="amb">consent</b></li>
-          </ul>
+        <article class="mod hud tilt rv">
+          <div class="mod-top"><span>mod.09 // review</span><svg class="i"><use href="#i-review"/></svg></div>
+          <h3 data-i18n="mod8.h">Answer review</h3>
+          <p data-i18n="mod8.p">Triage unanswered questions and user feedback, and note which document needs fixing.</p>
+          <div class="mod-line" data-i18n="mod8.line">queue <b>· insufficient · clarify · feedback</b></div>
         </article>
 
         <article class="mod hud tilt rv" style="--d:.06s">
-          <div class="mod-top"><span>mod.11 // plan</span><svg class="i"><use href="#i-cpu"/></svg></div>
-          <h3>Hardware planner</h3>
-          <p>Estimate GPUs, RAM and CPU for your number of users — before you buy anything.</p>
-          <div class="mod-line">users → <b>gpu · ram · cpu</b></div>
+          <div class="mod-top"><span>mod.10 // models</span><svg class="i"><use href="#i-spark"/></svg></div>
+          <h3 data-i18n="mod10.h">Bring your model</h3>
+          <p data-i18n="mod10.p">Use the bundled local model, any GGUF model on your server, or an OpenAI-compatible API — only after an admin explicitly approves sending context.</p>
+          <ul class="mod-vis v-models" aria-hidden="true">
+            <li data-i18n="mod10.l1"><span>bundled model</span><b>local</b></li>
+            <li data-i18n="mod10.l2"><span>any gguf · llama.cpp</span><b>local</b></li>
+            <li data-i18n="mod10.l3"><span>openai-compatible api</span><b class="amb">consent</b></li>
+          </ul>
         </article>
 
         <article class="mod hud tilt rv" style="--d:.12s">
+          <div class="mod-top"><span>mod.11 // plan</span><svg class="i"><use href="#i-cpu"/></svg></div>
+          <h3 data-i18n="mod11.h">Hardware planner</h3>
+          <p data-i18n="mod11.p">Estimate GPUs, RAM and CPU for your number of users — before you buy anything.</p>
+          <div class="mod-line" data-i18n="mod11.line">users → <b>gpu · ram · cpu</b></div>
+        </article>
+
+        <article class="mod hud tilt rv" style="--d:.18s">
           <div class="mod-top"><span>mod.12 // backup</span><svg class="i"><use href="#i-db"/></svg></div>
-          <h3>Backup &amp; restore</h3>
-          <p>Back up documents, chats, accounts and settings. Restores are validated before they replace anything.</p>
-          <div class="mod-line">backup.zip <b>· verified</b></div>
+          <h3 data-i18n="mod12.h">Backup &amp; restore</h3>
+          <p data-i18n="mod12.p">Back up documents, chats, accounts and settings. Restores are validated before they replace anything.</p>
+          <div class="mod-line" data-i18n="mod12.line">backup.zip <b>· verified</b></div>
         </article>
       </div>
     </div>
@@ -468,37 +485,37 @@
   <section class="section" id="security">
     <div class="container">
       <div class="sec-head">
-        <p class="kicker rv"><span data-scramble>05 // Perimeter</span></p>
-        <h2 class="h2 rv">Nothing leaves<br><span class="neon">the building.</span></h2>
-        <p class="lede rv">For manufacturers, energy, healthcare and defense suppliers, keeping documents in-house is a requirement — not a feature. Flip the switch to see the difference.</p>
+        <p class="kicker rv"><span data-scramble data-i18n="sec.kicker">05 // Perimeter</span></p>
+        <h2 class="h2 rv" data-i18n="sec.h2">Nothing leaves<br><span class="neon">the building.</span></h2>
+        <p class="lede rv" data-i18n="sec.lede">For manufacturers, energy, healthcare and defense suppliers, keeping documents in-house is a requirement — not a feature. Flip the switch to see the difference.</p>
       </div>
 
       <div class="perim hud rv" id="perim" data-mode="local">
         <div class="perim-top">
-          <div class="switch" role="group" aria-label="Compare deployments">
-            <button type="button" data-mode="cloud" aria-pressed="false" data-cursor="SWITCH">Cloud AI</button>
-            <button type="button" data-mode="local" aria-pressed="true" data-cursor="SWITCH">Soshyant</button>
+          <div class="switch" role="group" aria-label="Compare deployments" data-i18n-attr="aria-label:sec.compare">
+            <button type="button" data-mode="cloud" aria-pressed="false" data-cursor="SWITCH" data-i18n="sec.cloud">Cloud AI</button>
+            <button type="button" data-mode="local" aria-pressed="true" data-cursor="SWITCH" data-i18n="sec.local">Soshyant</button>
             <i class="switch-thumb" aria-hidden="true"></i>
           </div>
           <span class="perim-state" id="perimState">uplink: none · perimeter sealed</span>
         </div>
         <div class="perim-body">
-          <svg class="perim-svg" viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Data flow: with Soshyant, documents, index and model stay inside your network; with a cloud assistant, documents leave it.">
+          <svg class="perim-svg" viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Data flow: with Soshyant, documents, index and model stay inside your network; with a cloud assistant, documents leave it." data-i18n-attr="aria-label:sec.svg">
             <defs>
               <path id="pLocal" d="M96 150 L226 78 L356 150 L226 222 Z"/>
               <path id="pCloud" d="M96 150 L226 78 L356 150 L560 150"/>
             </defs>
             <rect class="perim-wall" x="18" y="22" width="442" height="256"/>
-            <text class="perim-lbl" x="34" y="44">YOUR NETWORK</text>
+            <text class="perim-lbl" x="34" y="44" data-i18n="svg.network">YOUR NETWORK</text>
             <path class="link" d="M96 150 L226 78 L356 150 L226 222 Z"/>
             <path class="link-out" d="M356 150 L560 150"/>
-            <g class="node" transform="translate(96 150)"><rect x="-44" y="-19" width="88" height="38"/><text y="4">DOCS</text></g>
-            <g class="node" transform="translate(226 78)"><rect x="-44" y="-19" width="88" height="38"/><text y="4">INDEX</text></g>
-            <g class="node" transform="translate(356 150)"><rect x="-44" y="-19" width="88" height="38"/><text y="4">LLM</text></g>
-            <g class="node" transform="translate(226 222)"><rect x="-44" y="-19" width="88" height="38"/><text y="4">USERS</text></g>
-            <g class="node cloud" transform="translate(560 150)"><rect x="-58" y="-28" width="116" height="56"/><text y="-3">3RD-PARTY</text><text y="14">CLOUD AI</text></g>
-            <g class="seal" transform="translate(460 150)"><rect x="-10" y="-10" width="20" height="20"/><path d="M-4 0 L-1 3 L5 -4"/><text y="-20">SEALED</text></g>
-            <g class="breach" transform="translate(460 150)"><circle r="10"/><circle class="core" r="4"/><text y="-22">EXPOSED</text></g>
+            <g class="node" transform="translate(96 150)"><rect x="-44" y="-19" width="88" height="38"/><text y="4" data-i18n="svg.docs">DOCS</text></g>
+            <g class="node" transform="translate(226 78)"><rect x="-44" y="-19" width="88" height="38"/><text y="4" data-i18n="svg.index">INDEX</text></g>
+            <g class="node" transform="translate(356 150)"><rect x="-44" y="-19" width="88" height="38"/><text y="4" data-i18n="svg.llm">LLM</text></g>
+            <g class="node" transform="translate(226 222)"><rect x="-44" y="-19" width="88" height="38"/><text y="4" data-i18n="svg.users">USERS</text></g>
+            <g class="node cloud" transform="translate(560 150)"><rect x="-58" y="-28" width="116" height="56"/><text y="-3" data-i18n="svg.cloud1">3RD-PARTY</text><text y="14" data-i18n="svg.cloud2">CLOUD AI</text></g>
+            <g class="seal" transform="translate(460 150)"><rect x="-10" y="-10" width="20" height="20"/><path d="M-4 0 L-1 3 L5 -4"/><text y="-20" data-i18n="svg.sealed">SEALED</text></g>
+            <g class="breach" transform="translate(460 150)"><circle r="10"/><circle class="core" r="4"/><text y="-22" data-i18n="svg.exposed">EXPOSED</text></g>
             <g class="pk pk-local">
               <circle r="4"><animateMotion dur="5s" repeatCount="indefinite" begin="0s"><mpath xlink:href="#pLocal"/></animateMotion></circle>
               <circle r="4"><animateMotion dur="5s" repeatCount="indefinite" begin="-1.25s"><mpath xlink:href="#pLocal"/></animateMotion></circle>
@@ -513,11 +530,11 @@
             </g>
           </svg>
           <ul class="perim-read">
-            <li><small>Your documents</small><b data-cloud="Uploaded to a third-party cloud" data-local="Stay on your own server">Stay on your own server</b></li>
-            <li><small>The model</small><b data-cloud="Runs on the vendor’s servers" data-local="Runs on your hardware">Runs on your hardware</b></li>
-            <li><small>Cost</small><b data-cloud="Per-token fees that grow with use" data-local="No per-question API fees (local mode)">No per-question API fees (local mode)</b></li>
-            <li><small>Answers from</small><b data-cloud="General knowledge, not your product" data-local="Only your approved documents">Only your approved documents</b></li>
-            <li><small>Proof</small><b data-cloud="No verifiable source" data-local="Document, section and version cited">Document, section and version cited</b></li>
+            <li><small data-i18n="sec.r1">Your documents</small><b data-cloud="Uploaded to a third-party cloud" data-local="Stay on your own server" data-cloud-fa="به ابر یک شرکت دیگر بارگذاری می‌شوند" data-local-fa="روی سرور خودتان می‌مانند">Stay on your own server</b></li>
+            <li><small data-i18n="sec.r2">The model</small><b data-cloud="Runs on the vendor’s servers" data-local="Runs on your hardware" data-cloud-fa="روی سرورهای فروشنده اجرا می‌شود" data-local-fa="روی سخت‌افزار شما اجرا می‌شود">Runs on your hardware</b></li>
+            <li><small data-i18n="sec.r3">Cost</small><b data-cloud="Per-token fees that grow with use" data-local="No per-question API fees (local mode)" data-cloud-fa="هزینه به‌ازای هر توکن که با استفاده بیشتر می‌شود" data-local-fa="بدون هزینه API برای هر پرسش (حالت محلی)">No per-question API fees (local mode)</b></li>
+            <li><small data-i18n="sec.r4">Answers from</small><b data-cloud="General knowledge, not your product" data-local="Only your approved documents" data-cloud-fa="دانش عمومی، نه محصول شما" data-local-fa="فقط اسناد تأییدشده شما">Only your approved documents</b></li>
+            <li><small data-i18n="sec.r5">Proof</small><b data-cloud="No verifiable source" data-local="Document, section and version cited" data-cloud-fa="بدون منبع قابل بررسی" data-local-fa="سند، بند و نسخه ذکر می‌شود">Document, section and version cited</b></li>
           </ul>
         </div>
       </div>
@@ -525,15 +542,15 @@
       <div class="term hud rv" id="secTerm">
         <div class="term-h">security --audit</div>
         <ul>
-          <li><b>[ OK ]</b>No default accounts — the first admin is created with a one-time code from the server</li>
-          <li><b>[ OK ]</b>Hashed passwords, server-side sessions, CSRF protection on every change</li>
-          <li><b>[ OK ]</b>Conversations isolated per user — identity always comes from the session</li>
-          <li><b>[ OK ]</b>TLS on your intranet with your own certificate and allowed host names</li>
-          <li><b>[ OK ]</b>Permissions enforced before search, model context, downloads and history</li>
-          <li><b>[ OK ]</b>Question and document text kept out of HTTP logs by default</li>
-          <li><b>[ OK ]</b>Optional API keys stay server-side, encrypted with Windows DPAPI</li>
-          <li><b>[ OK ]</b>Documents and evidence published in one atomic transaction</li>
-          <li class="ready">› audit complete · 8/8 checks passed<i class="caret"></i></li>
+          <li data-i18n="term.1"><b>[ OK ]</b>No default accounts — the first admin is created with a one-time code from the server</li>
+          <li data-i18n="term.2"><b>[ OK ]</b>Hashed passwords, server-side sessions, CSRF protection on every change</li>
+          <li data-i18n="term.3"><b>[ OK ]</b>Conversations isolated per user — identity always comes from the session</li>
+          <li data-i18n="term.4"><b>[ OK ]</b>TLS on your intranet with your own certificate and allowed host names</li>
+          <li data-i18n="term.5"><b>[ OK ]</b>Permissions enforced before search, model context, downloads and history</li>
+          <li data-i18n="term.6"><b>[ OK ]</b>Question and document text kept out of HTTP logs by default</li>
+          <li data-i18n="term.7"><b>[ OK ]</b>Optional API keys stay server-side, encrypted with Windows DPAPI</li>
+          <li data-i18n="term.8"><b>[ OK ]</b>Documents and evidence published in one atomic transaction</li>
+          <li class="ready" data-i18n="term.done">› audit complete · 8/8 checks passed<i class="caret"></i></li>
         </ul>
       </div>
     </div>
@@ -543,16 +560,16 @@
   <section class="section deploy" id="deploy">
     <div class="container">
       <div class="sec-head">
-        <p class="kicker rv"><span data-scramble>06 // Deployment targets</span></p>
-        <h2 class="h2 rv">Runs where <span class="neon">your team works.</span></h2>
+        <p class="kicker rv"><span data-scramble data-i18n="deploy.kicker">06 // Deployment targets</span></p>
+        <h2 class="h2 rv" data-i18n="deploy.h2">Runs where <span class="neon">your team works.</span></h2>
       </div>
       <div class="deploy-grid">
         <article class="dcard hud tilt rv">
           <div class="dvis" aria-hidden="true"><div class="mock-win"><div class="bar"><i></i><i></i><i></i></div><div class="rows"><b></b><b></b><b></b></div></div></div>
           <span class="d-code">target.01</span>
-          <h3>Windows desktop launcher</h3>
-          <p>Double-click to start. It runs quietly in the system tray with clean start, stop and server logs — no command window.</p>
-          <div class="tag-row"><span>system tray</span><span>offline install</span></div>
+          <h3 data-i18n="deploy.1h">Windows desktop launcher</h3>
+          <p data-i18n="deploy.1p">Double-click to start. It runs quietly in the system tray with clean start, stop and server logs — no command window.</p>
+          <div class="tag-row" data-i18n="deploy.1t"><span>system tray</span><span>offline install</span></div>
         </article>
         <article class="dcard hud tilt rv" style="--d:.08s">
           <div class="dvis" aria-hidden="true">
@@ -566,16 +583,16 @@
             </div>
           </div>
           <span class="d-code">target.02</span>
-          <h3>Your internal network</h3>
-          <p>Every browser on your intranet connects over HTTPS. The language model itself only ever listens on the server.</p>
-          <div class="tag-row"><span>https / tls</span><span>browser-based</span></div>
+          <h3 data-i18n="deploy.2h">Your internal network</h3>
+          <p data-i18n="deploy.2p">Every browser on your intranet connects over HTTPS. The language model itself only ever listens on the server.</p>
+          <div class="tag-row" data-i18n="deploy.2t"><span>https / tls</span><span>browser-based</span></div>
         </article>
         <article class="dcard hud tilt rv" style="--d:.16s">
           <div class="dvis" aria-hidden="true"><div class="phone"><b class="me"></b><b class="bot"></b><b class="bot2"></b></div></div>
           <span class="d-code">target.03</span>
-          <h3>Android companion app</h3>
-          <p>Answers on the shop floor. A native app that connects over your Wi-Fi with your private certificate — and blocks screenshots.</p>
-          <div class="tag-row"><span>native android</span><span>wi-fi + https</span></div>
+          <h3 data-i18n="deploy.3h">Android companion app</h3>
+          <p data-i18n="deploy.3p">Answers on the shop floor. A native app that connects over your Wi-Fi with your private certificate — and blocks screenshots.</p>
+          <div class="tag-row" data-i18n="deploy.3t"><span>native android</span><span>wi-fi + https</span></div>
         </article>
       </div>
     </div>
@@ -585,27 +602,27 @@
   <section class="section book" id="book">
     <div class="container book-grid">
       <div class="book-copy">
-        <p class="kicker rv"><span data-scramble>07 // Establish uplink</span></p>
-        <h2 class="h2 rv">Book a <span class="neon">live demo.</span></h2>
-        <p class="lede rv">Pick a slot. We’ll run the pipeline live and talk about what a pilot would look like for your team.</p>
+        <p class="kicker rv"><span data-scramble data-i18n="book.kicker">07 // Establish uplink</span></p>
+        <h2 class="h2 rv" data-i18n="book.h2">Book a <span class="neon">live demo.</span></h2>
+        <p class="lede rv" data-i18n="book.lede">Pick a slot. We’ll run the pipeline live and talk about what a pilot would look like for your team.</p>
         <ol class="agenda rv">
-          <li><span>01</span><div><h4>Live pipeline run</h4><p>Ask questions, open citations, and watch it refuse when the evidence isn’t there.</p></div></li>
-          <li><span>02</span><div><h4>The admin console</h4><p>Documents, watched folders, access groups and answer review.</p></div></li>
-          <li><span>03</span><div><h4>Your deployment</h4><p>Users, languages, hardware sizing and data boundaries.</p></div></li>
-          <li><span>04</span><div><h4>A pilot plan</h4><p>How to measure answer quality on your own questions.</p></div></li>
+          <li><span>01</span><div data-i18n="book.a1"><h4>Live pipeline run</h4><p>Ask questions, open citations, and watch it refuse when the evidence isn’t there.</p></div></li>
+          <li><span>02</span><div data-i18n="book.a2"><h4>The admin console</h4><p>Documents, watched folders, access groups and answer review.</p></div></li>
+          <li><span>03</span><div data-i18n="book.a3"><h4>Your deployment</h4><p>Users, languages, hardware sizing and data boundaries.</p></div></li>
+          <li><span>04</span><div data-i18n="book.a4"><h4>A pilot plan</h4><p>How to measure answer quality on your own questions.</p></div></li>
         </ol>
         <div class="book-meta rv">
-          <span><svg class="i"><use href="#i-video"/></svg>live &amp; online</span>
-          <span><svg class="i"><use href="#i-clock"/></svg>your time zone</span>
-          <span><svg class="i"><use href="#i-check"/></svg>no commitment</span>
+          <span><svg class="i"><use href="#i-video"/></svg><span data-i18n="book.m1">live &amp; online</span></span>
+          <span><svg class="i"><use href="#i-clock"/></svg><span data-i18n="book.m2">your time zone</span></span>
+          <span><svg class="i"><use href="#i-check"/></svg><span data-i18n="book.m3">no commitment</span></span>
         </div>
       </div>
 
       <div class="cal hud rv" style="--d:.1s">
         <div class="cal-top">
           <span class="cal-ico"><svg class="i"><use href="#i-calendar"/></svg></span>
-          <div><strong>Schedule your demo</strong><small>google calendar · secure booking</small></div>
-          <a id="calOpen" href="#" target="_blank" rel="noopener" hidden data-cursor="OPEN">new tab <svg class="i"><use href="#i-external"/></svg></a>
+          <div data-i18n="cal.top"><strong>Schedule your demo</strong><small>google calendar · secure booking</small></div>
+          <a id="calOpen" href="#" target="_blank" rel="noopener" hidden data-cursor="OPEN"><span data-i18n="cal.newtab">new tab</span> <svg class="i"><use href="#i-external"/></svg></a>
         </div>
 
         <div class="cal-embed" id="calEmbed" hidden></div>
@@ -616,24 +633,24 @@
               <div class="cal-month"><span id="calMonth">Month</span><span>‹ ›</span></div>
               <div class="cal-grid" id="calGrid"></div>
             </div>
-            <div class="cal-slots"><div class="day" id="calDay">Available</div><span>10:00</span><span>11:30</span><span>14:00</span><span>15:30</span><span>17:00</span></div>
+            <div class="cal-slots"><div class="day" id="calDay">Available</div><span data-num>10:00</span><span data-num>11:30</span><span data-num>14:00</span><span data-num>15:30</span><span data-num>17:00</span></div>
           </div>
           <div class="cal-overlay">
             <!-- Shown until a booking link is added in window.SOSHYANT.bookingUrl -->
             <div class="cal-msg" id="calUnset">
-              <span class="badge warn">signal pending</span>
-              <h3>Your Google Calendar booking page plugs in here.</h3>
-              <p>Paste your appointment schedule link into <code>bookingUrl</code> at the top of <code>index.html</code> and visitors can book straight from this panel.</p>
-              <div class="btns"><a class="btn btn-neon btn-sm" data-contact-href="email" href="#contact" data-cursor="EMAIL"><span>Email to schedule</span></a></div>
+              <span class="badge warn" data-i18n="cal.pending">signal pending</span>
+              <h3 data-i18n="cal.h">Your Google Calendar booking page plugs in here.</h3>
+              <p data-i18n="cal.p">Paste your appointment schedule link into <code>bookingUrl</code> at the top of <code>index.html</code> and visitors can book straight from this panel.</p>
+              <div class="btns"><a class="btn btn-neon btn-sm" data-contact-href="email" href="#contact" data-cursor="EMAIL"><span data-i18n="cal.email">Email to schedule</span></a></div>
             </div>
             <!-- Shown when the link can't be embedded (e.g. a calendar.app.google short link) -->
             <div class="cal-msg" id="calExternal" hidden>
-              <span class="badge">slots available</span>
-              <h3>Choose a time that works for you.</h3>
-              <p>Our booking page opens in a new tab and shows every open slot in your time zone.</p>
+              <span class="badge" data-i18n="cal.slots">slots available</span>
+              <h3 data-i18n="cal.h2">Choose a time that works for you.</h3>
+              <p data-i18n="cal.p2">Our booking page opens in a new tab and shows every open slot in your time zone.</p>
               <div class="btns">
-                <a class="btn btn-neon btn-sm" id="calExternalBtn" href="#" target="_blank" rel="noopener" data-cursor="OPEN"><span>Open booking page</span></a>
-                <a class="btn btn-ghost btn-sm" data-contact-href="email" href="#contact"><span>Email us</span></a>
+                <a class="btn btn-neon btn-sm" id="calExternalBtn" href="#" target="_blank" rel="noopener" data-cursor="OPEN"><span data-i18n="cal.open">Open booking page</span></a>
+                <a class="btn btn-ghost btn-sm" data-contact-href="email" href="#contact"><span data-i18n="cal.emailus">Email us</span></a>
               </div>
             </div>
           </div>
@@ -646,46 +663,46 @@
   <section class="section faq" id="faq">
     <div class="container faq-grid">
       <div class="faq-head">
-        <p class="kicker rv"><span data-scramble>08 // Query log</span></p>
-        <h2 class="h2 rv">Questions, <span class="neon">answered.</span></h2>
-        <p class="lede rv">Something else on your mind? <a class="link-neon" href="#contact">Open a channel</a> — we’re happy to go deep.</p>
+        <p class="kicker rv"><span data-scramble data-i18n="faq.kicker">08 // Query log</span></p>
+        <h2 class="h2 rv" data-i18n="faq.h2">Questions, <span class="neon">answered.</span></h2>
+        <p class="lede rv" data-i18n="faq.lede">Something else on your mind? <a class="link-neon" href="#contact">Open a channel</a> — we’re happy to go deep.</p>
       </div>
       <div class="faq-list rv">
         <details>
-          <summary><span class="q-id">Q.01</span><span class="q-t">What does “RAG” mean here?</span><span class="q-x" aria-hidden="true"></span></summary>
-          <div class="answer"><span class="a-id">A ›</span><p>Retrieval-augmented generation. When someone asks a question, Soshyant first searches your indexed documents (keyword and semantic), keeps only the passages that person is allowed to see, and hands them to the language model with instructions to answer only from that evidence and cite it. If the passages don’t support an answer, it says so.</p></div>
+          <summary><span class="q-id" data-i18n="faq.id1">Q.01</span><span class="q-t" data-i18n="faq.q1">What does “RAG” mean here?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id" data-i18n="faq.a">A ›</span><p data-i18n="faq.a1">Retrieval-augmented generation. When someone asks a question, Soshyant first searches your indexed documents (keyword and semantic), keeps only the passages that person is allowed to see, and hands them to the language model with instructions to answer only from that evidence and cite it. If the passages don’t support an answer, it says so.</p></div>
         </details>
         <details>
-          <summary><span class="q-id">Q.02</span><span class="q-t">Does it train the model on our documents?</span><span class="q-x" aria-hidden="true"></span></summary>
-          <div class="answer"><span class="a-id">A ›</span><p>No. Documents are indexed for retrieval; the model’s weights are never changed. When you update a document, answers use the new version as soon as it’s re-indexed — no retraining.</p></div>
+          <summary><span class="q-id" data-i18n="faq.id2">Q.02</span><span class="q-t" data-i18n="faq.q2">Does it train the model on our documents?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id" data-i18n="faq.a">A ›</span><p data-i18n="faq.a2">No. Documents are indexed for retrieval; the model’s weights are never changed. When you update a document, answers use the new version as soon as it’s re-indexed — no retraining.</p></div>
         </details>
         <details>
-          <summary><span class="q-id">Q.03</span><span class="q-t">Does it need an internet connection?</span><span class="q-x" aria-hidden="true"></span></summary>
-          <div class="answer"><span class="a-id">A ›</span><p>Not in local mode. The language model, the embedding model and the interface files all load from the server’s own disk — no CDN, web fonts or automatic downloads. If an administrator chooses to connect a cloud model, the server then needs internet and the question plus retrieved passages go to that provider — only after explicit approval.</p></div>
+          <summary><span class="q-id" data-i18n="faq.id3">Q.03</span><span class="q-t" data-i18n="faq.q3">Does it need an internet connection?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id" data-i18n="faq.a">A ›</span><p data-i18n="faq.a3">Not in local mode. The language model, the embedding model, the OCR model and the interface files all load from the server’s own disk — no CDN, web fonts or automatic downloads. If an administrator chooses to connect a cloud model, the server then needs internet and the question plus retrieved passages go to that provider — only after explicit approval.</p></div>
         </details>
         <details>
-          <summary><span class="q-id">Q.04</span><span class="q-t">Which documents can it read?</span><span class="q-x" aria-hidden="true"></span></summary>
-          <div class="answer"><span class="a-id">A ›</span><p>PDF (with a text layer), Word (DOCX), Excel (XLSX), plain text, Markdown and HTML. Scanned documents need OCR before import. Upload files one by one, import a folder, or watch a folder for changes.</p></div>
+          <summary><span class="q-id" data-i18n="faq.id4">Q.04</span><span class="q-t" data-i18n="faq.q4">Which documents can it read?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id" data-i18n="faq.a">A ›</span><p data-i18n="faq.a4">PDF, Word (DOCX), Excel (XLSX), plain text, Markdown and HTML, plus scanned images (PNG, JPG, TIFF). Scanned English pages are read by a local OCR model; Persian scans need a text version for now. Upload files one by one, import a folder, or watch a folder for changes.</p></div>
         </details>
         <details>
-          <summary><span class="q-id">Q.05</span><span class="q-t">Which languages are supported?</span><span class="q-x" aria-hidden="true"></span></summary>
-          <div class="answer"><span class="a-id">A ›</span><p>The interface and answers are available in English and Persian (<span class="fa">فارسی</span>), with a full right-to-left layout. We recommend validating answer quality on real questions from your own domain and language during a pilot.</p></div>
+          <summary><span class="q-id" data-i18n="faq.id5">Q.05</span><span class="q-t" data-i18n="faq.q5">Which languages are supported?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id" data-i18n="faq.a">A ›</span><p data-i18n="faq.a5">The interface and answers are available in English and Persian (<span class="fa">فارسی</span>), with a full right-to-left layout. We recommend validating answer quality on real questions from your own domain and language during a pilot.</p></div>
         </details>
         <details>
-          <summary><span class="q-id">Q.06</span><span class="q-t">Can different teams see different documents?</span><span class="q-x" aria-hidden="true"></span></summary>
-          <div class="answer"><span class="a-id">A ›</span><p>Yes. Administrators create access groups and choose which groups can use each document. Restricted passages are filtered on the server before ranking and before anything reaches the model. Confidential files can be imported as “administrators only” from the first second.</p></div>
+          <summary><span class="q-id" data-i18n="faq.id6">Q.06</span><span class="q-t" data-i18n="faq.q6">Can different teams see different documents?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id" data-i18n="faq.a">A ›</span><p data-i18n="faq.a6">Yes. Administrators create access groups and choose which groups can use each document. Restricted passages are filtered on the server before ranking and before anything reaches the model. Confidential files can be imported as “administrators only” from the first second.</p></div>
         </details>
         <details>
-          <summary><span class="q-id">Q.07</span><span class="q-t">What hardware do we need?</span><span class="q-x" aria-hidden="true"></span></summary>
-          <div class="answer"><span class="a-id">A ›</span><p>A single Windows server or workstation. A GPU is recommended for responsive answers; CPU-only operation is possible. The built-in hardware planner estimates GPUs, RAM and CPU cores for your number of users — and we’ll size it with you during the demo.</p></div>
+          <summary><span class="q-id" data-i18n="faq.id7">Q.07</span><span class="q-t" data-i18n="faq.q7">What hardware do we need?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id" data-i18n="faq.a">A ›</span><p data-i18n="faq.a7">A single Windows server or workstation. A GPU is recommended for responsive answers; CPU-only operation is possible. The built-in hardware planner estimates GPUs, RAM and CPU cores for your number of users — and we’ll size it with you during the demo.</p></div>
         </details>
         <details>
-          <summary><span class="q-id">Q.08</span><span class="q-t">Is there a mobile app?</span><span class="q-x" aria-hidden="true"></span></summary>
-          <div class="answer"><span class="a-id">A ›</span><p>Yes — a native Android app that connects to your own server over Wi-Fi using HTTPS and your private certificate. The model never runs on the phone, passwords aren’t stored on it, and screenshots are blocked.</p></div>
+          <summary><span class="q-id" data-i18n="faq.id8">Q.08</span><span class="q-t" data-i18n="faq.q8">Is there a mobile app?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id" data-i18n="faq.a">A ›</span><p data-i18n="faq.a8">Yes — a native Android app that connects to your own server over Wi-Fi using HTTPS and your private certificate. The model never runs on the phone, passwords aren’t stored on it, and screenshots are blocked.</p></div>
         </details>
         <details>
-          <summary><span class="q-id">Q.09</span><span class="q-t">Where is our data stored?</span><span class="q-x" aria-hidden="true"></span></summary>
-          <div class="answer"><span class="a-id">A ›</span><p>Documents, conversations and accounts live in a local database on your server, and backups are written there too. You decide how that storage is protected and retained under your own policies.</p></div>
+          <summary><span class="q-id" data-i18n="faq.id9">Q.09</span><span class="q-t" data-i18n="faq.q9">Where is our data stored?</span><span class="q-x" aria-hidden="true"></span></summary>
+          <div class="answer"><span class="a-id" data-i18n="faq.a">A ›</span><p data-i18n="faq.a9">Documents, conversations and accounts live in a local database on your server, and backups are written there too. You decide how that storage is protected and retained under your own policies.</p></div>
         </details>
       </div>
     </div>
@@ -695,30 +712,30 @@
   <section class="section contact" id="contact">
     <div class="container contact-grid">
       <div>
-        <p class="kicker rv"><span data-scramble>09 // Open a channel</span></p>
-        <h2 class="closing rv">The companies that wrote the manuals deserve an expert that <span class="neon glitch" data-text="never forgets.">never forgets.</span></h2>
-        <p class="lede rv">Tell us about your documents and your team — we’ll show you what a RAG expert running on your own hardware can do with them.</p>
+        <p class="kicker rv"><span data-scramble data-i18n="contact.kicker">09 // Open a channel</span></p>
+        <h2 class="closing rv" data-i18n="contact.h2">The companies that wrote the manuals deserve an expert that <span class="neon glitch" data-text="never forgets.">never forgets.</span></h2>
+        <p class="lede rv" data-i18n="contact.lede">Tell us about your documents and your team — we’ll show you what a RAG expert running on your own hardware can do with them.</p>
         <div class="hero-ctas rv">
-          <a class="btn btn-neon magnetic" href="#book" data-cursor="BOOK"><span>Book a demo</span><svg class="i"><use href="#i-arrow"/></svg></a>
-          <a class="btn btn-ghost magnetic" data-contact-href="email" href="#contact" data-cursor="EMAIL"><span>Send an email</span></a>
+          <a class="btn btn-neon magnetic" href="#book" data-cursor="BOOK"><span data-i18n="cta.book">Book a demo</span><svg class="i"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn-ghost magnetic" data-contact-href="email" href="#contact" data-cursor="EMAIL"><span data-i18n="contact.email">Send an email</span></a>
         </div>
       </div>
 
       <div class="idcard tilt rv" style="--d:.1s">
         <div class="id-holo" aria-hidden="true"></div>
-        <div class="id-top"><span>operator id</span><span>soshyant // expert</span></div>
+        <div class="id-top"><span data-i18n="id.top">operator id</span><span>soshyant // expert</span></div>
         <div class="id-person">
           <div class="id-avatar" id="avatar" aria-hidden="true">S</div>
           <div><strong data-contact="name">[Your Name]</strong><span data-contact="role">[Founder &amp; CEO, Soshyant]</span></div>
         </div>
         <ul class="id-fields">
-          <li><small>email</small><a data-contact-href="email" data-contact="email" href="#contact">[you@yourcompany.com]</a><button class="copy" type="button" data-copy="email" data-cursor="COPY">copy</button></li>
-          <li><small>phone</small><a data-contact-href="phone" data-contact="phone" href="#contact">[+00 000 000 0000]</a><button class="copy" type="button" data-copy="phone" data-cursor="COPY">copy</button></li>
-          <li><small>location</small><span data-contact="location">[City, Country]</span></li>
-          <li><small>linkedin</small><a data-contact-href="linkedin" data-contact="linkedin" href="#contact" target="_blank" rel="noopener">[linkedin.com/in/your-profile]</a></li>
-          <li><small>website</small><a data-contact-href="website" data-contact="website" href="#contact" target="_blank" rel="noopener">[www.yourcompany.com]</a></li>
+          <li><small data-i18n="id.email">email</small><a data-contact-href="email" data-contact="email" href="#contact" dir="ltr">[you@yourcompany.com]</a><button class="copy" type="button" data-copy="email" data-cursor="COPY">copy</button></li>
+          <li><small data-i18n="id.phone">phone</small><a data-contact-href="phone" data-contact="phone" href="#contact" dir="ltr">[+00 000 000 0000]</a><button class="copy" type="button" data-copy="phone" data-cursor="COPY">copy</button></li>
+          <li><small data-i18n="id.location">location</small><span data-contact="location">[City, Country]</span></li>
+          <li><small data-i18n="id.linkedin">linkedin</small><a data-contact-href="linkedin" data-contact="linkedin" href="#contact" target="_blank" rel="noopener" dir="ltr">[linkedin.com/in/your-profile]</a></li>
+          <li><small data-i18n="id.website">website</small><a data-contact-href="website" data-contact="website" href="#contact" target="_blank" rel="noopener" dir="ltr">[www.yourcompany.com]</a></li>
         </ul>
-        <div class="id-bottom"><span class="barcode" aria-hidden="true"></span><span>clearance: public</span></div>
+        <div class="id-bottom"><span class="barcode" aria-hidden="true"></span><span data-i18n="id.clearance">clearance: public</span></div>
       </div>
     </div>
   </section>
@@ -731,19 +748,20 @@
     <div class="foot-grid">
       <div>
         <a class="logo" href="#top"><span class="logo-mark" aria-hidden="true">S</span><span class="logo-word"><span class="lw-en">SOSHYANT</span><small>expert // rag engine</small></span></a>
-        <p>An on-premise RAG engine that answers from your company’s own documents — and cites every source.</p>
+        <p data-i18n="foot.blurb">An on-premise RAG engine that answers from your company’s own documents — and cites every source.</p>
       </div>
-      <div><h5>// product</h5><ul><li><a href="#console">Console</a></li><li><a href="#rag">How RAG works</a></li><li><a href="#features">Modules</a></li><li><a href="#security">Security</a></li></ul></div>
-      <div><h5>// company</h5><ul><li><a href="#book">Book a demo</a></li><li><a href="#faq">FAQ</a></li><li><a href="#contact">Contact</a></li></ul></div>
-      <div><h5>// contact</h5><ul><li><a data-contact-href="email" data-contact="email" href="#contact">[you@yourcompany.com]</a></li><li><a data-contact-href="phone" data-contact="phone" href="#contact">[+00 000 000 0000]</a></li><li data-contact="location">[City, Country]</li></ul></div>
+      <div><h5 data-i18n="foot.product">// product</h5><ul><li><a href="#console" data-i18n="foot.console">Console</a></li><li><a href="#rag" data-i18n="foot.rag">How RAG works</a></li><li><a href="#features" data-i18n="foot.modules">Modules</a></li><li><a href="#security" data-i18n="foot.security">Security</a></li></ul></div>
+      <div><h5 data-i18n="foot.company">// company</h5><ul><li><a href="#book" data-i18n="cta.book">Book a demo</a></li><li><a href="#faq" data-i18n="foot.faq">FAQ</a></li><li><a href="#contact" data-i18n="foot.contact">Contact</a></li></ul></div>
+      <div><h5 data-i18n="foot.reach">// contact</h5><ul><li><a data-contact-href="email" data-contact="email" href="#contact" dir="ltr">[you@yourcompany.com]</a></li><li><a data-contact-href="phone" data-contact="phone" href="#contact" dir="ltr">[+00 000 000 0000]</a></li><li data-contact="location">[City, Country]</li></ul></div>
     </div>
     <div class="foot-base">
-      <span>© <span id="year">2026</span> Soshyant. All rights reserved.</span>
-      <span>sys.status: online · uplink: none</span>
+      <span>© <span id="year">2026</span> <span data-i18n="foot.rights">Soshyant. All rights reserved.</span></span>
+      <span data-i18n="foot.status">sys.status: online · uplink: none</span>
     </div>
   </div>
 </footer>
 
+<script src="fa.js" defer></script>
 <script src="main.js" defer></script>
 </body>
 </html>

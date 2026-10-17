@@ -23,6 +23,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--download-embeddings", action="store_true")
+    parser.add_argument("--ocr-models", type=Path,
+                        help="folder with unlimited-ocr-Q4_K_M.gguf, mmproj-unlimited-ocr-bf16.gguf and provenance.json")
     args = parser.parse_args()
     source = args.source.resolve()
     runtime = ROOT / "runtime"
@@ -31,7 +33,7 @@ def main():
     site = runtime / "Lib/site-packages"
     site.mkdir(parents=True, exist_ok=True)
     names = ["numpy", "onnxruntime", "tokenizers", "pypdf", "openpyxl", "et_xmlfile",
-             "flatbuffers", "packaging"]
+             "flatbuffers", "packaging", "PIL", "pypdfium2", "pypdfium2_raw", "pypdfium2_cfg"]
     site_source = None
     for name in names:
         spec = importlib.util.find_spec(name)
@@ -47,6 +49,8 @@ def main():
             copy_tree(path, site / path.name)
         for path in site_source.glob(name + "-*.dist-info"):
             copy_tree(path, site / path.name)
+        for path in site_source.glob({"PIL": "pillow"}.get(name, name) + "-*.dist-info"):
+            copy_tree(path, site / path.name)
         for path in site_source.glob(name + ".libs"):
             copy_tree(path, site / path.name)
     (ROOT / "assets/llama").mkdir(parents=True, exist_ok=True)
@@ -60,6 +64,15 @@ def main():
     if not target.exists() or target.stat().st_size != model.stat().st_size:
         print("Copying the installed language model...", flush=True)
         shutil.copy2(model, target)
+    if args.ocr_models:
+        # English OCR (optional). Files are copied as provided; nothing is downloaded here.
+        (ROOT / "assets/ocr").mkdir(parents=True, exist_ok=True)
+        for name in ("unlimited-ocr-Q4_K_M.gguf", "mmproj-unlimited-ocr-bf16.gguf", "provenance.json"):
+            source_file = args.ocr_models / name
+            target = ROOT / "assets/ocr" / name
+            if not target.exists() or target.stat().st_size != source_file.stat().st_size:
+                print("Copying OCR asset: " + name, flush=True)
+                shutil.copy2(source_file, target)
     if args.download_embeddings:
         repository = "Qdrant/paraphrase-multilingual-MiniLM-L12-v2-onnx-Q"
         opener = urllib.request.build_opener()

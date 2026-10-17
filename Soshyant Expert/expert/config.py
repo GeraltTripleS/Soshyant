@@ -3,6 +3,21 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+# English OCR for scanned pages (see OCR.md); older server.json files get these defaults.
+OCR_DEFAULTS = {
+    "ocr_enabled": True,
+    "ocr_model": "assets/ocr/unlimited-ocr-Q4_K_M.gguf",
+    "ocr_projector": "assets/ocr/mmproj-unlimited-ocr-bf16.gguf",
+    "ocr_port": 18196,
+    "ocr_gpu_layers": 0,
+    "ocr_threads": 0,
+    "ocr_max_pages": 200,
+    "ocr_max_side": 1600,
+    "ocr_max_tokens": 2048,
+    "ocr_page_seconds": 300,
+    "ocr_idle_seconds": 120,
+}
+
 
 def read_json(path):
     with Path(path).open(encoding="utf-8") as stream:
@@ -13,12 +28,24 @@ class Config:
     def __init__(self, root=ROOT):
         self.root = Path(root).resolve()
         self.settings = read_json(self.root / "config/server.json")
+        for key, value in OCR_DEFAULTS.items():
+            self.settings.setdefault(key, value)
         self.domain_path = self.root / "config/domain.json"
         self.data = self.root / "data"
         self.data.mkdir(parents=True, exist_ok=True)
-        for key in ("model_file", "llama_executable", "embedding_directory"):
+        for key in ("model_file", "llama_executable", "embedding_directory", "ocr_model", "ocr_projector"):
             path = Path(self.settings[key])
             self.settings[key] = str((self.root / path).resolve()) if not path.is_absolute() else str(path)
+
+    def save_setting(self, key, value):
+        """Persist one server setting atomically, keeping the file's other values as written."""
+        path = self.root / "config/server.json"
+        saved = read_json(path)
+        saved[key] = value
+        temporary = path.with_suffix(".tmp")
+        temporary.write_text(json.dumps(saved, indent=2), encoding="utf-8")
+        temporary.replace(path)
+        self.settings[key] = value
 
     def domain(self):
         return self.validate_domain(read_json(self.domain_path))

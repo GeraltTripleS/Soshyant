@@ -25,7 +25,7 @@ Administrators also have **Watched folders** for approval-based document updates
 
 - موتور مستقل از رابط و صوت؛ موضوع با تنظیمات تعیین می‌شود.
 - جست‌وجوی ترکیبی واژگانی و معنایی؛ مدل چندزبانه ONNX فقط از مسیر محلی خوانده می‌شود.
-- TXT، Markdown، HTML، PDF متنی، DOCX و XLSX؛ اسناد اسکن‌شده به OCR بیرونی نیاز دارند.
+- TXT، Markdown، HTML، PDF، DOCX، XLSX و تصویر اسکن (PNG، JPG، TIFF). صفحه‌های اسکن‌شده **انگلیسی** با OCR محلی خوانده می‌شوند؛ اسکن فارسی هنوز نمایه نمی‌شود و نسخه متنی لازم دارد. جزئیات در [OCR.md](OCR.md).
 - نسخه سند، اولویت منبع، بایگانی قابل بازگشت و حفظ فایل نسخه قبلی.
 - ذخیره یکپارچه سند و شواهد در تراکنش SQLite؛ انتشار ناقص نمایه انجام نمی‌شود.
 - پاسخ ساخت‌یافته: answered، clarify یا insufficient، با نسخه دانش و ارجاع‌ها.
@@ -79,6 +79,7 @@ runtime\python.exe manage.py restore data\backups\backup-NAME.zip
 runtime\python.exe -m unittest discover -s tests -v
 runtime\python.exe manage.py check --full
 runtime\python.exe tools\smoke_real.py
+runtime\python.exe tools\smoke_ocr.py
 ```
 
 آزمون‌های واحد از اسناد موقت و مدل شبیه‌سازی‌شده استفاده می‌کنند. آزمون آخر مدل واقعی را روی داده آزمایشی موقت اجرا و فقط پردازش مدل خودش را متوقف می‌کند. اسناد مشتری وارد آن نمی‌شوند.
@@ -99,6 +100,12 @@ runtime\python.exe tools\smoke_real.py
 
 در **Documents → Add a document folder** اسناد را گروهی وارد کنید. برای حذف سند بایگانی‌شده **Show archived** را روشن و **Delete permanently** را انتخاب کنید؛ تأیید لازم است. جزئیات در [MODELS-AND-FOLDERS.md](MODELS-AND-FOLDERS.md) آمده است.
 
+
+## OCR انگلیسی برای اسناد اسکن‌شده
+
+صفحه‌های PDF بدون لایه متنی و فایل‌های تصویری (PNG، JPG و TIFF چندصفحه‌ای) با مدل Unlimited-OCR (مجوز MIT) و همان llama.cpp همراه برنامه، روی خود سرور خوانده می‌شوند؛ چیزی دانلود یا به اینترنت ارسال نمی‌شود. محل این بخش‌ها در ارجاع‌ها با `(OCR)` مشخص می‌شود، مثلاً `page 4 (OCR)`. مدیر در بخش **Documents** گزینه **Read scanned English pages with local OCR** را روشن یا خاموش می‌کند و وضعیت آن در **Overview** نیز دیده می‌شود.
+
+OCR فقط برای **انگلیسی** فعال است. در آزمون، مدل گاهی اعداد صفحه‌های فارسی را بی‌صدا تغییر می‌داد؛ بنابراین صفحه‌ای که خروجی آن عمدتاً خط فارسی/عربی باشد، یا مدل در آن تکرار شود یا چیزی برنگرداند، نمایه نمی‌شود و نام صفحه در یادداشت سند نمایش داده می‌شود. اجرا به‌طور پیش‌فرض روی پردازنده است (از حدود ۳۵ ثانیه برای صفحه کم‌متن تا حدود ۲٫۵ دقیقه برای صفحه پرمتن)؛ اگر حافظه کارت گرافیک کافی است، با `"ocr_gpu_layers": 99` حدود ۱ تا ۸ ثانیه طول می‌کشد. راهنمای کامل در [OCR.md](OCR.md) و نتیجه ارزیابی در [OCR-EVALUATION.md](OCR-EVALUATION.md) است.
 
 ## مدل با کلید API
 

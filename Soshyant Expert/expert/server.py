@@ -195,6 +195,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(200, {"version": __version__, "domain": self.app.config.domain(),
                 "knowledge_version": store.version(), "model": {"installed": engine.model.available(), "state": engine.model.state, 'selection_id':engine.selection_id(), **self.app.models.active_info()},
                 "search": {"mode": self.app.config.settings["embedding_mode"], "installed": engine.knowledge.embeddings.ready()},
+                "ocr": engine.knowledge.ocr.status(),
                 "queues": {kind: q.qsize() for kind, q in engine.queues.items()}, "secure": self.app.secure,
                 "upload_limit_mb": self.app.config.settings["max_document_mb"]})
         if path == "/api/conversations":
@@ -423,6 +424,15 @@ class Handler(BaseHTTPRequestHandler):
             result = self.app.models.activate(data.get('model_id'),data.get('confirm_cloud',False))
             store.audit(account['id'], 'model_activate')
             return self.send(200, result)
+        if path == '/api/ocr':
+            enabled = self.json_body().get('enabled')
+            if not isinstance(enabled, bool):
+                raise ValueError('Choose whether OCR is on or off.')
+            self.app.config.save_setting('ocr_enabled', enabled)
+            if not enabled:
+                engine.knowledge.ocr.close()
+            store.audit(account['id'], 'ocr_' + ('enable' if enabled else 'disable'))
+            return self.send(200, engine.knowledge.ocr.status())
         if path == '/api/documents/import':
             restricted = query.get('restricted', ['0'])[0]
             if restricted not in ('0','1'):

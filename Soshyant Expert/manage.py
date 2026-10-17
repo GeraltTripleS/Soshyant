@@ -20,10 +20,17 @@ def check(full=False):
     import tokenizers
     import pypdf
     import openpyxl
+    import PIL
+    import pypdfium2
     from expert.knowledge import LocalEmbeddings
     vector = LocalEmbeddings(config.settings).encode(["A local document search check."])[0]
     print(f"Independent runtime: {sys.prefix}")
     print(f"Local embedding model: OK ({len(vector)} dimensions)")
+    ocr_files = [config.settings["ocr_model"], config.settings["ocr_projector"]]
+    if all(Path(name).is_file() for name in ocr_files):
+        print("English OCR model: OK" + ("" if config.settings["ocr_enabled"] else " (turned off)"))
+    else:
+        print("English OCR model: not installed (optional; scanned pages are not indexed)")
     if full:
         manifest = json.loads((ROOT / "assets-manifest.json").read_text(encoding="utf-8"))
         for name, expected in manifest.items():

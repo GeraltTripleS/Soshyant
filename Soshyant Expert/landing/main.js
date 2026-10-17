@@ -10,11 +10,67 @@
   const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=<>/\\[]{}';
+  const GLYPHS_FA = 'ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهی۰۱۲۳۴۵۶۷۸۹';
   const onView = (el, cb, opts) => {
     if (!el) return;
     if (!('IntersectionObserver' in window)) { cb(true); return; }
     new IntersectionObserver((es) => cb(es[0].isIntersecting), opts).observe(el);
   };
+
+  /* ---------- Language (English default, Persian from fa.js) ---------- */
+  const FA = window.SOSHYANT_FA || null;
+  const LANG_KEY = 'soshyant-landing-lang';
+  let lang = html.lang === 'fa' && FA ? 'fa' : 'en';
+  const isFa = () => lang === 'fa';
+  const T = (key, en) => (isFa() && FA.ui[key] != null ? FA.ui[key] : en);
+  const digits = (v) => (isFa() ? String(v).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]) : String(v));
+  const dec = (x, n) => (isFa() ? digits(x.toFixed(n)).replace('.', '٫') : x.toFixed(n));
+  const onLang = (fn) => document.addEventListener('langchange', fn);
+  const setText = (el, text) => { el._scr = (el._scr || 0) + 1; el.textContent = text; }; // also stops a running scramble
+
+  function i18n() {
+    const nodes = $$('[data-i18n]').map((el) => ({ el, key: el.dataset.i18n, en: el.innerHTML }));
+    const attrs = [];
+    $$('[data-i18n-attr]').forEach((el) => el.dataset.i18nAttr.split(';').forEach((pair) => {
+      const [name, key] = pair.split(':').map((s) => s.trim());
+      if (name && key) attrs.push({ el, name, key, en: el.getAttribute(name) });
+    }));
+    const meta = $('meta[name="description"]');
+    const en = { title: document.title, desc: meta ? meta.content : '' };
+    const pick = (key, fallback) => (isFa() && FA.text[key] != null ? FA.text[key] : fallback);
+
+    function apply(next, byUser) {
+      if (next === 'fa' && !FA) next = 'en';
+      const changed = next !== lang;
+      lang = next;
+      html.lang = next;
+      html.dir = next === 'fa' ? 'rtl' : 'ltr';
+      nodes.forEach((n) => { n.el._scr = (n.el._scr || 0) + 1; n.el.innerHTML = pick(n.key, n.en); });
+      attrs.forEach((a) => a.el.setAttribute(a.name, pick(a.key, a.en)));
+      document.title = pick('meta.title', en.title);
+      if (meta) meta.content = pick('meta.desc', en.desc);
+      $$('[data-num]').forEach((el) => { if (!el.dataset.num) el.dataset.num = el.textContent; el.textContent = digits(el.dataset.num); });
+      $$('.copy').forEach((b) => { b.textContent = T('copy', 'copy'); });
+      html.classList.remove('i18n-pending');
+      if (!byUser) return;
+      try { localStorage.setItem(LANG_KEY, next); } catch (e) { /* storage blocked */ }
+      const url = new URL(location.href);
+      if (url.searchParams.has('lang')) { url.searchParams.set('lang', next); history.replaceState(null, '', url); }
+      if (!reduce) {
+        html.classList.add('lang-swap');
+        setTimeout(() => html.classList.remove('lang-swap'), 450);
+        $$('.rv.in [data-scramble]').forEach((s) => scramble(s));
+      }
+      if (changed) document.dispatchEvent(new CustomEvent('langchange'));
+    }
+
+    const btn = $('#langBtn');
+    if (btn) {
+      if (!FA) btn.hidden = true;
+      btn.addEventListener('click', () => apply(isFa() ? 'en' : 'fa', true));
+    }
+    apply(lang, false);
+  }
 
   /* ---------- Boot sequence ---------- */
   function boot() {
@@ -39,7 +95,7 @@
         line.classList.add('on');
         const p = Math.round(((i + 1) / lines.length) * 100);
         bar.style.width = p + '%';
-        pct.textContent = String(p).padStart(3, '0') + '%';
+        pct.textContent = digits(String(p).padStart(3, '0')) + '%';
       }, 200 + i * step));
       setTimeout(finish, 200 + lines.length * step + 450);
     });
@@ -58,7 +114,7 @@
       const p = max > 0 ? window.scrollY / max : 0;
       bar.classList.toggle('scrolled', window.scrollY > 10);
       progress.style.transform = `scaleX(${p})`;
-      if (pct) pct.textContent = String(Math.round(p * 100)).padStart(3, '0') + '%';
+      if (pct) pct.textContent = digits(String(Math.round(p * 100)).padStart(3, '0')) + '%';
     };
     window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
     update();
@@ -67,8 +123,10 @@
       bar.classList.toggle('open', open);
       html.classList.toggle('menu-open', open);
       toggle.setAttribute('aria-expanded', String(open));
-      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      toggle.setAttribute('aria-label', open ? T('menuClose', 'Close menu') : T('menuOpen', 'Open menu'));
     };
+    setMenu(false);
+    onLang(() => { setMenu(bar.classList.contains('open')); update(); });
     toggle.addEventListener('click', () => setMenu(!bar.classList.contains('open')));
     $$('.nav-links a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
@@ -98,7 +156,8 @@
       if (e.target.tagName === 'IFRAME') { show(false); return; }
       const t = e.target.closest('a, button, summary, [data-cursor]');
       ring.classList.toggle('hover', !!t);
-      label.textContent = t ? (t.dataset.cursor || (t.tagName === 'SUMMARY' ? 'EXPAND' : t.tagName === 'A' ? 'OPEN' : 'SELECT')) : '';
+      const key = t ? (t.dataset.cursor || (t.tagName === 'SUMMARY' ? 'EXPAND' : t.tagName === 'A' ? 'OPEN' : 'SELECT')) : '';
+      label.textContent = (isFa() && FA.ui.cursor && FA.ui.cursor[key]) || key;
     });
     window.addEventListener('pointerdown', () => ring.classList.add('down'));
     window.addEventListener('pointerup', () => ring.classList.remove('down'));
@@ -154,13 +213,14 @@
   function scramble(el, text = el.textContent, duration = 700) {
     const token = (el._scr = (el._scr || 0) + 1);
     if (reduce) { el.textContent = text; return; }
+    const set = /[؀-ۿ]/.test(text) ? GLYPHS_FA : GLYPHS;
     const start = performance.now();
     const frame = (now) => {
       if (token !== el._scr) return;
       const p = clamp((now - start) / duration, 0, 1);
       const n = Math.floor(p * text.length);
       let out = text.slice(0, n);
-      for (let i = n; i < text.length; i++) out += text[i] === ' ' ? ' ' : GLYPHS[(Math.random() * GLYPHS.length) | 0];
+      for (let i = n; i < text.length; i++) out += text[i] === ' ' ? ' ' : set[(Math.random() * set.length) | 0];
       el.textContent = out;
       if (p < 1) requestAnimationFrame(frame); else el.textContent = text;
     };
@@ -169,15 +229,18 @@
 
   function countUp(el) {
     const to = Number(el.dataset.count);
-    if (reduce) { el.textContent = to; return; }
+    el._n = to;
+    if (reduce) { el.textContent = digits(to); return; }
     const start = performance.now();
     const frame = (now) => {
       const p = clamp((now - start) / 1400, 0, 1);
-      el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+      el._n = Math.round(to * (1 - Math.pow(1 - p, 3)));
+      el.textContent = digits(el._n);
       if (p < 1) requestAnimationFrame(frame);
     };
     requestAnimationFrame(frame);
   }
+  const countDigits = () => $$('[data-count]').forEach((el) => { el.textContent = digits(el._n != null ? el._n : el.dataset.count); });
 
   function typeTerminal(el) {
     $$('li', el).forEach((li, i) => setTimeout(() => li.classList.add('on'), reduce ? 0 : 250 + i * 230));
@@ -261,7 +324,7 @@
       canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       if (rebuild) build();
-      if (!q.x) { q.x = q.tx = W * 0.66; q.y = q.ty = H * 0.45; }
+      if (!q.x) { q.x = q.tx = W * side(); q.y = q.ty = H * 0.45; }
     }
 
     hero.addEventListener('pointermove', (e) => {
@@ -275,12 +338,14 @@
     hero.addEventListener('pointerleave', () => { q.user = false; });
 
     const fmt = (v) => (v >= 0 ? '+' : '') + v.toFixed(2);
+    // The cloud sits opposite the headline: right of centre in English, left in Persian.
+    const side = () => (isFa() ? 0.32 : 0.68);
 
     function draw(now) {
       const t = now / 1000;
       const narrow = W < 900;
       if (!q.user || now - lastMove > 3500) {
-        q.tx = W * (narrow ? 0.5 : 0.68) + Math.sin(t * 0.37) * W * (narrow ? 0.3 : 0.18);
+        q.tx = W * (narrow ? 0.5 : side()) + Math.sin(t * 0.37) * W * (narrow ? 0.3 : 0.18);
         q.ty = H * 0.5 + Math.sin(t * 0.53 + 1.2) * H * 0.24;
       }
       q.x += (q.tx - q.x) * 0.1;
@@ -289,7 +354,7 @@
       ctx.clearRect(0, 0, W, H);
       const ry = t * 0.07, rx = -0.35 + Math.sin(t * 0.13) * 0.06;
       const cY = Math.cos(ry), sY = Math.sin(ry), cX = Math.cos(rx), sX = Math.sin(rx);
-      const ox = W * (narrow ? 0.5 : 0.68), oy = H * 0.5;
+      const ox = W * (narrow ? 0.5 : side()), oy = H * 0.5;
       const sc = Math.min(W, H) * (narrow ? 0.62 : 0.6), f = 2.8;
       for (const p of pts) {
         const x = p.x * cY - p.z * sY;
@@ -354,8 +419,8 @@
       ctx.beginPath(); ctx.arc(q.x, q.y, pulse, 0, Math.PI * 2); ctx.stroke();
       ctx.fillStyle = '#ffb547';
       ctx.beginPath(); ctx.arc(q.x, q.y, 3, 0, Math.PI * 2); ctx.fill();
-      ctx.font = '700 10px "JetBrains Mono", monospace';
-      ctx.fillText('QUERY', q.x + pulse + 6, q.y + 3);
+      ctx.font = '700 10px "JetBrains Mono", Vazirmatn, monospace';
+      ctx.fillText(T('queryLabel', 'QUERY'), q.x + pulse + 6, q.y + 3);
 
       if (list && now - lastPanel > 150) {
         lastPanel = now;
@@ -422,6 +487,8 @@
     };
     const box = $('#consoleBox');
     if (!box) return;
+    // Persian page: the two English sessions are replaced by their Persian versions from fa.js.
+    const sessions = () => (isFa() ? FA.console.map((f, i) => ({ ...S[i], ...f, lang: 'fa', dir: 'rtl' })).concat(S.slice(FA.console.length)) : S);
     const btns = $$('.con-sess');
     let run = 0, timer = null, cur = 0, started = false;
     const sleep = (ms, id) => new Promise((res) => { timer = setTimeout(() => { if (id === run) res(); }, ms); });
@@ -456,11 +523,12 @@
       const id = ++run;
       clearTimeout(timer);
       cur = i;
-      const s = S[i];
+      const list = sessions();
+      const s = list[i];
       btns.forEach((b, k) => b.classList.toggle('active', k === i));
       el.main.lang = s.lang;
       el.main.dir = s.dir;
-      if (reduce) { final(s); await sleep(9000, id); return play((i + 1) % S.length); }
+      if (reduce) { final(s); await sleep(9000, id); return play((i + 1) % list.length); }
 
       el.q.textContent = '';
       el.log.innerHTML = '';
@@ -500,15 +568,22 @@
       fillSource(s);
       el.src.hidden = false;
       await sleep(6500, id);
-      play((i + 1) % S.length);
+      play((i + 1) % list.length);
     }
 
+    const still = () => {
+      run++; clearTimeout(timer);
+      const s = sessions()[cur];
+      el.main.lang = s.lang; el.main.dir = s.dir;
+      final(s);
+    };
     btns.forEach((b, k) => b.addEventListener('click', () => play(k)));
-    final(S[0]);
+    still();
     onView(box, (v) => {
       if (v && !started) { started = true; play(cur); }
-      else if (!v && started) { started = false; run++; clearTimeout(timer); final(S[cur]); }
+      else if (!v && started) { started = false; still(); }
     }, { threshold: 0.3 });
+    onLang(() => { if (started) play(cur); else still(); });
   }
 
   /* ---------- 03 RAG pipeline simulator ---------- */
@@ -550,19 +625,26 @@
       }
     ];
 
+    // Persian text for the same passages and questions; ids, scores and citations stay identical.
+    const chunk = (id) => (isFa() && FA.sim.chunks[id] ? FA.sim.chunks[id] : CHUNKS[id]);
+    const question = (i) => (isFa() && FA.sim.questions[i] ? { ...QS[i], ...FA.sim.questions[i] } : QS[i]);
+
     const kb = $('#kb'), emb = $('#emb'), embVec = $('#embVec'), qEl = $('#simQuery'), ctxEl = $('#ctx');
     const ans = $('#simAns'), tokBar = $('#tokBar'), tokNote = $('#tokNote'), runBtn = $('#simRun');
     const trk = $$('.trk', root), presets = $$('.chip-btn', root);
     const ids = Object.keys(CHUNKS);
-    kb.innerHTML = ids.map((id) => {
-      const c = CHUNKS[id];
-      return `<div class="tile" data-id="${id}"><span class="rank"></span>` +
-        `<span class="t-doc">${c.doc} · ${c.loc}${c.restricted ? ` · <em>${c.restricted}</em>` : ''}</span>` +
-        `<span class="t-txt">${c.text}</span>` +
-        `<span class="t-score"><span class="bar lex"><i></i></span><span class="bar sem"><i></i></span><span class="t-hyb"></span></span>` +
-        `<span class="deny">ACCESS<br>DENIED</span></div>`;
-    }).join('');
-    $('#kbNote').textContent = `${ids.length} passages · ${new Set(ids.map((i) => CHUNKS[i].doc)).size} docs`;
+    const buildKb = () => {
+      kb.innerHTML = ids.map((id) => {
+        const c = chunk(id);
+        return `<div class="tile" data-id="${id}"><span class="rank"></span>` +
+          `<span class="t-doc">${c.doc} · ${c.loc}${c.restricted ? ` · <em>${c.restricted}</em>` : ''}</span>` +
+          `<span class="t-txt">${c.text}</span>` +
+          `<span class="t-score"><span class="bar lex"><i></i></span><span class="bar sem"><i></i></span><span class="t-hyb"></span></span>` +
+          `<span class="deny">${T('denied', 'ACCESS<br>DENIED')}</span></div>`;
+      }).join('');
+      $('#kbNote').textContent = `${digits(ids.length)} ${T('passages', 'passages')} · ${digits(new Set(ids.map((i) => CHUNKS[i].doc)).size)} ${T('docs', 'docs')}`;
+    };
+    buildKb();
     emb.innerHTML = '<i></i>'.repeat(64);
     const cells = $$('i', emb);
     const tile = (cid) => $(`.tile[data-id="${cid}"]`, kb);
@@ -590,9 +672,13 @@
       d.innerHTML = htmlText; // static, trusted copy defined above
       ctxEl.appendChild(d);
     };
+    const tokText = (n) => {
+      const loc = isFa() ? 'fa-IR' : 'en-US';
+      return `${n.toLocaleString(loc)} / ${(8192).toLocaleString(loc)} ${T('tokens', 'tokens')}`;
+    };
     const tokens = (to, id) => (async () => {
       for (let k = 1; k <= 20; k++) {
-        tokNote.textContent = `${Math.round((to * k) / 20).toLocaleString('en-US')} / 8,192 tokens`;
+        tokNote.textContent = tokText(Math.round((to * k) / 20));
         await sleep(30, id);
       }
     })();
@@ -607,11 +693,12 @@
         $('.t-hyb', t).textContent = '';
       });
       ctxEl.innerHTML = '';
-      ans.innerHTML = '<span class="sim-idle">Waiting for pipeline…</span>';
+      ans.innerHTML = `<span class="sim-idle">${T('idle', 'Waiting for pipeline…')}</span>`;
       tokBar.style.width = '0';
-      tokNote.textContent = '0 / 8,192 tokens';
+      tokNote.textContent = tokText(0);
       cells.forEach((c) => { c.style.background = ''; });
       embVec.textContent = '[ … ]';
+      qEl.textContent = question(qi).q;
     }
 
     async function go(qi) {
@@ -620,8 +707,8 @@
       clearTimeout(autoTimer);
       cur = qi;
       reset(qi);
-      const Q = QS[qi];
-      $('span', runBtn).textContent = '↻ Replay';
+      const Q = question(qi);
+      $('span', runBtn).textContent = T('replay', '↻ Replay');
 
       // 01 — embed the question
       setStage(0, 1500);
@@ -644,11 +731,11 @@
       for (let r = 0; r < ranked.length; r++) {
         const h = ranked[r], t = tile(h.cid);
         t.classList.add('hit');
-        $('.rank', t).textContent = '#' + (r + 1);
+        $('.rank', t).textContent = '#' + digits(r + 1);
         const [lx, sm] = $$('.bar i', t);
         lx.style.width = h.lex * 100 + '%';
         sm.style.width = h.sem * 100 + '%';
-        $('.t-hyb', t).textContent = 'hybrid ' + h.hyb.toFixed(2);
+        $('.t-hyb', t).textContent = T('hybrid', 'hybrid') + ' ' + dec(h.hyb, 2);
         await sleep(180, id);
       }
       $$('.tile:not(.hit)', kb).forEach((t) => t.classList.add('miss'));
@@ -665,28 +752,29 @@
 
       // 04 — augment the prompt
       setStage(3, 1600);
-      addBlock('sys', '<b>SYSTEM</b>Answer only from the passages below. Cite each claim. If they don’t cover it, say so.');
+      addBlock('sys', `<b>${T('system', 'SYSTEM')}</b>${T('systemText', 'Answer only from the passages below. Cite each claim. If they don’t cover it, say so.')}`);
       await sleep(260, id);
       for (let n = 0; n < Q.ctx.length; n++) {
-        const c = CHUNKS[Q.ctx[n]];
-        addBlock('psg', `<b>[${n + 1}]</b>${c.doc} ${c.loc} — ${c.text}`, String(n + 1));
+        const c = chunk(Q.ctx[n]);
+        addBlock('psg', `<b>[${digits(n + 1)}]</b>${c.doc} ${c.loc} — ${c.text}`, String(n + 1));
         await sleep(260, id);
       }
-      addBlock('q', `<b>QUESTION</b>${Q.q}`);
+      addBlock('q', `<b>${T('question', 'QUESTION')}</b>${Q.q}`);
       tokBar.style.width = ((Q.tokens / 8192) * 100).toFixed(1) + '%';
       tokens(Q.tokens, id);
       await sleep(700, id);
 
       // 05 — grounded generation
       setStage(4, 2200);
-      ans.innerHTML = `<span class="status ${Q.status}">${Q.label}</span><div class="sim-text"></div>`;
+      const label = Q.status === 'ok' ? T('answered', Q.label) : T('insufficient', Q.label);
+      ans.innerHTML = `<span class="status ${Q.status}">${label}</span><div class="sim-text"></div>`;
       const out = $('.sim-text', ans);
       for (const part of Q.answer.split(/(\[\d\])/)) {
         const m = part.match(/^\[(\d)\]$/);
         if (m) {
           const c = document.createElement('span');
           c.className = 'cite pop';
-          c.textContent = m[1];
+          c.textContent = digits(m[1]);
           c.dataset.n = m[1];
           out.appendChild(c);
           await sleep(140, id);
@@ -714,10 +802,18 @@
 
     presets.forEach((b, i) => b.addEventListener('click', () => { userTouched = true; go(i); }));
     runBtn.addEventListener('click', () => { userTouched = true; go(cur); });
+    const idle = () => { $('span', runBtn).textContent = T('run', '▶ Run pipeline'); reset(cur); };
+    idle();
     onView(root, (v) => {
       inView = v;
       if (v && !started) go(0);
     }, { threshold: 0.25 });
+    onLang(() => {
+      run++;
+      clearTimeout(autoTimer);
+      buildKb();
+      if (started) go(cur); else idle();
+    });
   }
 
   /* ---------- 05 Perimeter switch ---------- */
@@ -727,13 +823,24 @@
     const btns = $$('.switch button', root);
     const state = $('#perimState');
     let touched = false;
+    const stateText = (mode) => (mode === 'cloud'
+      ? T('perimCloud', 'uplink: open · documents leaving your network')
+      : T('perimLocal', 'uplink: none · perimeter sealed'));
+    const readout = (b, mode) => (isFa() && b.dataset[mode + 'Fa']) || b.dataset[mode];
     const set = (mode) => {
       if (root.dataset.mode === mode) return;
       root.dataset.mode = mode;
       btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
-      scramble(state, mode === 'cloud' ? 'uplink: open · documents leaving your network' : 'uplink: none · perimeter sealed', 500);
-      $$('[data-local]', root).forEach((b) => scramble(b, b.dataset[mode], 450));
+      scramble(state, stateText(mode), 500);
+      $$('[data-local]', root).forEach((b) => scramble(b, readout(b, mode), 450));
     };
+    const paint = () => {
+      const mode = root.dataset.mode;
+      setText(state, stateText(mode));
+      $$('[data-local]', root).forEach((b) => setText(b, readout(b, mode)));
+    };
+    paint();
+    onLang(paint);
     btns.forEach((b) => b.addEventListener('click', () => { touched = true; set(b.dataset.mode); }));
     // Demonstrate the switch once when it first comes into view.
     let demoed = false;
@@ -793,9 +900,9 @@
     $$('.copy').forEach((b) => b.addEventListener('click', async () => {
       const v = clean(contact[b.dataset.copy]);
       if (!v) return;
-      try { await navigator.clipboard.writeText(v); b.textContent = 'copied'; } catch (e) { b.textContent = 'failed'; }
+      try { await navigator.clipboard.writeText(v); b.textContent = T('copied', 'copied'); } catch (e) { b.textContent = T('failed', 'failed'); }
       b.classList.add('ok');
-      setTimeout(() => { b.textContent = 'copy'; b.classList.remove('ok'); }, 1600);
+      setTimeout(() => { b.textContent = T('copy', 'copy'); b.classList.remove('ok'); }, 1600);
     }));
   }
 
@@ -817,7 +924,7 @@
       url.searchParams.set('gv', 'true');
       const frame = document.createElement('iframe');
       frame.src = url.href;
-      frame.title = 'Book a Soshyant Expert demo (Google Calendar)';
+      frame.title = T('calFrame', 'Book a Soshyant Expert demo (Google Calendar)');
       frame.loading = 'lazy';
       $('#calEmbed').appendChild(frame);
       $('#calEmbed').hidden = false;
@@ -833,29 +940,38 @@
   function calendarMock() {
     const grid = $('#calGrid');
     if (!grid) return;
-    const today = new Date();
-    const first = new Date(today.getFullYear(), today.getMonth(), 1);
-    const days = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-    $('#calMonth').textContent = first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-    const frag = document.createDocumentFragment();
-    ['M', 'T', 'W', 'T', 'F', 'S', 'S'].forEach((d) => {
-      const s = document.createElement('span'); s.className = 'dow'; s.textContent = d; frag.appendChild(s);
-    });
-    for (let i = 0; i < (first.getDay() + 6) % 7; i++) frag.appendChild(document.createElement('span'));
-    let selected = null;
-    for (let d = 1; d <= days; d++) {
-      const date = new Date(today.getFullYear(), today.getMonth(), d);
-      const s = document.createElement('span');
-      s.className = 'd';
-      s.textContent = d;
-      if (d > today.getDate() && date.getDay() % 6 !== 0 && d % 4 !== 1) {
-        s.classList.add('av');
-        if (!selected) { selected = date; s.classList.add('sel'); }
+    const draw = () => {
+      // Persian: Persian month names and digits on the same (Gregorian) calendar the booking page uses.
+      const locale = isFa() ? 'fa-IR-u-ca-gregory' : undefined;
+      const today = new Date();
+      const first = new Date(today.getFullYear(), today.getMonth(), 1);
+      const days = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+      $('#calMonth').textContent = first.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+      grid.textContent = '';
+      const frag = document.createDocumentFragment();
+      T('weekdays', ['M', 'T', 'W', 'T', 'F', 'S', 'S']).forEach((d) => {
+        const s = document.createElement('span'); s.className = 'dow'; s.textContent = d; frag.appendChild(s);
+      });
+      for (let i = 0; i < (first.getDay() + 6) % 7; i++) frag.appendChild(document.createElement('span'));
+      let selected = null;
+      for (let d = 1; d <= days; d++) {
+        const date = new Date(today.getFullYear(), today.getMonth(), d);
+        const s = document.createElement('span');
+        s.className = 'd';
+        s.textContent = digits(d);
+        if (d > today.getDate() && date.getDay() % 6 !== 0 && d % 4 !== 1) {
+          s.classList.add('av');
+          if (!selected) { selected = date; s.classList.add('sel'); }
+        }
+        frag.appendChild(s);
       }
-      frag.appendChild(s);
-    }
-    grid.appendChild(frag);
-    if (selected) $('#calDay').textContent = selected.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+      grid.appendChild(frag);
+      $('#calDay').textContent = selected
+        ? selected.toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' })
+        : T('available', 'Available');
+    };
+    draw();
+    onLang(draw);
   }
 
   /* ---------- Footer word: SOSHYANT ↔ سوشیانت ---------- */
@@ -870,8 +986,12 @@
   }
 
   /* ---------- Init ---------- */
+  i18n();
   const year = $('#year');
-  if (year) year.textContent = new Date().getFullYear();
+  const setYear = () => { if (year) year.textContent = digits(new Date().getFullYear()); };
+  setYear();
+  onLang(setYear);
+  onLang(countDigits);
   nav();
   cursor();
   magnetic();

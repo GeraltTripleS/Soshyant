@@ -16,7 +16,7 @@
 - کیفیت تخصصی روی دامنه واقعی مشتری، مجموعه ۱۰۰ تا ۲۰۰ پرسش مرجع و زبان‌های مورد نیاز مشتری.
 - ظرفیت کاربران هم‌زمان و زمان پاسخ در حجم سند واقعی؛ مدل فعلاً یک پاسخ را در هر لحظه پردازش می‌کند و بقیه در صف محدود منتظر می‌مانند.
 - استقرار شبکه داخلی با گواهی TLS مجموعه، سیاست فایل‌ها، بررسی امنیت مستقل و پذیرش عملیاتی.
-- OCR داخلی و مجوزهای متفاوت برای تک‌تک اسناد؛ این نسخه دانش مشترک یک سازمان دارد.
+- مجوزهای متفاوت برای تک‌تک اسناد؛ این نسخه دانش مشترک یک سازمان دارد. (OCR انگلیسی اکنون افزوده شده است؛ بخش «OCR انگلیسی» در پایین.)
 
 این نتایج، آماده‌بودن یک نسخه محلی برای پایلوت را نشان می‌دهند؛ ادعای تأیید تخصص یا آمادگی قطعی تولید نیستند.
 
@@ -85,3 +85,12 @@ In a disposable browser workspace, approved-file indexing and publication succee
 The complete 92-test regression suite passed. A final eight-test permissions suite (including an additional legacy-provenance case), a targeted HTTP workflow-setting check and the Android Java HTTPS integration test also passed. Checks cover SQL filtering before retrieval/ranking, no model call without permitted evidence, private-before-indexing creation, group/CSRF boundaries, denied downloads, revocation in conversation history and completed jobs, transitive historical dependencies, canceled publication across access changes, retained policy metadata after document deletion, group removal remaining restricted, and watched replacements retaining grants.
 
 The disposable browser preview verified group creation, document group selection, saving and reopening the permission policy, the new import-access choices, changing defaults for existing watched folders, and Persian document-access controls. Saved policies were reopened and verified, and the browser reported no console errors. Tests use temporary accounts, documents and policy only. Existing production permissions were not changed. See ACCESS-CONTROL.md for migration and revocation behavior, including conservative handling of legacy responses and the limits of recalling already delivered content.
+
+
+## English OCR for scans — 2026-10-17
+
+The complete 105-test suite passed, including 11 OCR tests and an HTTP test that the OCR on/off setting requires an administrator and CSRF and is saved to `config/server.json`. The OCR tests cover text cleanup (layout labels and pictures removed, tables kept as `cell | cell` rows, right-to-left table order), blank-page skipping and tile-grid sizing, loop, repeated-line and script detection, Persian and unreadable pages being reported instead of indexed, the note naming skipped pages, mixed PDFs where only text-less pages go to OCR, image files requiring OCR, the scanned-page limit, the message shown when OCR is off, and OCR defaults for older settings files. `manage.py check --full` passed and verified the OCR model checksums.
+
+`tools/smoke_ocr.py` ran the real model end to end on generated English pages in a temporary copy. On the GPU, a scanned PDF page was read and indexed as `page 1 (OCR)`, a blank page was skipped without running the model, and a PNG took about 3.5 s. Pages with a few lines at the top, two columns or a ruled table returned 100% of words and numbers in 1–8 s. On the CPU (the default), a light page took about 36 s and a dense page about 2½ minutes. A dense page of 30 near-identical numbered lines made the model lose its place and re-read lines; the repeated-line check now reports such a page as unreadable instead of indexing it.
+
+Not verified: real customer scans (stamps, handwriting, skew, poor copies), long scanned manuals under concurrent chat load, and installation on a clean machine. Persian OCR is deliberately off: in the evaluation it silently changed numbers, so Persian pages are reported and not indexed. See OCR.md and OCR-EVALUATION.md.

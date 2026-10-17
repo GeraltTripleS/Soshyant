@@ -60,19 +60,21 @@
    </form><small class="composer-note">Missing context? The assistant asks for clarification or explains the limits of the documents.</small><small class="composer-note">Administrators can review answers that need attention and submitted feedback.</small></div>
   </section>
   <section id="view-documents" class="view content-view" hidden>
-   <div class="section-intro"><span class="eyebrow">MANAGE YOUR KNOWLEDGE</span><h2>The sources behind your answers</h2><p>Track document versions, extraction status, and supporting evidence. Scanned files need readable text before upload.</p></div>
+   <div class="section-intro"><span class="eyebrow">MANAGE YOUR KNOWLEDGE</span><h2>The sources behind your answers</h2><p>Track document versions, extraction status, and supporting evidence. Scanned English pages are read with local OCR.</p></div>
    <form id="uploadForm" class="card upload-card" data-admin>
-    <div class="upload-symbol">↑</div><h3>Add a document to your knowledge</h3><p>PDF · DOCX · XLSX · TXT · Markdown · HTML</p>
-    <label class="file-label">Choose a document<input type="file" id="uploadFile" accept=".pdf,.docx,.xlsx,.txt,.md,.html,.htm" required></label>
+    <div class="upload-symbol">↑</div><h3>Add a document to your knowledge</h3><p>PDF · DOCX · XLSX · TXT · Markdown · HTML · PNG · JPG · TIFF</p>
+    <label class="file-label">Choose a document<input type="file" id="uploadFile" accept=".pdf,.docx,.xlsx,.txt,.md,.html,.htm,.png,.jpg,.jpeg,.tif,.tiff" required></label>
     <div class="inline-fields"><label>Source title<input id="uploadTitle" placeholder="Optional" maxlength="200"></label><label>Source priority<select id="uploadPriority"><option value="0">Normal</option><option value="5">Reference source</option><option value="-5">Supplementary source</option></select></label></div>
-    <label>Initial document access<select id="uploadAccess"><option value="0">All signed-in users</option><option value="1">Administrators only</option></select></label><button class="primary" id="uploadButton">Upload & index</button><p id="uploadPhase" role="status"></p>
+    <label>Initial document access<select id="uploadAccess"><option value="0">All signed-in users</option><option value="1">Administrators only</option></select></label>
+    <div class="ocr-setting"><label class="checkbox"><input id="ocrEnabled" type="checkbox"> Read scanned English pages with local OCR</label><small id="ocrStatus" role="status"></small></div>
+    <button class="primary" id="uploadButton">Upload & index</button><p id="uploadPhase" role="status"></p>
    </form>
    <form id="folderForm" class="card" data-admin>
     <div class="eyebrow">IMPORT A COLLECTION</div><h3>Add a document folder</h3>
     <p>Choose a folder on this computer. Supported files are copied to this server and indexed one at a time. Nothing is sent to the internet.</p>
     <label>Choose a folder<input id="folderFiles" type="file" webkitdirectory multiple required></label>
     <label class="checkbox"><input id="folderRecursive" type="checkbox" checked> Include subfolders</label>
-    <small>PDF, DOCX, XLSX, TXT, Markdown and HTML. Up to 1,000 files per import; the usual per-file size limit applies. Identical indexed content is skipped. Scans need OCR first.</small>
+    <small>PDF, DOCX, XLSX, TXT, Markdown, HTML and scanned images. Up to 1,000 files per import; the usual per-file size limit applies. Identical indexed content is skipped. English scans are read with local OCR.</small>
     <p id="folderSummary" role="status"></p>
     <label>Initial document access<select id="folderAccess"><option value="0">All signed-in users</option><option value="1">Administrators only</option></select></label><button class="primary" id="folderStart">Import & index folder</button> <button class="quiet" type="button" id="folderStop" hidden>Stop after current file</button>
     <p id="folderPhase" role="status"></p><div id="folderReport" class="folder-report" aria-live="polite"></div>
@@ -82,7 +84,7 @@
   </section>
   <section id="view-watched" class="view content-view" hidden>
    <div class="section-intro"><span class="eyebrow">KEEP YOUR KNOWLEDGE CURRENT</span><h2>Watched document folders</h2><p>Local folders are checked every minute while the server runs. Nothing is imported, replaced or archived until you approve it.</p></div>
-   <form id="watchForm" class="card form-card"><h3>Add a watched folder</h3><label>Folder on this server<input id="watchPath" maxlength="2000" dir="ltr" required placeholder="Choose a folder or enter its full path"></label><button id="watchBrowse" type="button" class="quiet">Choose folder…</button><label class="checkbox"><input id="watchRecursive" type="checkbox" checked> Include subfolders</label><p>PDF, DOCX, XLSX, TXT, Markdown and HTML. Scans do not run OCR. Choose a dedicated document folder outside the application data directory.</p><label>New file access<select id="watchAccess"><option value="0">All signed-in users</option><option value="1">Administrators only</option></select></label><button id="watchAdd" class="primary">Add folder & scan</button><p id="watchPhase" role="status"></p></form>
+   <form id="watchForm" class="card form-card"><h3>Add a watched folder</h3><label>Folder on this server<input id="watchPath" maxlength="2000" dir="ltr" required placeholder="Choose a folder or enter its full path"></label><button id="watchBrowse" type="button" class="quiet">Choose folder…</button><label class="checkbox"><input id="watchRecursive" type="checkbox" checked> Include subfolders</label><p>PDF, DOCX, XLSX, TXT, Markdown, HTML and scanned images. English scans are read with local OCR when it is on. Choose a dedicated document folder outside the application data directory.</p><label>New file access<select id="watchAccess"><option value="0">All signed-in users</option><option value="1">Administrators only</option></select></label><button id="watchAdd" class="primary">Add folder & scan</button><p id="watchPhase" role="status"></p></form>
    <div class="table-heading"><h3>Your watched folders</h3><button id="watchRefresh" type="button" class="quiet">Refresh</button></div><div id="watchFolders"></div>
    <div class="table-heading"><h3>Changes awaiting review</h3></div><p>Changed documents keep their published version until replacement indexing succeeds. Missing source files stay in the library unless you approve archiving.</p><div id="watchChanges"></div>
   </section>
