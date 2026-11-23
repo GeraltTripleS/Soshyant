@@ -1,0 +1,18 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+  html, body { margin: 0; background: transparent; }
+  .p { display: none; }
+  .p.on { display: grid; place-items: center; }
+  #mark { width: 1024px; height: 1024px; }
+  #profile { width: 1080px; height: 1080px; background: radial-gradient(60% 60% at 50% 50%, rgba(25,255,176,.16), transparent 70%), #030507; }
+  #profile svg { width: 560px; height: 560px; filter: drop-shadow(0 0 60px rgba(25,255,176,.35)); }
+  #touch { width: 180px; height: 180px; background: #030507; }
+  #touch svg { width: 132px; height: 132px; }
+  svg { display: block; }
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><symbol id="m" viewBox="0 0 64 64"><path d="M14 0H64V50L50 64H0V14Z" fill="#19ffb0"/><path d="M41 19H22.5V32H41.5V45H23" fill="none" stroke="#030507" stroke-width="7"/><rect x="44.5" y="15.5" width="7" height="7" fill="#030507"/><rect x="12.5" y="41.5" width="7" height="7" fill="#030507"/></symbol></svg>
+<div class="p" id="mark"><svg width="1024" height="1024"><use href="#m"/></svg></div>
+<div class="p" id="profile"><svg><use href="#m"/></svg></div>
+<div class="p" id="touch"><svg><use href="#m"/></svg></div>
+<script>document.getElementById(location.hash.slice(1) || 'mark').classList.add('on');</script>
+</body></html>

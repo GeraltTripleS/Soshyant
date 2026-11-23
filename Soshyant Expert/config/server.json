@@ -1,6 +1,6 @@
 {
   "port": 8095,
-  "model_file": "C:\\Users\\asus\\.lmstudio\\models\\ornith-ai\\Ornith-1.5-9B-GGUF\\Ornith-1.5-9B-Q4_K_M.gguf",
+  "model_file": "C:\\Users\\asus\\.lmstudio\\models\\BoldingBuilds\\Ternary-Bonsai-2-27B-Abliterated-PTQ1_0-GGUF\\Ternary-Bonsai-2-27B-Abliterated-PTQ1_0.gguf",
   "llama_executable": "assets/llama/llama-server.exe",
   "model_port": 18195,
   "gpu_layers": 99,
@@ -25,5 +25,7 @@
   "ocr_max_side": 1600,
   "ocr_max_tokens": 2048,
   "ocr_page_seconds": 300,
-  "ocr_idle_seconds": 120
+  "ocr_idle_seconds": 120,
+  "speech_enabled": true,
+  "cloud_model_id": ""
 }

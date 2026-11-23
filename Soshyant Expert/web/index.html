@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" dir="ltr">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Soshyant Expert · Your private knowledge</title><link rel="stylesheet" href="/style.css"><script src="/i18n.js" defer></script><script src="/app.js" defer></script><script src="/capacity.js" defer></script><script src="/library.js" defer></script></head>
+<title>Soshyant Expert · Your private knowledge</title><link rel="stylesheet" href="/style.css"><script src="/i18n.js" defer></script><script src="/app.js" defer></script><script src="/capacity.js" defer></script><script src="/library.js" defer></script><script src="/speech.js" defer></script></head>
 <body>
 <section id="auth" class="auth-screen">
  <label class="language-control auth-language">Language <select class="language-select" aria-label="Language"><option value="en">English</option><option value="fa">Persian</option></select></label>
@@ -20,7 +20,7 @@
  </form>
 </section>
 <div id="shell" class="shell" hidden>
- <aside class="sidebar"><div class="wordmark"><span class="brand-icon">S</span><div>SOSHYANT<br><b>EXPERT</b></div></div>
+ <aside class="sidebar" id="workspaceSidebar"><div class="wordmark"><span class="brand-icon">S</span><div>SOSHYANT<br><b>EXPERT</b></div></div>
   <div class="workspace-label">PRIVATE KNOWLEDGE WORKSPACE</div><h2 id="workspaceName">Knowledge workspace</h2>
   <button id="newConversation" class="primary wide">＋ New conversation</button>
   <nav aria-label="Application sections">
@@ -29,18 +29,20 @@
    <button data-view="documents" class="nav-item"><span>▤</span> Documents <span id="docCount" class="count">0</span></button>
    <button data-view="watched" data-admin class="nav-item"><span>↻</span> Watched folders</button>
    <button data-view="reviews" data-admin class="nav-item"><span>✓</span> Answer review</button>
+   <details class="nav-settings"><summary>Workspace settings</summary>
    <button data-view="domain" data-admin class="nav-item"><span>◇</span> Domain settings</button>
    <button data-view="models" data-admin class="nav-item"><span>◈</span> Language models</button>
    <button data-view="groups" data-admin class="nav-item"><span>♧</span> Access groups</button>
    <button data-view="users" data-admin class="nav-item"><span>♙</span> Users</button>
    <button data-view="maintenance" class="nav-item"><span>⚙</span> Maintenance & account</button>
    <button data-view="capacity" class="nav-item"><span>▦</span> Hardware planner</button>
+   </details>
   </nav>
   <div class="history-label">YOUR CONVERSATIONS</div><input id="chatSearch" type="search" placeholder="Search conversations" aria-label="Search conversations" maxlength="100"><div id="conversationList" class="conversation-list"></div>
   <div class="sidebar-footer"><span class="dot"></span> Local storage · Selected model provider<br><small id="serverVersion"></small></div>
  </aside>
  <main>
-  <header><div><div class="eyebrow">YOUR SPECIALIST DOCUMENT ASSISTANT</div><h1 id="viewTitle">Talk to your knowledge</h1></div>
+  <header><button type="button" class="quiet menu-toggle" id="menuToggle" aria-label="Open navigation" aria-expanded="false" aria-controls="workspaceSidebar">☰</button><div class="header-title"><div class="eyebrow">YOUR SPECIALIST DOCUMENT ASSISTANT</div><h1 id="viewTitle">Talk to your knowledge</h1></div>
    <div class="header-actions"><label class="language-control">Language <select class="language-select" aria-label="Language"><option value="en">English</option><option value="fa">Persian</option></select></label><span id="accountName" class="account-chip"></span><button id="logout" class="quiet">Sign out</button></div>
   </header>
   <div id="notice" class="notice" role="status" hidden></div>
@@ -52,15 +54,18 @@
    <div class="card"><h3>Next steps</h3><div class="model-actions"><button id="dashboardModels" class="quiet">Choose model</button><button id="dashboardBackup" class="quiet">Backups & account</button><button id="dashboardChat" class="primary">Ask a question</button></div><p>Document access can be shared with everyone or limited to selected groups.</p></div>
   </section>
   <section id="view-chat" class="view chat-view">
-   <div class="chat-toolbar"><span><span class="dot"></span> Grounded in your documents</span><div class="chat-tools"><button id="renameChat" class="quiet">Rename</button><button id="deleteChat" class="quiet destructive">Delete chat</button><button id="exportChat" class="quiet">Export conversation ↓</button></div></div>
+   <div class="chat-toolbar"><span class="knowledge-pill"><span class="dot"></span> Answers with sources</span><div class="chat-tools"><button id="renameChat" class="quiet">Rename</button><button id="deleteChat" class="quiet destructive">Delete chat</button><button id="exportChat" class="quiet">Export conversation ↓</button></div></div>
    <div id="messages" class="messages" aria-live="polite"></div>
    <div class="composer-wrap"><form id="askForm" class="composer"><label class="sr-only" for="question">Your question</label>
     <textarea id="question" rows="2" maxlength="4000" placeholder="What would you like to know from your documents?" dir="auto"></textarea>
-    <div class="composer-bottom"><span id="answerPhase">Verify answers against their supporting sources.</span><div><button type="button" id="cancelAnswer" class="quiet" hidden>Stop</button><button type="submit" id="askButton" class="primary">Send question →</button></div></div>
+    <div id="speechInline" class="speech-inline" hidden><span class="speech-dot" aria-hidden="true"></span><span id="speechPhase" role="status" aria-live="polite"></span><button id="speechStop" type="button" class="quiet" hidden>Stop recording</button><button id="speechCancel" type="button" class="quiet">Cancel</button></div><p id="speechError" class="error speech-error" role="alert" hidden></p>
+    <div class="composer-bottom"><span id="answerPhase">Verify answers against their supporting sources.</span><div class="composer-actions"><button type="button" id="voiceInput" class="quiet mic-button" aria-label="Record question" title="Record question" hidden><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"></path></svg></button><button type="button" id="cancelAnswer" class="quiet" hidden>Stop</button><button type="submit" id="askButton" class="primary">Send question →</button></div></div>
    </form><small class="composer-note">Missing context? The assistant asks for clarification or explains the limits of the documents.</small><small class="composer-note">Administrators can review answers that need attention and submitted feedback.</small></div>
   </section>
   <section id="view-documents" class="view content-view" hidden>
    <div class="section-intro"><span class="eyebrow">MANAGE YOUR KNOWLEDGE</span><h2>The sources behind your answers</h2><p>Track document versions, extraction status, and supporting evidence. Scanned English pages are read with local OCR.</p></div>
+   <div class="table-heading"><h3>Library</h3><input id="documentSearch" class="document-search" type="search" placeholder="Search documents" aria-label="Search documents" maxlength="100"><label data-admin class="checkbox"><input id="includeArchived" type="checkbox"> Show archived</label><button class="quiet" id="refreshDocuments">Refresh</button></div>
+   <div id="documentList" class="document-list"></div><p id="documentSearchEmpty" class="library-empty" role="status" hidden>No documents match your search.</p>
    <form id="uploadForm" class="card upload-card" data-admin>
     <div class="upload-symbol">↑</div><h3>Add a document to your knowledge</h3><p>PDF · DOCX · XLSX · TXT · Markdown · HTML · PNG · JPG · TIFF</p>
     <label class="file-label">Choose a document<input type="file" id="uploadFile" accept=".pdf,.docx,.xlsx,.txt,.md,.html,.htm,.png,.jpg,.jpeg,.tif,.tiff" required></label>
@@ -79,8 +84,6 @@
     <label>Initial document access<select id="folderAccess"><option value="0">All signed-in users</option><option value="1">Administrators only</option></select></label><button class="primary" id="folderStart">Import & index folder</button> <button class="quiet" type="button" id="folderStop" hidden>Stop after current file</button>
     <p id="folderPhase" role="status"></p><div id="folderReport" class="folder-report" aria-live="polite"></div>
    </form>
-   <div class="table-heading"><h3>Library</h3><label data-admin class="checkbox"><input id="includeArchived" type="checkbox"> Show archived</label><button class="quiet" id="refreshDocuments">Refresh</button></div>
-   <div id="documentList" class="document-list"></div>
   </section>
   <section id="view-watched" class="view content-view" hidden>
    <div class="section-intro"><span class="eyebrow">KEEP YOUR KNOWLEDGE CURRENT</span><h2>Watched document folders</h2><p>Local folders are checked every minute while the server runs. Nothing is imported, replaced or archived until you approve it.</p></div>
@@ -162,6 +165,7 @@
   <section id="view-maintenance" class="view content-view" hidden>
    <div class="section-intro"><span class="eyebrow">STAY IN CONTROL</span><h2>System health and continuity</h2><p>Backups and models remain under your organization's control.</p></div>
    <div id="systemStatus" class="stat-grid"></div>
+   <form id="speechSettings" class="card form-card" data-admin><h3>Local speech input</h3><p>Optional English dictation. Audio is transcribed on this server and is not saved. Review the text before sending your question.</p><label class="checkbox"><input id="speechEnabled" type="checkbox"> Enable voice input</label><label>Speech device<select id="speechDevice"><option value="cpu">CPU</option><option value="cuda">NVIDIA GPU (CUDA)</option></select></label><p id="speechInstallation" role="status"></p><button class="primary" type="submit">Save speech settings</button><p id="speechSettingsError" class="error" role="alert"></p><small>First install the optional module using SETUP-SPEECH.bat on the server. Speech memory is additional to the hardware planner estimate.</small></form>
    <div class="card" data-admin><h3>Back up knowledge and accounts</h3><p>Includes documents, conversations, accounts, and domain settings. Keep the models and application runtime separately.</p><button class="primary" id="createBackup">Create backup</button><div id="backupResult"></div><small>Restore using the local maintenance tool with the server stopped. The current data is preserved before restoration.</small></div>
    <form id="passwordForm" class="card form-card"><h3>Change password</h3><label>Current password<input type="password" id="currentPassword" required autocomplete="current-password" dir="ltr"></label><label>New password<input type="password" id="changedPassword" required minlength="12" maxlength="256" autocomplete="new-password" dir="ltr"></label><button class="primary">Change password & end sessions</button></form>
   </section>

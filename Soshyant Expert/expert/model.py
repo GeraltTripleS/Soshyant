@@ -8,6 +8,7 @@ import time
 import urllib.error
 import urllib.request
 from .cloud import CloudClient
+from .process_owner import ProcessOwner
 
 
 class LocalModel:
@@ -21,6 +22,7 @@ class LocalModel:
         self.log = None
         self.state = "stopped"
         self.cloud = CloudClient(config)
+        self.process_owner = None
 
     def available(self):
         if self.settings.get('cloud_model_id'):
@@ -49,8 +51,14 @@ class LocalModel:
                        "-ngl", str(self.settings["gpu_layers"]), "-c", str(self.settings["context_size"]),
                        "--parallel", "1", "--jinja", "--chat-template-kwargs", '{"enable_thinking":false}']
             self.state = "loading"
-            self.process = subprocess.Popen(command, stdout=self.log, stderr=self.log,
-                                             creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0)
+            try:
+                self.process_owner = ProcessOwner()
+                self.process = subprocess.Popen(command, stdout=self.log, stderr=self.log,
+                    creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0)
+                self.process_owner.attach(self.process)
+            except Exception:
+                self.close()
+                raise RuntimeError('The local model could not start with automatic process cleanup. Check the runtime and Windows permissions.') from None
             deadline = time.monotonic() + 180
             while time.monotonic() < deadline:
                 if canceled():
@@ -129,6 +137,9 @@ class LocalModel:
                 self.process.kill()
                 self.process.wait(timeout=5)
         self.process = None
+        if self.process_owner is not None:
+            self.process_owner.close()
+            self.process_owner = None
         self.state = "stopped"
         if self.log is not None:
             self.log.close()

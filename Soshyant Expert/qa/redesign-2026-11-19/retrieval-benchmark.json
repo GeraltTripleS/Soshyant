@@ -1,0 +1,14 @@
+{
+  "baseline": {
+    "cold_ms": 185.33,
+    "warm_median_ms": 56.75,
+    "warm_p95_ms": 65.66
+  },
+  "current": {
+    "cold_ms": 54.53,
+    "warm_median_ms": 6.49,
+    "warm_p95_ms": 6.78
+  },
+  "warm_speedup": 8.74,
+  "scope": "2000 synthetic passages; lexical retrieval only; 30 sequential queries; no LLM generation or concurrent load"
+}

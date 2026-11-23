@@ -1,5 +1,11 @@
 # Soshyant Expert
 
+Start with **Soshyant Expert.exe** or **START.bat**. Opening `start.py` through a Windows file association or another Python now delegates automatically to the included `runtime` interpreter, so document indexing uses the installed search dependencies. After a runtime-related indexing failure, choose **Reindex** on the failed document; uploading it again is unnecessary.
+
+The November workspace update adds a redesigned interface, compact mobile navigation, searchable document library, and permission-scoped retrieval caching with vectorized similarity scoring. Existing documents do not need reindexing. See [VALIDATION.md](VALIDATION.md) for measured results and limits.
+
+**English voice input for the web app** uses the microphone icon beside Send: record, stop, and edit the resulting text directly in the chat composer. No separate screen or insertion step is needed. Administrators can configure the optional local module in **Maintenance & account → Local speech input**. See [SPEECH.md](SPEECH.md) for setup, privacy, CPU/GPU requirements and offline operation.
+
 موتور دستیار تخصصی مستند، با یک دامنه در هر نصب، رابط انگلیسی پیش‌فرض و فارسی، اجرای محلی پیش‌فرض و اتصال اختیاری مدل API.
 
 ## Windows desktop launcher

@@ -27,6 +27,7 @@ from .model_library import ModelLibrary
 from .knowledge import EXTENSIONS
 from .engine import Engine
 from .storage import Store, instance_lock
+from .speech import Speech, MAX_BYTES
 
 
 class Application:
@@ -37,6 +38,7 @@ class Application:
         self.engine = Engine(self.store, config, model)
         self.capacity = CapacityPlanner(config)
         self.models = ModelLibrary(config, self.engine)
+        self.speech = Speech(config)
         self.import_lock = threading.Lock()
         self.setup_lock = threading.Lock()
         self.login_lock = threading.Lock()
@@ -52,6 +54,7 @@ class Application:
 
     def close(self):
         self.watched.close()
+        self.speech.close()
         self.engine.close()
 
 
@@ -154,6 +157,7 @@ class Handler(BaseHTTPRequestHandler):
                  "/i18n.js": ("i18n.js", "text/javascript; charset=utf-8"),
                  "/capacity.js": ("capacity.js", "text/javascript; charset=utf-8"),
                  "/library.js": ("library.js", "text/javascript; charset=utf-8"),
+                 "/speech.js": ("speech.js", "text/javascript; charset=utf-8"),
                  "/app.js": ("app.js", "text/javascript; charset=utf-8"),
                  "/style.css": ("style.css", "text/css; charset=utf-8")}
         if path in files:
@@ -165,6 +169,11 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(200, {"setup_required": not bool(self.app.store.one("SELECT id FROM users LIMIT 1"))})
         account = self.account()
         store, engine = self.app.store, self.app.engine
+        if path == '/api/speech':
+            return self.send(200, self.app.speech.status())
+        match = re.fullmatch(r'/api/speech/jobs/([a-f0-9]{32})', path)
+        if match:
+            return self.send(200, self.app.speech.get(match[1], account['id']))
         if path == "/api/me":
             return self.send(200, account)
         if path == '/api/dashboard':
@@ -243,6 +252,24 @@ class Handler(BaseHTTPRequestHandler):
         path = urlsplit(self.path).path
         query = parse_qs(urlsplit(self.path).query)
         store, engine = self.app.store, self.app.engine
+        if path == '/api/speech/settings':
+            self.account(write=True, admin=True)
+            return self.send(200, self.app.speech.settings(self.json_body()))
+        if path == '/api/speech/transcribe':
+            account = self.account(write=True)
+            if self.headers.get_content_type() not in ('audio/wav', 'application/octet-stream'):
+                raise ValueError('Expected WAV audio.')
+            identity = self.app.speech.submit(account['id'], self.body(MAX_BYTES))
+            return self.send(202, {'job_id': identity})
+        match = re.fullmatch(r'/api/speech/jobs/([a-f0-9]{32})/(cancel|consume)', path)
+        if match:
+            account = self.account(write=True)
+            self.json_body()
+            if match[2] == 'cancel':
+                self.app.speech.cancel(match[1], account['id'])
+            else:
+                self.app.speech.get(match[1], account['id'], consume=True)
+            return self.send(200, {'ok': True})
         if path == "/api/setup":
             data = self.json_body()
             with self.app.setup_lock:

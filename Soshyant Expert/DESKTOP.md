@@ -4,6 +4,8 @@ Double-click **Soshyant Expert.exe** in this folder. No command window is requir
 
 ## Daily use
 
+Local LLM processes are now attached to a Windows job owned by the running application. Closing the app's process releases that job and stops its model child, even after an unexpected exit. This prevents leftover inference processes from retaining the model port/GPU memory. The app still refuses to adopt or terminate unrelated processes on an occupied port.
+
 1. Choose **Start server**, then **Open application**. Opening the application also starts the server if needed. The authenticated interface opens in your default browser.
 2. Closing the launcher window leaves it in the system tray. Double-click the tray icon to show it again. **Exit** in its menu offers to stop a server started by the launcher before closing.
 3. **Stop server** sends a local shutdown request and waits for cleanup. It controls only the child process started by this launcher. If the server was started with `START.bat`, stop it in that original window first; the launcher reports that state and leaves it alone.

@@ -885,7 +885,9 @@
   function contactInfo() {
     const contact = cfg.contact || {};
     const clean = (v) => String(v || '').replace(/^\s*\[|\]\s*$/g, '').trim();
-    $$('[data-contact]').forEach((el) => { const v = contact[el.dataset.contact]; if (v) el.textContent = v; });
+    // Links are shown without https:// and www.; the href keeps the full address.
+    const shown = (key, v) => (key === 'linkedin' || key === 'website' ? clean(v).replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/+$/, '') : v);
+    $$('[data-contact]').forEach((el) => { const v = contact[el.dataset.contact]; if (v) el.textContent = shown(el.dataset.contact, v); });
     $$('[data-contact-href]').forEach((a) => {
       const key = a.dataset.contactHref;
       const v = clean(contact[key]);
@@ -894,9 +896,6 @@
       else if (key === 'phone') a.href = 'tel:' + v.replace(/[^\d+]/g, '');
       else a.href = /^https?:\/\//i.test(v) ? v : 'https://' + v;
     });
-    const avatar = $('#avatar');
-    const initials = clean(contact.name).split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('');
-    if (avatar && initials) avatar.textContent = initials.toUpperCase();
     $$('.copy').forEach((b) => b.addEventListener('click', async () => {
       const v = clean(contact[b.dataset.copy]);
       if (!v) return;

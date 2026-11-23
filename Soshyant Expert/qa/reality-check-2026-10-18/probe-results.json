@@ -1,0 +1,19 @@
+{
+  "scope": "Synthetic bad model output injected into real Engine validation; NOT a real LLM accuracy test.",
+  "source": "Aurora X200 warranty is 36 months from installation. Warranty claims require the installation report and serial number.",
+  "injected_answer": "The Aurora X200 warranty is 999 months. [1]",
+  "saved_status": "answered",
+  "returned_citation_text": "Aurora X200 warranty is 36 months from installation. Warranty claims require the installation report and serial number.",
+  "unsupported_number_accepted": true,
+  "backup_archive_entries": [
+    "expert.sqlite",
+    "domain.json",
+    "manifest.json"
+  ],
+  "server_config_in_backup": false,
+  "cloud_profiles_in_backup": false,
+  "queue_settings": {
+    "answer_workers": 1,
+    "queue_size": 8
+  }
+}

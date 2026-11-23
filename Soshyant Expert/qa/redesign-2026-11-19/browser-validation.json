@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-19",
+  "environment": "Disposable preview, synthetic data and simulated answer model",
+  "passed": [
+    "Sign in and administrator overview",
+    "New conversation and question submission",
+    "Answer citation expansion",
+    "Document filtering and no-results state",
+    "Grouped workspace settings",
+    "Local/API model screen",
+    "Hardware planner calculation/display",
+    "Phone navigation opens and closes on selection",
+    "English and Persian RTL interface"
+  ],
+  "responsive": [
+    {
+      "width": 375,
+      "height": 812,
+      "englishScrollWidth": 360,
+      "persianScrollWidth": 360
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "scrollWidth": 753,
+      "mainWidth": 535,
+      "mainScrollWidth": 535
+    }
+  ],
+  "consoleErrorsOrWarnings": [],
+  "limits": [
+    "Single Chromium browser",
+    "No physical microphone used",
+    "No real LLM generation benchmark",
+    "Preview missing-OCR notice is due to temporary asset paths"
+  ]
+}

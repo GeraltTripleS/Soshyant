@@ -1,5 +1,5 @@
 """Local document extraction, transactional publication and hybrid retrieval."""
-from collections import Counter
+from collections import Counter, OrderedDict
 import hashlib
 import html
 from html.parser import HTMLParser
@@ -213,6 +213,9 @@ class Knowledge:
         self.embeddings = LocalEmbeddings(config.settings)
         self.ocr = LocalOCR(config)
         self.publication_lock = threading.RLock()
+        self.retrieval_lock = threading.RLock()
+        self.retrieval_cache = OrderedDict()
+        self.query_cache = OrderedDict()
 
     def list_documents(self, include_archived=False, owner=None):
         from .permissions import clause
@@ -327,49 +330,89 @@ class Knowledge:
     def search(self, question, glossary=None, limit=5, owner=None):
         import numpy as np
         from .permissions import clause
+        # Permission filtering happens before corpus statistics, ranking and model context.
+        # Versions and owner are part of the key; revoked grants never reuse another scope.
         with self.store.connect() as db:
             version = db.execute("SELECT value FROM meta WHERE key='knowledge_version'").fetchone()[0]
-            rows = [dict(row) for row in db.execute(
-                "SELECT c.id,c.document_id,c.document_version,c.location,c.text,c.vector,d.filename,d.title,d.priority "
-                "FROM chunks c JOIN documents d ON d.id=c.document_id "
-                "WHERE d.active=1 AND d.status='indexed'" + (' AND '+clause() if owner is not None else ''),
-                (owner,) if owner is not None else ())]
-        if not rows:
+            access = db.execute("SELECT value FROM meta WHERE key='access_version'").fetchone()[0]
+            # User deactivation/role updates also invalidate even if no ACL changed.
+            user = db.execute('SELECT role,active FROM users WHERE id=?', (owner,)).fetchone() if owner is not None else None
+            scope = tuple(user) if user else None
+            key = (version, access, owner, scope)
+            with self.retrieval_lock:
+                corpus = self.retrieval_cache.get(key)
+                if corpus is not None:
+                    self.retrieval_cache.move_to_end(key)
+                else:
+                    rows = [dict(row) for row in db.execute(
+                        "SELECT c.id,c.document_id,c.document_version,c.location,c.text,c.vector,d.filename,d.title,d.priority "
+                        "FROM chunks c JOIN documents d ON d.id=c.document_id "
+                        "WHERE d.active=1 AND d.status='indexed'" + (' AND '+clause() if owner is not None else ''),
+                        (owner,) if owner is not None else ())]
+                    terms = [Counter(tokens(row['text'] + ' ' + row['title'])) for row in rows]
+                    frequency = Counter(term for counts in terms for term in counts)
+                    lengths = [sum(counts.values()) for counts in terms]
+                    vectors = {}
+                    for i, row in enumerate(rows):
+                        if row['vector']:
+                            vector = np.frombuffer(row['vector'], dtype=np.float32)
+                            vectors.setdefault(len(vector), []).append((i, vector))
+                        row.pop('vector', None)
+                    matrices = {size: (np.array([i for i, _ in items]), np.stack([v for _, v in items]))
+                                for size, items in vectors.items()}
+                    corpus = (rows, terms, frequency, lengths, max(1, sum(lengths) / max(1, len(rows))), matrices)
+                    # Bound total cached passages as well as number of permission scopes.
+                    while self.retrieval_cache and (len(self.retrieval_cache) >= 4 or
+                            sum(len(value[0]) for value in self.retrieval_cache.values()) + len(rows) > 40000):
+                        self.retrieval_cache.popitem(last=False)
+                    self.retrieval_cache[key] = corpus
+        rows, terms, document_frequency, lengths, average, matrices = corpus
+        if not rows or limit <= 0:
             return [], version
         query = question
         for term, expanded in (glossary or {}).items():
             if normalize(term) in normalize(question):
                 query += " " + expanded
         wanted = set(tokens(query))
-        terms = [Counter(tokens(row["text"] + " " + row["title"])) for row in rows]
-        document_frequency = Counter(t for counts in terms for t in wanted if t in counts)
-        average = max(1, sum(sum(c.values()) for c in terms) / len(terms))
         lexical = []
-        for counts in terms:
-            length = sum(counts.values())
+        for counts, length in zip(terms, lengths):
             score = sum(math.log(1 + (len(rows) - document_frequency[t] + .5) / (document_frequency[t] + .5))
                         * counts[t] * 2.2 / (counts[t] + 1.2 * (.25 + .75 * length / average))
                         for t in wanted if counts[t])
             lexical.append(score)
-        semantic = [0.] * len(rows)
-        if self.config.settings["embedding_mode"] == "hybrid" and any(row["vector"] for row in rows):
-            q = self.embeddings.encode([query])[0]
-            for i, row in enumerate(rows):
-                if row["vector"]:
-                    v = np.frombuffer(row["vector"], dtype=np.float32)
-                    semantic[i] = float(v @ q) if v.shape == q.shape else 0.
+        semantic = np.zeros(len(rows), dtype=np.float32)
+        if self.config.settings["embedding_mode"] == "hybrid" and matrices:
+            with self.retrieval_lock:
+                q = self.query_cache.get(query)
+                if q is None:
+                    q = self.embeddings.encode([query])[0]
+                    self.query_cache[query] = q
+                    while len(self.query_cache) > 32:
+                        self.query_cache.popitem(last=False)
+                else:
+                    self.query_cache.move_to_end(query)
+            if len(q) in matrices:
+                indices, matrix = matrices[len(q)]
+                semantic[indices] = matrix @ q
         lexical_order = sorted(range(len(rows)), key=lambda i: lexical[i], reverse=True)
         semantic_order = sorted(range(len(rows)), key=lambda i: semantic[i], reverse=True)
         ranks = {}
-        for scores, order in ((lexical, lexical_order), (semantic, semantic_order)):
-            for rank, i in enumerate(order):
-                if scores[i] > 0:
-                    ranks[i] = ranks.get(i, 0) + 1 / (60 + rank)
         floor = self.config.settings["semantic_floor"]
+        for scores, order, threshold in ((lexical, lexical_order, 0), (semantic, semantic_order, floor)):
+            for rank, i in enumerate(order):
+                if scores[i] > threshold:
+                    ranks[i] = ranks.get(i, 0) + 1 / (60 + rank)
         eligible = [i for i in ranks if lexical[i] > 0 or semantic[i] >= floor]
         eligible.sort(key=lambda i: (ranks[i], rows[i]["priority"]), reverse=True)
         result = []
-        for i in eligible[:limit]:
+        seen = set()
+        for i in eligible:
             row = rows[i]
+            fingerprint = normalize(row['text']).strip()
+            if fingerprint in seen:
+                continue
+            seen.add(fingerprint)
             result.append({key: value for key, value in row.items() if key not in ("vector", "priority")})
+            if len(result) >= limit:
+                break
         return result, version

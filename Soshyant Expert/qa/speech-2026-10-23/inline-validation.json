@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-23",
+  "interaction_tests_passed": 4,
+  "browser_visual_check": "Mic icon immediately beside Send; no speech dialog",
+  "live_microphone_test": "Not performed; interaction tests use simulated audio APIs",
+  "speech_backend": "Unchanged from previously verified local Bark implementation",
+  "screenshot": "inline-microphone.png"
+}

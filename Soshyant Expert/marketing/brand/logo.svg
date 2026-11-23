@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>Soshyant Expert</title>
+  <!-- Plate: the brand's clipped-corner square. Mark: an S traced like a circuit, from a query node (top) to an answer node (bottom). -->
+  <path d="M14 0H64V50L50 64H0V14Z" fill="#19ffb0"/>
+  <path d="M41 19H22.5V32H41.5V45H23" fill="none" stroke="#030507" stroke-width="7" stroke-linejoin="miter"/>
+  <rect x="44.5" y="15.5" width="7" height="7" fill="#030507"/>
+  <rect x="12.5" y="41.5" width="7" height="7" fill="#030507"/>
+</svg>

@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-23",
+  "full_regression": {
+    "passed": 111,
+    "seconds": 138.943
+  },
+  "focused_speech_after_retention_change": {
+    "passed": 6,
+    "seconds": 8.972
+  },
+  "real_cpu_smoke": {
+    "text": "how long is the warranty for the aurora pump",
+    "seconds": 47.23,
+    "python_network_events_blocked": true,
+    "audio": "synthetic Windows speech synthesis; no microphone"
+  },
+  "limits": [
+    "English only",
+    "CPU cold load is slow",
+    "Microphone/device acceptance not performed",
+    "Existing hardware planner excludes speech"
+  ],
+  "web_journey": {
+    "real_Bark_file_transcription": "passed",
+    "editable_transcript": "passed",
+    "existing_draft_preserved": "passed",
+    "no_automatic_question_submission": "passed",
+    "explicit_send_to_preview_RAG": "passed (simulated answering model, real retrieval)",
+    "English_and_Persian_labels": "passed",
+    "captured_browser_errors": 0,
+    "live_microphone_acceptance": "not performed"
+  },
+  "setup": {
+    "separate_cpu_runtime": "installed",
+    "self_contained_setup": "passed",
+    "model_and_processor_local": "passed",
+    "production_data_modified": false
+  }
+}

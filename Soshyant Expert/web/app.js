@@ -49,10 +49,19 @@ function button(text, action, className = 'quiet') {
 }
 
 function showView(name) {
+  document.body.classList.remove('navigation-open');
+  $('menuToggle').setAttribute('aria-expanded', 'false');
+  if (name !== 'chat') window.expertSpeech?.cancel();
   state.view = name;
   for (const view of document.querySelectorAll('.view')) view.hidden = view.id !== 'view-' + name;
   for (const tab of document.querySelectorAll('[data-view]')) tab.classList.toggle('active', tab.dataset.view === name);
   $('viewTitle').textContent = t(titles[name]);
+  for (const tab of document.querySelectorAll('[data-view]')) {
+    if (tab.dataset.view === name) tab.setAttribute('aria-current', 'page');
+    else tab.removeAttribute('aria-current');
+  }
+  const selectedSettings = document.querySelector('.nav-settings [data-view="' + name + '"]');
+  if (selectedSettings) selectedSettings.closest('details').open = true;
   if (name === 'dashboard') loadDashboard().catch(error => toast(error.message));
   if (name === 'watched') loadWatched().catch(error => toast(error.message));
   if (name === 'reviews') loadReviews().catch(error => toast(error.message));
@@ -147,6 +156,7 @@ async function refreshStatus() {
     $('systemStatus').append(card);
   }
   renderOcr();
+  window.expertSpeech?.refresh();
   const missing = !state.status.model.installed || (state.status.search.mode === 'hybrid' && !state.status.search.installed);
   const cloud=state.status.model.kind==='cloud';
   $('notice').hidden = !missing && !cloud;
@@ -230,6 +240,7 @@ $('chatManageForm').onsubmit = async event => {
 $('chatRenameValue').oninput = () => $('chatRenameValue').setCustomValidity('');
 
 async function selectConversation(identity) {
+  window.expertSpeech?.cancel();
   if (state.job) {toast(t('ابتدا پاسخ فعلی را متوقف کنید یا منتظر پایان آن بمانید.')); return;}
   state.conversation = identity;
   state.messages = await api('/api/conversations/' + identity + '/messages');
@@ -239,6 +250,7 @@ async function selectConversation(identity) {
 }
 
 $('newConversation').onclick = async () => {
+  window.expertSpeech?.cancel();
   if (state.job) return;
   try {
     const conversation = await api('/api/conversations', {method: 'POST', data: {}});
@@ -255,12 +267,19 @@ function renderMessages() {
   if (!state.messages.length) {
     const empty = element('div', 'empty-state');
     empty.append(element('div', 'empty-symbol', '✳'), element('div', 'eyebrow', t('پرسش شما، در میان منابع شما')),
-      element('h2', '', t('دانش شما، پاسخ مستند')), element('p', '', t('از اسناد این مجموعه بپرسید. هر پاسخ مستند، شواهدی برای بررسی دارد.')));
+      element('h2', '', t('A little curiosity.\nA lot of knowledge.')), element('p', '', t('Ask your documents a question. Follow the evidence to the answer.')));
     const suggestions = element('div', 'suggestions');
     for (const question of [t('موضوع اصلی اسناد چیست؟'), t('کدام نکات نیاز به توجه بیشتری دارند؟')]) {
       suggestions.append(button(question, () => {$('question').value = question; $('question').focus();}));
     }
     empty.append(suggestions);
+    const steps = element('div', 'knowledge-steps');
+    for (const [number, title, description] of [['01', 'Ask naturally', 'Type or speak your question.'], ['02', 'Find the evidence', 'Search the knowledge you can access.'], ['03', 'Check the source', 'Inspect the passage behind each citation.']]) {
+      const step = element('div', 'knowledge-step');
+      step.append(element('span', 'step-number', number), element('strong', '', t(title)), element('small', '', t(description)));
+      steps.append(step);
+    }
+    empty.append(steps);
     container.append(empty);
     return;
   }
@@ -272,7 +291,7 @@ function renderMessages() {
     } else {
       const result = message.result || {};
       const label = element('div', 'message-label');
-      label.append(element('span', '', 'Soshyant Expert'), element('span', 'status-label', t(statusNames[result.status]) || ''));
+      label.append(element('span', '', 'Soshyant Expert'), element('span', 'status-label', result.status === 'answered' ? t('Sources attached') : t(statusNames[result.status]) || ''));
       card.append(label);
       const text = element('div', 'message-text');
       const sourceNodes = new Map();
@@ -336,7 +355,7 @@ async function watchJob(identity, progress) {
 $('askForm').onsubmit = async event => {
   event.preventDefault();
   const question = $('question').value.trim();
-  if (!question || state.job) return;
+  if (!question || state.job || window.expertSpeech?.busy()) return;
   $('askButton').disabled = true;
   $('newConversation').disabled = true;
   $('question').disabled = true;
@@ -401,6 +420,7 @@ async function loadDocuments() {
   if (!rows.length) container.append(element('p', '', t('هنوز سندی اضافه نشده است. مدیر می‌تواند اولین منبع را بارگذاری کند.')));
   for (const document of rows) {
     const card = element('div', 'document');
+    card.dataset.search = (document.title + ' ' + document.filename).toLocaleLowerCase();
     const info = element('div', 'doc-info');
     info.append(element('h3', '', document.title), element('p', '', document.filename + t(' · نسخه ') + document.version + ' · ' + document.passages + t(' شاهد · ') + Math.ceil(document.bytes / 1024) + ' KB'));
     info.append(element('small','',t(document.restricted?'Restricted access':'All signed-in users')));
@@ -445,8 +465,32 @@ async function loadDocuments() {
     card.append(element('div', 'doc-symbol', '▤'), info, element('span', 'doc-status ' + document.status, document.active ? t(statusNames[document.status]) || document.status : t('بایگانی')), actions);
     container.append(card);
   }
+  filterDocuments();
 }
 $('includeArchived').onchange = () => loadDocuments().catch(error => toast(error.message));
+function filterDocuments() {
+  const query = $('documentSearch').value.trim().toLocaleLowerCase();
+  let visible = 0;
+  for (const card of $('documentList').querySelectorAll('.document')) {
+    card.hidden = !card.dataset.search.includes(query);
+    if (!card.hidden) visible++;
+  }
+  $('documentSearchEmpty').hidden = !query || visible > 0;
+}
+$('documentSearch').oninput = filterDocuments;
+$('menuToggle').onclick = () => {
+  const opened = document.body.classList.toggle('navigation-open');
+  $('menuToggle').setAttribute('aria-expanded', String(opened));
+};
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && document.body.classList.contains('navigation-open')) {
+    document.body.classList.remove('navigation-open');$('menuToggle').setAttribute('aria-expanded','false');$('menuToggle').focus();
+  }
+});
+document.querySelector('main').addEventListener('click', event => {
+  if (event.target.closest('#menuToggle')) return;
+  document.body.classList.remove('navigation-open');$('menuToggle').setAttribute('aria-expanded','false');
+});
 $('cancelDeleteDocument').onclick = () => {pendingDocumentDelete=null;$('deleteDocumentDialog').close();};
 $('deleteDocumentDialog').addEventListener('cancel', event => {
   if(documentDeleting)event.preventDefault();else pendingDocumentDelete=null;

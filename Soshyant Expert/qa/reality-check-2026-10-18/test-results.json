@@ -1,0 +1,13 @@
+{
+  "assessment_date": "2026-10-18",
+  "verdict": "NEEDS WORK",
+  "scope": "Windows server, browser preview, Android host API transport; no production data mutation",
+  "server_tests": {"passed": 105, "failed": 0, "duration_seconds": 129.982, "exit_code": 0},
+  "installation_full_check": {"result": "passed", "embedding_dimensions": 384, "ocr_assets_present": true, "manifest_checksums": "passed"},
+  "android_host_api_integration": {"result": "passed", "native_android_ui_tested": false},
+  "additional_probes": {"result": "completed", "details": "probe-results.json", "unsupported_numeric_answer_with_valid_reference_accepted": true, "backup_contains_server_configuration": false},
+  "browser": {"details": "browser-results.json", "simulated_answer_model": true, "real_customer_documents_used": false, "english_mobile_overflow_reproduced": true, "captured_console_errors_or_warnings": 0},
+  "local_http_measurements": {"details": "http-results.json", "request_count": 15, "min_ms": 1.78, "max_ms": 27.49, "browser_page_load_measured": false},
+  "unverified": ["Clean offline machine installation", "Complete recovery on another machine", "Real selected-model domain accuracy", "Concurrent user performance under ingestion", "Latest native Android UI and lifecycle", "Live API provider acceptance", "Customer scan OCR accuracy", "Cross-browser compatibility", "Browser paint and page load timing"],
+  "application_source_modified": false
+}

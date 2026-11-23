@@ -30,6 +30,8 @@ class Config:
         self.settings = read_json(self.root / "config/server.json")
         for key, value in OCR_DEFAULTS.items():
             self.settings.setdefault(key, value)
+        self.settings.setdefault('speech_enabled', False)
+        self.settings.setdefault('speech_device', 'cpu')
         self.domain_path = self.root / "config/domain.json"
         self.data = self.root / "data"
         self.data.mkdir(parents=True, exist_ok=True)

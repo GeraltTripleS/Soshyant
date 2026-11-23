@@ -9,7 +9,7 @@
   <meta property="og:title" content="Soshyant Expert — Your company already wrote the answers">
   <meta property="og:description" content="An on-premise RAG engine: retrieves passages from your own documents and generates cited answers.">
   <meta property="og:type" content="website">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M10 0H40V30L30 40H0V10Z' fill='%2319ffb0'/%3E%3Ctext x='20' y='31' font-family='Impact,Arial Black,sans-serif' font-size='28' fill='%23030507' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M14 0H64V50L50 64H0V14Z' fill='%2319ffb0'/%3E%3Cpath d='M41 19H22.5V32H41.5V45H23' fill='none' stroke='%23030507' stroke-width='7'/%3E%3Crect x='44.5' y='15.5' width='7' height='7' fill='%23030507'/%3E%3Crect x='12.5' y='41.5' width='7' height='7' fill='%23030507'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -47,17 +47,17 @@
        and paste the address inside src="…" here, e.g.
        "https://calendar.google.com/calendar/appointments/schedules/AcZssZ…?gv=true"
        A calendar.app.google/… share link also works (it opens in a new tab instead of inline). */
-    bookingUrl: "",
+    bookingUrl: "https://calendar.app.google/z5wvi5gZUk4pkc8b9",
 
-    /* Contact details shown on the ID card, booking panel and footer. */
+    /* Contact details shown on the ID card, booking panel and footer.
+       LinkedIn and website may be full URLs; the page shows them without https:// and www. */
     contact: {
-      name: "[Your Name]",
-      role: "[Founder & CEO, Soshyant]",
-      email: "[you@yourcompany.com]",
-      phone: "[+00 000 000 0000]",
-      location: "[City, Country]",
-      linkedin: "[linkedin.com/in/your-profile]",
-      website: "[www.yourcompany.com]"
+      name: "Saeid Salemi",
+      role: "Founder and CTPO",
+      email: "Saeed@ahouda.com",
+      phone: "+98 999 993 4659",
+      linkedin: "https://www.linkedin.com/in/saeid-salemi",
+      website: "https://soshyantexpert.site/"
     }
   };
   /* The page is English by default; visitors switch to Persian with the EN / فا button.
@@ -65,6 +65,8 @@
 </script>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <!-- Logo: clipped-corner plate (currentColor) with an S traced from a query node to an answer node. -->
+  <symbol id="i-logo" viewBox="0 0 64 64"><path d="M14 0H64V50L50 64H0V14Z" fill="currentColor"/><path d="M41 19H22.5V32H41.5V45H23" fill="none" stroke-width="7" style="stroke:var(--logo-ink,#030507)"/><rect x="44.5" y="15.5" width="7" height="7" style="fill:var(--logo-ink,#030507)"/><rect x="12.5" y="41.5" width="7" height="7" style="fill:var(--logo-ink,#030507)"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 5l7 7-7 7"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v15M5 13l7 7 7-7"/></symbol>
   <symbol id="i-external" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
@@ -131,7 +133,7 @@
 <header class="nav" id="nav">
   <div class="container nav-inner">
     <a class="logo" href="#top" aria-label="Soshyant Expert — home" data-i18n-attr="aria-label:logo.aria" data-cursor="HOME">
-      <span class="logo-mark" aria-hidden="true">S</span>
+      <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 64 64"><use href="#i-logo"/></svg></span>
       <span class="logo-word" aria-hidden="true">
         <span class="lw-en">SOSHYANT</span>
         <span class="lw-fa fa">سوشیانت</span>
@@ -725,15 +727,14 @@
         <div class="id-holo" aria-hidden="true"></div>
         <div class="id-top"><span data-i18n="id.top">operator id</span><span>soshyant // expert</span></div>
         <div class="id-person">
-          <div class="id-avatar" id="avatar" aria-hidden="true">S</div>
-          <div><strong data-contact="name">[Your Name]</strong><span data-contact="role">[Founder &amp; CEO, Soshyant]</span></div>
+          <div class="id-avatar" aria-hidden="true"><svg viewBox="0 0 64 64"><use href="#i-logo"/></svg></div>
+          <div><strong data-contact="name">Saeid Salemi</strong><span data-contact="role">Founder and CTPO</span></div>
         </div>
         <ul class="id-fields">
-          <li><small data-i18n="id.email">email</small><a data-contact-href="email" data-contact="email" href="#contact" dir="ltr">[you@yourcompany.com]</a><button class="copy" type="button" data-copy="email" data-cursor="COPY">copy</button></li>
-          <li><small data-i18n="id.phone">phone</small><a data-contact-href="phone" data-contact="phone" href="#contact" dir="ltr">[+00 000 000 0000]</a><button class="copy" type="button" data-copy="phone" data-cursor="COPY">copy</button></li>
-          <li><small data-i18n="id.location">location</small><span data-contact="location">[City, Country]</span></li>
-          <li><small data-i18n="id.linkedin">linkedin</small><a data-contact-href="linkedin" data-contact="linkedin" href="#contact" target="_blank" rel="noopener" dir="ltr">[linkedin.com/in/your-profile]</a></li>
-          <li><small data-i18n="id.website">website</small><a data-contact-href="website" data-contact="website" href="#contact" target="_blank" rel="noopener" dir="ltr">[www.yourcompany.com]</a></li>
+          <li><small data-i18n="id.email">email</small><a data-contact-href="email" data-contact="email" href="#contact" dir="ltr">Saeed@ahouda.com</a><button class="copy" type="button" data-copy="email" data-cursor="COPY">copy</button></li>
+          <li><small data-i18n="id.phone">phone</small><a data-contact-href="phone" data-contact="phone" href="#contact" dir="ltr">+98 999 993 4659</a><button class="copy" type="button" data-copy="phone" data-cursor="COPY">copy</button></li>
+          <li><small data-i18n="id.linkedin">linkedin</small><a data-contact-href="linkedin" data-contact="linkedin" href="https://www.linkedin.com/in/saeid-salemi" target="_blank" rel="noopener" dir="ltr">linkedin.com/in/saeid-salemi</a></li>
+          <li><small data-i18n="id.website">website</small><a data-contact-href="website" data-contact="website" href="https://soshyantexpert.site/" target="_blank" rel="noopener" dir="ltr">soshyantexpert.site</a></li>
         </ul>
         <div class="id-bottom"><span class="barcode" aria-hidden="true"></span><span data-i18n="id.clearance">clearance: public</span></div>
       </div>
@@ -747,12 +748,12 @@
     <div class="foot-word" id="footWord" aria-hidden="true"><span class="fw-en">SOSHYANT</span><span class="fw-fa fa">سوشیانت</span></div>
     <div class="foot-grid">
       <div>
-        <a class="logo" href="#top"><span class="logo-mark" aria-hidden="true">S</span><span class="logo-word"><span class="lw-en">SOSHYANT</span><small>expert // rag engine</small></span></a>
+        <a class="logo" href="#top"><span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 64 64"><use href="#i-logo"/></svg></span><span class="logo-word"><span class="lw-en">SOSHYANT</span><small>expert // rag engine</small></span></a>
         <p data-i18n="foot.blurb">An on-premise RAG engine that answers from your company’s own documents — and cites every source.</p>
       </div>
       <div><h5 data-i18n="foot.product">// product</h5><ul><li><a href="#console" data-i18n="foot.console">Console</a></li><li><a href="#rag" data-i18n="foot.rag">How RAG works</a></li><li><a href="#features" data-i18n="foot.modules">Modules</a></li><li><a href="#security" data-i18n="foot.security">Security</a></li></ul></div>
       <div><h5 data-i18n="foot.company">// company</h5><ul><li><a href="#book" data-i18n="cta.book">Book a demo</a></li><li><a href="#faq" data-i18n="foot.faq">FAQ</a></li><li><a href="#contact" data-i18n="foot.contact">Contact</a></li></ul></div>
-      <div><h5 data-i18n="foot.reach">// contact</h5><ul><li><a data-contact-href="email" data-contact="email" href="#contact" dir="ltr">[you@yourcompany.com]</a></li><li><a data-contact-href="phone" data-contact="phone" href="#contact" dir="ltr">[+00 000 000 0000]</a></li><li data-contact="location">[City, Country]</li></ul></div>
+      <div><h5 data-i18n="foot.reach">// contact</h5><ul><li><a data-contact-href="email" data-contact="email" href="#contact" dir="ltr">Saeed@ahouda.com</a></li><li><a data-contact-href="phone" data-contact="phone" href="#contact" dir="ltr">+98 999 993 4659</a></li></ul></div>
     </div>
     <div class="foot-base">
       <span>© <span id="year">2026</span> <span data-i18n="foot.rights">Soshyant. All rights reserved.</span></span>

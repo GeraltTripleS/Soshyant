@@ -1,0 +1,58 @@
+{
+  "environment": "Disposable localhost:8097 preview; synthetic documents; PreviewModel",
+  "browser": "ChatGPT in-app browser (Chromium); no cross-browser coverage",
+  "journeys": {
+    "sign_in": "passed",
+    "document_library": "passed: displayed indexed fixture",
+    "question_submission": "passed: simulated model",
+    "citation_expansion": "passed: source text and versioned download link displayed",
+    "rename_chat": "passed: title updated",
+    "persian_language": "passed: interface switched to RTL"
+  },
+  "responsive": [
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "documentScrollWidth": 1905
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "documentScrollWidth": 753
+    },
+    {
+      "viewport": [
+        375,
+        667
+      ],
+      "language": "English",
+      "clientWidth": 360,
+      "documentScrollWidth": 367,
+      "headerHeight": 204.1875,
+      "headerActionsRight": 366.625,
+      "status": "horizontal overflow; screenshot shows crowded/clipped header"
+    },
+    {
+      "viewport": [
+        375,
+        667
+      ],
+      "language": "Persian",
+      "clientWidth": 360,
+      "documentScrollWidth": 360
+    }
+  ],
+  "consoleWarningsOrErrors": [],
+  "limitations": [
+    "Native Android UI not exercised",
+    "Large screenshots are softened by capture tooling; no font-quality verdict",
+    "Screenshots are viewport captures, not full-page captures",
+    "Initial login-before.png is blank from capture timing and is not valid visual evidence",
+    "Browser page-load/paint timings not measured",
+    "OCR model paths are not remapped by preview harness; missing-OCR notice in preview is not a production installation failure"
+  ]
+}

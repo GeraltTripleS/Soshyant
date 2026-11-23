@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Soshyant Expert — Instagram carousel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Vazirmatn:wght@500;700&display=block" rel="stylesheet">
+<style>
+/* Signal Cartography — 1080×1350 carousel. Render one slide with #1 … #5. */
+:root {
+  --bg: #030507; --jade: #19ffb0; --hot: #ff3d81; --amber: #ffb547; --ice: #6ef6ff; --red: #ff4d5e;
+  --text: #dcfff3; --text-2: #a3c9bd; --muted: #6f918a; --dim: #42605a;
+  --line: rgba(25, 255, 176, .14); --line-2: rgba(25, 255, 176, .3); --line-3: rgba(25, 255, 176, .55);
+  --display: "Big Shoulders Display", Impact, sans-serif;
+  --head: "Chakra Petch", "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", Consolas, monospace;
+  --fa: "Vazirmatn", Tahoma, sans-serif;
+  --m: 84px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #000; }
+body { -webkit-font-smoothing: antialiased; }
+.slide { position: relative; display: none; width: 1080px; height: 1350px; overflow: hidden; background: var(--bg); color: var(--text); font: 400 28px/1.4 var(--head); }
+.slide.on { display: block; }
+/* lattice + scanlines + vignette */
+.slide::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(25, 255, 176, .075) 1.2px, transparent 1.2px); background-size: 30px 30px; background-position: 15px 15px; }
+.slide::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 20;
+  background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, .022) 0 1px, transparent 1px 3px), radial-gradient(120% 90% at 50% 45%, transparent 58%, rgba(0, 0, 0, .55)); }
+/* HUD corner brackets */
+.frame { position: absolute; inset: 44px; z-index: 2; pointer-events: none;
+  --c: var(--line-3); --l: 34px; --w: 2px;
+  background:
+    linear-gradient(var(--c), var(--c)) 0 0 / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 0 0 / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 100% 0 / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 100% 0 / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 0 100% / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 0 100% / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 100% 100% / var(--l) var(--w), linear-gradient(var(--c), var(--c)) 100% 100% / var(--w) var(--l);
+  background-repeat: no-repeat; }
+.layer { position: absolute; z-index: 3; }
+
+/* rails */
+.top { top: 78px; left: var(--m); right: var(--m); display: flex; align-items: center; justify-content: space-between; }
+.brand { display: flex; align-items: center; gap: 16px; }
+.mark { display: block; width: 48px; height: 48px; color: var(--jade); }
+.mark svg { display: block; width: 100%; height: 100%; }
+.word { display: grid; gap: 6px; }
+.word b { font: 800 27px/1 var(--display); letter-spacing: .18em; color: #effff8; }
+.word small { font: 500 12px/1 var(--mono); letter-spacing: .26em; text-transform: uppercase; color: var(--jade); }
+.count { font: 500 18px/1 var(--mono); letter-spacing: .2em; color: var(--muted); }
+.count i { font-style: normal; color: var(--jade); }
+.bottom { bottom: 76px; left: var(--m); right: var(--m); display: flex; align-items: center; justify-content: space-between; font: 500 16px/1 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--dim); }
+.bottom .go { color: var(--jade); }
+.bottom .dot { display: inline-block; width: 8px; height: 8px; margin-right: 12px; background: var(--jade); box-shadow: 0 0 10px var(--jade); vertical-align: 1px; }
+
+/* type */
+.kicker { display: flex; align-items: center; gap: 14px; font: 500 20px/1 var(--mono); letter-spacing: .24em; text-transform: uppercase; color: var(--jade); }
+.kicker::before { content: ""; width: 11px; height: 11px; background: currentColor; box-shadow: 0 0 14px currentColor; }
+.kicker.hot { color: var(--hot); }
+.h { font: 900 112px/.88 var(--display); text-transform: uppercase; color: #effff8; letter-spacing: -.004em; }
+.neon { color: var(--jade); text-shadow: 0 0 34px rgba(25, 255, 176, .45); }
+.hotc { color: var(--hot); text-shadow: 0 0 34px rgba(255, 61, 129, .45); }
+.mono { font-family: var(--mono); }
+
+/* ---------- 01 cover ---------- */
+#field { position: absolute; z-index: 1; top: 150px; left: 0; width: 1080px; height: 640px; }
+.panel { top: 196px; right: var(--m); width: 344px; padding: 20px 22px 18px; background: rgba(3, 8, 9, .82); border: 1px solid var(--line); font: 500 15px/1.6 var(--mono); }
+.panel::before, .panel::after { content: ""; position: absolute; width: 16px; height: 16px; border: 2px solid var(--jade); }
+.panel::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+.panel::after { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+.panel .ph { display: flex; justify-content: space-between; padding-bottom: 12px; margin-bottom: 10px; border-bottom: 1px solid var(--line); color: var(--jade); letter-spacing: .18em; text-transform: uppercase; font-size: 13px; }
+.panel .pq { color: var(--text-2); margin-bottom: 8px; }
+.panel .pq em { font-style: normal; color: var(--amber); }
+.panel ol { list-style: none; }
+.panel li { display: grid; grid-template-columns: 30px 1fr auto; color: var(--text-2); }
+.panel li b { font-weight: 500; color: var(--jade); }
+.panel li:first-child, .panel li:first-child b { color: var(--amber); }
+.tag { top: 806px; left: var(--m); display: flex; align-items: center; gap: 16px; font: 500 19px/1 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--text-2); }
+.tag b { padding: 9px 12px; background: var(--hot); color: #16000a; letter-spacing: .22em; clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px); }
+.cover-h { top: 856px; left: var(--m); font-size: 128px; line-height: .87; }
+.cover-h span { display: block; }
+
+/* ---------- 02 problem ---------- */
+.s2k { top: 182px; left: var(--m); }
+.s2h { top: 228px; left: var(--m); }
+.big { top: 468px; left: calc(var(--m) - 12px); font: 900 420px/.8 var(--display); color: var(--hot); text-shadow: 0 0 80px rgba(255, 61, 129, .45); letter-spacing: -.02em; }
+.cap { top: 838px; left: var(--m); width: 820px; font: 500 40px/1.32 var(--head); color: var(--text); }
+.week { top: 982px; left: var(--m); width: 640px; }
+.cells { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.cells i { height: 26px; border: 1px solid var(--line-2); }
+.cells i:first-child { border-color: rgba(255, 61, 129, .7); background: repeating-linear-gradient(-45deg, var(--hot) 0 6px, rgba(255, 61, 129, .38) 6px 12px); box-shadow: 0 0 22px rgba(255, 61, 129, .35); }
+.days { display: grid; grid-template-columns: repeat(5, 1fr); margin-top: 12px; font: 500 16px/1 var(--mono); letter-spacing: .16em; color: var(--muted); }
+.days span:first-child { color: var(--hot); }
+.wk { margin-top: 26px; font: 500 22px/1.3 var(--mono); color: var(--hot); }
+.src { top: 1162px; left: var(--m); font: 400 15px/1.4 var(--mono); letter-spacing: .04em; color: var(--muted); }
+
+/* ---------- 03 RAG ---------- */
+.s3k { top: 182px; left: var(--m); }
+.s3h { top: 228px; left: var(--m); }
+.query { top: 466px; left: var(--m); right: var(--m); padding: 20px 24px; border: 1px solid var(--line-2); background: rgba(25, 255, 176, .035); font: 500 24px/1.3 var(--mono); color: var(--text); }
+.query::before { content: "›"; margin-right: 16px; color: var(--hot); }
+.step { left: var(--m); right: var(--m); display: flex; align-items: center; gap: 16px; height: 46px; font: 500 15px/1 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.step::before { content: ""; width: 1px; height: 100%; margin-left: 30px; background: linear-gradient(var(--line-3), var(--jade)); }
+.step b { font-weight: 500; color: var(--jade); }
+.step1 { top: 546px; }
+.kb { top: 600px; left: var(--m); right: var(--m); display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.tile { position: relative; height: 80px; padding: 13px 14px; border: 1px solid var(--line); background: rgba(6, 14, 16, .92); opacity: .38; }
+.tile s { display: block; text-decoration: none; font: 500 12px/1 var(--mono); letter-spacing: .1em; color: var(--muted); }
+.tile u { display: block; height: 5px; margin-top: 12px; background: rgba(220, 255, 243, .18); }
+.tile u + u { width: 70%; margin-top: 8px; }
+.tile.hit { opacity: 1; border-color: var(--jade); background: rgba(25, 255, 176, .07); box-shadow: 0 0 0 1px rgba(25, 255, 176, .25), 0 0 26px rgba(25, 255, 176, .2); }
+.tile.hit s { color: var(--text-2); }
+.tile.hit u { background: rgba(25, 255, 176, .45); }
+.tile em { position: absolute; top: -1px; right: -1px; padding: 5px 8px; background: var(--jade); color: #00160d; font: 700 13px/1 var(--mono); font-style: normal; }
+.tile.deny { opacity: 1; border-color: var(--red); background: rgba(255, 77, 94, .08); }
+.tile.deny::after { content: "ACCESS DENIED"; position: absolute; inset: 0; display: grid; place-items: center; background: rgba(30, 2, 8, .86); color: var(--red); font: 700 13px/1 var(--mono); letter-spacing: .2em; }
+.step2 { top: 876px; }
+.answer { top: 930px; left: var(--m); right: var(--m); padding: 24px 28px 22px; border: 1px solid var(--line-2); background: linear-gradient(180deg, rgba(25, 255, 176, .07), rgba(25, 255, 176, .015)); }
+.status { display: inline-block; padding: 7px 11px; border: 1px solid var(--jade); background: rgba(25, 255, 176, .08); font: 700 14px/1 var(--mono); letter-spacing: .18em; color: var(--jade); }
+.answer p { margin-top: 16px; font: 500 30px/1.45 var(--head); color: var(--text); }
+.cite { display: inline-grid; place-items: center; min-width: 30px; height: 30px; padding: 0 7px; margin-left: 6px; vertical-align: 3px; background: var(--jade); color: #00160d; font: 700 16px/1 var(--mono);
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px); }
+.srcs { display: flex; gap: 34px; margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--line-2); font: 500 16px/1 var(--mono); letter-spacing: .06em; color: var(--muted); }
+.srcs b { font-weight: 700; color: var(--amber); }
+
+/* ---------- 04 perimeter ---------- */
+.s4k { top: 182px; left: var(--m); }
+.s4h { top: 228px; left: var(--m); }
+.perim { top: 456px; left: var(--m); width: 912px; height: 470px; }
+.perim svg { width: 100%; height: 100%; overflow: visible; }
+.wall { fill: rgba(25, 255, 176, .035); stroke: var(--jade); stroke-width: 1.6; stroke-dasharray: 7 7; }
+.plbl { fill: var(--jade); font: 600 12.5px var(--mono); letter-spacing: .2em; }
+.link { fill: none; stroke: rgba(25, 255, 176, .42); stroke-width: 1.3; }
+.out { fill: none; stroke: var(--hot); stroke-width: 1.3; stroke-dasharray: 4 6; opacity: .35; }
+.node rect { fill: #061013; stroke: var(--line-3); }
+.node text { fill: var(--text); font: 600 13px var(--mono); letter-spacing: .14em; text-anchor: middle; }
+.cloud rect { fill: none; stroke: var(--dim); stroke-dasharray: 3 5; }
+.cloud text { fill: var(--dim); font: 600 12px var(--mono); letter-spacing: .14em; text-anchor: middle; }
+.pk { fill: var(--jade); filter: drop-shadow(0 0 4px var(--jade)); }
+.seal rect { fill: var(--bg); stroke: var(--jade); stroke-width: 1.4; }
+.seal rect.mask { stroke: none; }
+.seal path { fill: none; stroke: var(--jade); stroke-width: 2; }
+.seal text { fill: var(--jade); font: 700 11.5px var(--mono); letter-spacing: .18em; text-anchor: middle; }
+.x path { stroke: var(--hot); stroke-width: 2.2; }
+.audit { top: 966px; left: var(--m); right: var(--m); display: grid; gap: 16px; font: 500 22px/1.35 var(--mono); color: var(--text-2); }
+.audit li { list-style: none; display: grid; grid-template-columns: 104px 1fr; }
+.audit b { font-weight: 700; color: var(--jade); }
+.audit .fa { font-family: var(--fa); font-weight: 500; }
+
+/* ---------- 05 CTA ---------- */
+.s5k { top: 182px; left: var(--m); }
+.cta-h { top: 230px; left: var(--m); font-size: 168px; line-height: .84; }
+.cta-h span { display: block; }
+.agenda { top: 584px; left: var(--m); right: var(--m); padding: 26px 28px; border: 1px solid var(--line); background: rgba(2, 6, 7, .92); font: 500 22px/1.7 var(--mono); color: var(--text-2); }
+.agenda .t { margin-bottom: 8px; color: var(--muted); }
+.agenda .t::before { content: "$ "; color: var(--hot); }
+.agenda b { font-weight: 700; color: var(--jade); margin-right: 18px; }
+.agenda .ready { margin-top: 6px; color: var(--jade); }
+.caret { display: inline-block; width: 13px; height: 25px; margin-left: 6px; vertical-align: -4px; background: var(--jade); }
+.card { top: 906px; left: var(--m); right: var(--m); padding: 30px 30px 26px; border: 1px solid var(--line-3); background: linear-gradient(150deg, #0a1a1f, #04090b 62%);
+  clip-path: polygon(24px 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%, 0 24px); }
+.card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--jade), var(--ice), var(--hot)); }
+.card .lbl { font: 700 13px/1 var(--mono); letter-spacing: .26em; text-transform: uppercase; color: var(--jade); }
+.card .url { margin-top: 18px; font: 700 54px/1 var(--mono); letter-spacing: -.01em; color: #effff8; }
+.card .url span { color: var(--jade); }
+.card .rows { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 26px; padding-top: 22px; border-top: 1px dashed var(--line-2); }
+.card small { display: block; font: 500 13px/1 var(--mono); letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
+.card .rows b { display: block; margin-top: 10px; font: 500 24px/1.2 var(--mono); color: var(--text); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="logo" viewBox="0 0 64 64"><path d="M14 0H64V50L50 64H0V14Z" fill="currentColor"/><path d="M41 19H22.5V32H41.5V45H23" fill="none" stroke="#030507" stroke-width="7"/><rect x="44.5" y="15.5" width="7" height="7" fill="#030507"/><rect x="12.5" y="41.5" width="7" height="7" fill="#030507"/></symbol></svg>
+
+<!-- 01 · cover -->
+<section class="slide" id="s1">
+  <canvas id="field" width="2160" height="1280"></canvas>
+  <div class="frame"></div>
+  <div class="layer top"><div class="brand"><span class="mark"><svg viewBox="0 0 64 64"><use href="#logo"/></svg></span><span class="word"><b>SOSHYANT</b><small>expert // rag engine</small></span></div><span class="count"><i>01</i> / 05</span></div>
+  <div class="layer panel">
+    <div class="ph"><span>live retrieval</span><span>top-5</span></div>
+    <div class="pq">q = embed(<em>question</em>)</div>
+    <ol>
+      <li><b>01</b><span>PUMP_MANUAL §7.2</span><span>0.94</span></li>
+      <li><b>02</b><span>PUMP_MANUAL §7.4</span><span>0.88</span></li>
+      <li><b>03</b><span>PUMP_MANUAL §9.1</span><span>0.81</span></li>
+      <li><b>04</b><span>SAFETY_PROC §2.1</span><span>0.69</span></li>
+      <li><b>05</b><span>MAINT_SCHED §3.4</span><span>0.54</span></li>
+    </ol>
+  </div>
+  <p class="layer tag"><b>RAG</b>retrieval-augmented generation · on-premise</p>
+  <h1 class="layer h cover-h"><span>Your company</span><span>already wrote</span><span class="neon">the answers.</span></h1>
+  <div class="layer bottom"><span><i class="dot"></i>an expert that reads your documents</span><span class="go">swipe →</span></div>
+</section>
+
+<!-- 02 · problem -->
+<section class="slide" id="s2">
+  <div class="frame"></div>
+  <div class="layer top"><div class="brand"><span class="mark"><svg viewBox="0 0 64 64"><use href="#logo"/></svg></span><span class="word"><b>SOSHYANT</b><small>expert // rag engine</small></span></div><span class="count"><i>02</i> / 05</span></div>
+  <p class="layer kicker hot s2k">signal loss</p>
+  <h2 class="layer h s2h">Your knowledge is<br><span class="hotc">buried alive.</span></h2>
+  <div class="layer big">19%</div>
+  <p class="layer cap">of the average workweek is spent searching for and gathering internal information.</p>
+  <div class="layer week">
+    <div class="cells"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="days"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span></div>
+    <p class="wk">≈ one full day, every week, per person.</p>
+  </div>
+  <p class="layer src">Source: McKinsey Global Institute, “The Social Economy” (2012)</p>
+  <div class="layer bottom"><span><i class="dot" style="background:var(--hot);box-shadow:0 0 10px var(--hot)"></i>err_03 · knowledge_drain</span><span class="go">swipe →</span></div>
+</section>
+
+<!-- 03 · how RAG answers -->
+<section class="slide" id="s3">
+  <div class="frame"></div>
+  <div class="layer top"><div class="brand"><span class="mark"><svg viewBox="0 0 64 64"><use href="#logo"/></svg></span><span class="word"><b>SOSHYANT</b><small>expert // rag engine</small></span></div><span class="count"><i>03</i> / 05</span></div>
+  <p class="layer kicker s3k">rag, decoded</p>
+  <h2 class="layer h s3h">Ask. Retrieve.<br><span class="neon">Answer. Cite.</span></h2>
+  <div class="layer query">What torque for the M12 pump housing bolts?</div>
+  <div class="layer step step1"><span><b>01</b> embed · <b>02</b> hybrid search · <b>03</b> access filter</span></div>
+  <div class="layer kb">
+    <div class="tile hit"><em>#1</em><s>PUMP MANUAL · §7.2</s><u></u><u></u></div>
+    <div class="tile"><s>HR HANDBOOK · §4.3</s><u></u><u></u></div>
+    <div class="tile hit"><em>#2</em><s>PUMP MANUAL · §7.4</s><u></u><u></u></div>
+    <div class="tile deny"><s>PRICING 2026 · §1.0</s><u></u><u></u></div>
+    <div class="tile"><s>WARRANTY · §2.1</s><u></u><u></u></div>
+    <div class="tile"><s>GEARBOX · §5.1</s><u></u><u></u></div>
+    <div class="tile"><s>SAFETY PROC · §2.1</s><u></u><u></u></div>
+    <div class="tile"><s>MAINT SCHED · §3.4</s><u></u><u></u></div>
+    <div class="tile"><s>HYDRAULICS · T5.2</s><u></u><u></u></div>
+    <div class="tile hit"><em>#3</em><s>PUMP MANUAL · §9.1</s><u></u><u></u></div>
+    <div class="tile"><s>HR HANDBOOK · §6.1</s><u></u><u></u></div>
+    <div class="tile"><s>WARRANTY · §2.4</s><u></u><u></u></div>
+  </div>
+  <div class="layer step step2"><span><b>04</b> augment · <b>05</b> generate from evidence only</span></div>
+  <div class="layer answer">
+    <span class="status">ANSWERED</span>
+    <p>Tighten to 60 N·m in a star pattern, in two passes.<span class="cite">1</span> Re‑torque after the first heat cycle.<span class="cite">2</span></p>
+    <div class="srcs"><span><b>[1]</b> Pump Manual rev.4 · §7.2</span><span><b>[2]</b> Pump Manual rev.4 · §7.4</span></div>
+  </div>
+  <div class="layer bottom"><span><i class="dot"></i>pipeline: grounded</span><span class="go">swipe →</span></div>
+</section>
+
+<!-- 04 · perimeter -->
+<section class="slide" id="s4">
+  <div class="frame"></div>
+  <div class="layer top"><div class="brand"><span class="mark"><svg viewBox="0 0 64 64"><use href="#logo"/></svg></span><span class="word"><b>SOSHYANT</b><small>expert // rag engine</small></span></div><span class="count"><i>04</i> / 05</span></div>
+  <p class="layer kicker s4k">perimeter</p>
+  <h2 class="layer h s4h">Nothing leaves<br><span class="neon">the building.</span></h2>
+  <div class="layer perim">
+    <svg viewBox="0 0 640 330" xmlns="http://www.w3.org/2000/svg">
+      <rect class="wall" x="6" y="14" width="448" height="302"/>
+      <text class="plbl" x="24" y="40">YOUR NETWORK</text>
+      <path class="link" d="M96 165 L226 82 L356 165 L226 248 Z"/>
+      <path class="link" d="M96 165 L356 165" stroke-dasharray="2 6"/>
+      <path class="out" d="M398 165 L566 165"/>
+      <g class="node" transform="translate(96 165)"><rect x="-48" y="-21" width="96" height="42"/><text y="5">DOCS</text></g>
+      <g class="node" transform="translate(226 82)"><rect x="-48" y="-21" width="96" height="42"/><text y="5">INDEX</text></g>
+      <g class="node" transform="translate(356 165)"><rect x="-48" y="-21" width="96" height="42"/><text y="5">LLM</text></g>
+      <g class="node" transform="translate(226 248)"><rect x="-48" y="-21" width="96" height="42"/><text y="5">USERS</text></g>
+      <circle class="pk" cx="161" cy="123.5" r="4.5"/>
+      <circle class="pk" cx="291" cy="123.5" r="4.5"/>
+      <circle class="pk" cx="291" cy="206.5" r="4.5"/>
+      <circle class="pk" cx="161" cy="206.5" r="4.5"/>
+      <g class="seal" transform="translate(454 165)"><rect class="mask" x="-34" y="-40" width="68" height="20"/><rect x="-12" y="-12" width="24" height="24"/><path d="M-5 0 L-1 4 L6 -5"/><text y="-25">SEALED</text></g>
+      <g class="x" transform="translate(510 165)"><path d="M-7 -7 L7 7 M7 -7 L-7 7"/></g>
+      <g class="cloud" transform="translate(578 165)"><rect x="-52" y="-30" width="104" height="60"/><text y="-4">3RD-PARTY</text><text y="14">CLOUD AI</text></g>
+    </svg>
+  </div>
+  <ul class="layer audit">
+    <li><b>[ OK ]</b><span>Model, index and documents stay on your server</span></li>
+    <li><b>[ OK ]</b><span>Every answer cites document, section, version</span></li>
+    <li><b>[ OK ]</b><span>Access groups enforced before retrieval</span></li>
+    <li><b>[ OK ]</b><span>Reads scanned English pages · EN / <span class="fa">فارسی</span></span></li>
+  </ul>
+  <div class="layer bottom"><span><i class="dot"></i>uplink: none · perimeter sealed</span><span class="go">swipe →</span></div>
+</section>
+
+<!-- 05 · call to action -->
+<section class="slide" id="s5">
+  <div class="frame"></div>
+  <div class="layer top"><div class="brand"><span class="mark"><svg viewBox="0 0 64 64"><use href="#logo"/></svg></span><span class="word"><b>SOSHYANT</b><small>expert // rag engine</small></span></div><span class="count"><i>05</i> / 05</span></div>
+  <p class="layer kicker s5k">establish uplink</p>
+  <h2 class="layer h cta-h"><span>Book a</span><span class="neon">live demo.</span></h2>
+  <div class="layer agenda">
+    <div class="t">soshyant --demo</div>
+    <div><b>[ OK ]</b>run the pipeline live on real questions</div>
+    <div><b>[ OK ]</b>tour the admin console and access groups</div>
+    <div><b>[ OK ]</b>size the hardware and plan your pilot</div>
+    <div class="ready">› channel open<i class="caret"></i></div>
+  </div>
+  <div class="layer card">
+    <div class="lbl">operator id // soshyant expert</div>
+    <div class="url">soshyantexpert<span>.site</span></div>
+    <div class="rows">
+      <div><small>email</small><b>Saeed@ahouda.com</b></div>
+      <div><small>phone</small><b>+98 999 993 4659</b></div>
+    </div>
+  </div>
+  <div class="layer bottom"><span><i class="dot"></i>on-premise rag engine</span><span class="go">link in bio ↗</span></div>
+</section>
+
+<script>
+  const n = Number((location.hash || '#1').slice(1)) || 1;
+  document.getElementById('s' + n).classList.add('on');
+
+  // 01 · a vector space of passages; the query (amber) finds its five nearest neighbours.
+  (function field() {
+    const c = document.getElementById('field');
+    if (!c || n !== 1) return;
+    const x = c.getContext('2d'), S = 2, W = 1080, H = 640;
+    x.scale(S, S);
+    let seed = 20261018;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const gauss = () => { let u = 0, v = 0; while (!u) u = rnd(); while (!v) v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+    const COLORS = [[25, 255, 176], [110, 246, 255], [255, 181, 71], [255, 61, 129], [25, 255, 176], [110, 246, 255], [255, 181, 71]];
+    const cx = 400, cy = 330, pts = [];
+    COLORS.forEach((col, k) => {
+      const a = (k / COLORS.length) * Math.PI * 2 + .35;
+      const ox = cx + Math.cos(a) * 270, oy = cy + Math.sin(a) * 175;
+      for (let i = 0; i < 66; i++) {
+        const z = rnd();
+        pts.push({ x: ox + gauss() * 46, y: oy + gauss() * 30, z, col, k });
+      }
+    });
+    // faint links inside each cluster
+    x.lineWidth = .7; x.strokeStyle = 'rgba(25,255,176,0.07)'; x.beginPath();
+    pts.forEach((p, i) => { let m = 0; for (let j = i + 1; j < pts.length && m < 2; j++) { const q = pts[j]; if (q.k !== p.k) continue; if ((p.x - q.x) ** 2 + (p.y - q.y) ** 2 < 900) { x.moveTo(p.x, p.y); x.lineTo(q.x, q.y); m++; } } });
+    x.stroke();
+    // crosshair through the query
+    const q = { x: 334, y: 304 };
+    x.strokeStyle = 'rgba(25,255,176,0.09)'; x.lineWidth = 1; x.beginPath();
+    x.moveTo(40, q.y); x.lineTo(W - 40, q.y); x.moveTo(q.x, 10); x.lineTo(q.x, H - 10); x.stroke();
+    // points
+    pts.forEach((p) => {
+      const a = .16 + p.z * .62, s = 1.6 + p.z * 2.6;
+      x.fillStyle = `rgba(${p.col[0]},${p.col[1]},${p.col[2]},${a.toFixed(2)})`;
+      x.fillRect(p.x - s / 2, p.y - s / 2, s, s);
+    });
+    // nearest five
+    const near = pts.map((p) => ({ p, d: (p.x - q.x) ** 2 + (p.y - q.y) ** 2 })).sort((a, b) => a.d - b.d).slice(0, 5);
+    near.forEach(({ p }, i) => {
+      const g = x.createLinearGradient(q.x, q.y, p.x, p.y);
+      g.addColorStop(0, 'rgba(255,181,71,0.95)'); g.addColorStop(1, 'rgba(25,255,176,0.8)');
+      x.strokeStyle = g; x.lineWidth = i === 0 ? 1.8 : 1.1;
+      x.beginPath(); x.moveTo(q.x, q.y); x.lineTo(p.x, p.y); x.stroke();
+      x.strokeStyle = i === 0 ? '#ffb547' : '#19ffb0'; x.lineWidth = 1.4;
+      x.strokeRect(p.x - 6, p.y - 6, 12, 12);
+    });
+    // the query
+    x.shadowColor = 'rgba(255,181,71,0.8)'; x.shadowBlur = 14;
+    x.strokeStyle = '#ffb547'; x.lineWidth = 1.6;
+    x.beginPath(); x.arc(q.x, q.y, 18, 0, Math.PI * 2); x.stroke();
+    x.beginPath(); x.arc(q.x, q.y, 30, 0, Math.PI * 2); x.globalAlpha = .35; x.stroke(); x.globalAlpha = 1;
+    x.fillStyle = '#ffb547'; x.beginPath(); x.arc(q.x, q.y, 4, 0, Math.PI * 2); x.fill();
+    x.shadowBlur = 0;
+  })();
+</script>
+</body>
+</html>

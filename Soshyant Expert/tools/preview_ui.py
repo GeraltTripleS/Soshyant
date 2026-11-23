@@ -4,6 +4,7 @@ from pathlib import Path
 import shutil
 import sys
 import tempfile
+import argparse
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -28,6 +29,9 @@ class PreviewModel:
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--speech', action='store_true', help='Use installed local speech assets with disposable data/settings')
+    args = parser.parse_args()
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)
         (root / "config").mkdir()
@@ -44,6 +48,9 @@ def main():
         store = Store(config.data)
         owner = store.create_user("preview-admin", "preview-only-password", "admin")
         app = Application(config, store, PreviewModel())
+        if args.speech:
+            app.speech.runtime_root = ROOT
+            config.settings['speech_enabled'] = True
         chat = store.new_conversation(owner)
         app.engine.answer(owner, chat, 'What information is missing from the current knowledge?')
         incoming = root / 'incoming'

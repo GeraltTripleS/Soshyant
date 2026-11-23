@@ -1,0 +1,18 @@
+{
+  "name": "soshyant-landing-host",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "bun install",
+    "build": "bun build src/server.ts --target=bun --outfile dist/server.mjs",
+    "local": "bun run src/local.ts",
+    "deploy": "bun run build && bun --bun x prisma deploy module.ts"
+  },
+  "dependencies": {
+    "@prisma/composer": "^0.30.0",
+    "@prisma/composer-prisma-cloud": "^0.30.0"
+  },
+  "devDependencies": {
+    "prisma": "^8.0.0-rc.23"
+  }
+}

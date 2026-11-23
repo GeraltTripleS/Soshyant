@@ -1,0 +1,43 @@
+{
+  "scope": "Six synthetic document/query pairs, real local embedding model, no generated answers or customer data",
+  "top_1": 6,
+  "top_5": 6,
+  "cases": [
+    {
+      "query": "Aurora X200 warranty duration",
+      "expected": "warranty.txt",
+      "rank": 1,
+      "elapsed_ms": 8.38
+    },
+    {
+      "query": "What paperwork do I need to claim the pump guarantee?",
+      "expected": "warranty.txt",
+      "rank": 1,
+      "elapsed_ms": 8.3
+    },
+    {
+      "query": "How do I clear error E-04?",
+      "expected": "reset.txt",
+      "rank": 1,
+      "elapsed_ms": 7.1
+    },
+    {
+      "query": "Who handles an unresolved pump issue after two visits?",
+      "expected": "escalation.txt",
+      "rank": 1,
+      "elapsed_ms": 8.21
+    },
+    {
+      "query": "When should I water tomato seedlings?",
+      "expected": "gardening.txt",
+      "rank": 1,
+      "elapsed_ms": 7.14
+    },
+    {
+      "query": "What day do orders ship from the warehouse?",
+      "expected": "shipping.txt",
+      "rank": 1,
+      "elapsed_ms": 8.99
+    }
+  ]
+}

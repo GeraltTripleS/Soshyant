@@ -276,7 +276,7 @@ class HTTPTests(Fixture):
     def setUp(self):
         super().setUp()
         (self.root / "web").mkdir()
-        for name in ("index.html", "app.js", "style.css", "i18n.js", "capacity.js", "library.js"):
+        for name in ("index.html", "app.js", "style.css", "i18n.js", "capacity.js", "library.js", "speech.js"):
             shutil.copy2(ROOT / "web" / name, self.root / "web" / name)
         self.application = Application(self.config, self.store, self.model)
         self.addCleanup(self.application.close)

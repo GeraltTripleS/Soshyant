@@ -66,4 +66,6 @@ Authenticated users see shared documents and restricted documents granted to the
 
 ## Android Wi-Fi gateway
 
+Web-only local speech endpoints are documented in [SPEECH.md](SPEECH.md): authenticated status and short WAV transcription jobs, owner-scoped result/cancel/consume, and administrator-only settings. They are deliberately absent from the Android gateway allowlist. Voice transcripts do not automatically create chat messages.
+
 The native Android project is in `../Soshyant Android`. Its optional TLS-only gateway normally runs on the selected Wi-Fi IPv4 address at port 8096 and forwards chat/login/history/status calls to the existing loopback server. Run `expert.mobile_gateway` with an explicit bind address, certificate, key and loopback backend, or use the Android project's START-WIFI.bat launcher. Administrative APIs are not exposed by the gateway. The same user sessions, conversation ownership and CSRF tokens apply; returned session cookies are marked Secure. Original phone Host/Origin are checked at the gateway; the trusted loopback hop uses the backend origin. The phone never needs a language-model provider key.
